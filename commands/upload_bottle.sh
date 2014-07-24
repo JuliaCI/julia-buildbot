@@ -38,7 +38,7 @@ done
 basename=$(echo $PREFIX*.tar.gz | tr ' ' '\n' | head -1 | xargs basename)
 revision=$(echo $basename | awk -F. 'function isnum(x){return(x==x+0)} { print isnum($((NF-2))) }')
 if [[ "$revision" != "0" ]]; then
-	revision=$(echo $basename | awk -F. '{print length($((NF-2)))}')
+	revision=$(echo $basename | awk -F. '{print $((NF-2))}')
 else
 	revision=""
 fi
