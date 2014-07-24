@@ -7,15 +7,16 @@ if [[ "$#" != 1 ]]; then
 	exit 1
 fi
 
-if [[ -z $(ls /tmp/bottle_cache/$1*.tar.gz) ]]; then
-	echo "ERROR: Cannot find any bottles for $1"
+PREFIX=$(basename $1)
+if [[ -z $(ls /tmp/bottle_cache/$PREFIX*.tar.gz) ]]; then
+	echo "ERROR: Cannot find any bottles for $PREFIX"
 	exit 1;
 fi
 
 # Crappy check because we don't have a solution for Triggering/Dependent stuffage
-if [ $(ls /tmp/bottle_cache/$1*.tar.gz | wc -l) -lt 3 ]; then
+if [ $(ls /tmp/bottle_cache/$PREFIX*.tar.gz | wc -l) -lt 3 ]; then
 	echo "ERROR: Insufficient number of bottles, passing out" >&2
-	echo $(ls /tmp/bottle_cache/$1*.tar.gz | wc -l) >&2
+	echo $(ls /tmp/bottle_cache/$PREFIX*.tar.gz | wc -l) >&2
 	exit 0;
 fi
 
@@ -28,13 +29,13 @@ function upload()
 cd /tmp/bottle_cache
 
 # First things first, upload everything!
-for f in $1*.tar.gz; do
+for f in $PREFIX*.tar.gz; do
 	echo "Uploading $f"
 	upload "$f"
 done
 
 # Figure out if there's a revision included (only do this once, as all bottles must be the same)
-basename=$(echo $1*.tar.gz | tr ' ' '\n' | head -1 | xargs basename)
+basename=$(echo $PREFIX*.tar.gz | tr ' ' '\n' | head -1 | xargs basename)
 revision=$(echo $basename | awk -F. 'function isnum(x){return(x==x+0)} { print isnum($((NF-2))) }')
 if [[ "$revision" != "0" ]]; then
 	revision=$(echo $basename | awk -F. '{print length($((NF-2)))}')
@@ -53,7 +54,7 @@ if [[ ! -z "$revision" ]]; then
 fi
 
 # Now, emit each hash
-for f in $1*.tar.gz; do
+for f in $PREFIX*.tar.gz; do
 	REGEX='^(.*)-([0-9.]+)\.([^\.]+).bottle.(([0-9]+)\.)?tar.gz'
 	platform=$(echo $f | sed -E "s/$REGEX/\3/")
 
@@ -63,6 +64,6 @@ done
 echo "  end"
 
 # If we've gotten this far, let's go ahead and clean up after ourselves
-for f in $1*.tar.gz; do
+for f in $PREFIX*.tar.gz; do
 	rm -f "$f"
 done
