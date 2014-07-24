@@ -6,29 +6,34 @@ if [[ -z "$FORMULA" ]]; then
     exit -1
 fi
 
+brew=bin/brew
+if [[ ! -f $brew ]]; then
+	git clone https://github.com/Homebrew/homebrew.git .
+fi
+
 echo "Building $FORMULA at" $(date)
 # Remove the formula if it exists
-brew rm $FORMULA 2>/dev/null
+$brew rm $FORMULA 2>/dev/null
 
 # Update our caches!
-brew update
+$brew update
 
 # Install dependencies first as bottles when possible
-deps=$(brew deps -n $1)
+deps=$($brew deps -n $1)
 for dep in $deps; do
 	base=$(basename $dep)
 	# Check to see if this depdency can be installed via bottle
-	if [[ ! -z $(brew info $dep | grep bottled) ]]; then
+	if [[ ! -z $($brew info $dep | grep bottled) ]]; then
 		# If so, install it!
-		brew install -v $dep
+		$brew install -v $dep
 	else
 		# Otherwise, build it with --build-bottle
-		brew install -v --build-bottle $dep
+		$brew install -v --build-bottle $dep
 	fi
 done
 
 # Then, finally, build the bottle!
-brew install -v --build-bottle $FORMULA
+$brew install -v --build-bottle $FORMULA
 
 # Bottle it!
-brew bottle -vd $FORMULA
+$brew bottle -vd $FORMULA
