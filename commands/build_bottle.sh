@@ -6,17 +6,21 @@ if [[ -z "$FORMULA" ]]; then
     exit -1
 fi
 
-brew=bin/brew
-if [[ ! -f $brew ]]; then
-	git clone https://github.com/Homebrew/homebrew.git .
-fi
-
 echo "Building $FORMULA at" $(date)
-# Remove the formula if it exists
-$brew rm $FORMULA 2>/dev/null
+
+brew=homebrew/bin/brew
+if [[ ! -f $brew ]]; then
+	git clone https://github.com/Homebrew/homebrew.git homebrew
+	$brew tap staticfloat/julia
+	$brew tap staticfloat/juliadeps
+fi
 
 # Update our caches!
 $brew update
+
+# Remove the formula if it exists
+$brew rm $FORMULA 2>/dev/null
+
 
 # Install dependencies first as bottles when possible
 deps=$($brew deps -n $1)
