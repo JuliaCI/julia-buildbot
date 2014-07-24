@@ -39,4 +39,4 @@ done
 $brew install -v --build-bottle $FORMULA
 
 # Bottle it!
-$brew bottle -vd $FORMULA
+$brew bottle -v $FORMULA
