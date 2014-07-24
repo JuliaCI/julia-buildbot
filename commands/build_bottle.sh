@@ -18,9 +18,8 @@ fi
 # Update our caches!
 $brew update
 
-# Remove the formula if it exists
-$brew rm $FORMULA 2>/dev/null
-
+# Remove everything first, so we always start clean
+$brew rm $($brew list) 2>/dev/null
 
 # Install dependencies first as bottles when possible
 deps=$($brew deps -n $1)
