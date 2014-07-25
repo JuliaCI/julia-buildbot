@@ -55,7 +55,7 @@ fi
 
 # Now, emit each hash
 for f in $PREFIX*.tar.gz; do
-	REGEX='^(.*)-([0-9.]+)\.([^\.]+).bottle.(([0-9]+)\.)?tar.gz'
+	REGEX='^(.*)-([0-9._]+)\.([^\.]+).bottle.(([0-9]+)\.)?tar.gz'
 	platform=$(echo $f | sed -E "s/$REGEX/\3/")
 
 	sha=$(shasum $f | cut -d" " -f1)
