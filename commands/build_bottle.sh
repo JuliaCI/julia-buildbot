@@ -20,8 +20,8 @@ fi
 $brew update
 
 # Remove everything first, so we always start clean
-$brew rm $($brew deps $FORMULA) 2>/dev/null
-$brew rm $FORMULA 2>/dev/null
+$brew rm --force $($brew deps $FORMULA) 2>/dev/null
+$brew rm --force $FORMULA 2>/dev/null
 
 # Install dependencies first as bottles when possible
 deps=$($brew deps -n $1)
