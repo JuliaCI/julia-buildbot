@@ -8,7 +8,8 @@ fi
 
 echo "Building $FORMULA at" $(date)
 
-brew=homebrew/bin/brew
+# I guess we'll keep doing things in /usr/local for now
+brew=$(which brew)
 if [[ ! -f $brew ]]; then
 	git clone https://github.com/Homebrew/homebrew.git homebrew
 	$brew tap staticfloat/julia
