@@ -15,8 +15,7 @@ fi
 
 # Crappy check because we don't have a solution for Triggering/Dependent stuffage
 if [ $(ls /tmp/bottle_cache/$PREFIX*.tar.gz | wc -l) -lt 3 ]; then
-	echo "ERROR: Insufficient number of bottles, passing out" >&2
-	echo $(ls /tmp/bottle_cache/$PREFIX*.tar.gz | wc -l) >&2
+	echo "ERROR: Insufficient number (" $(ls /tmp/bottle_cache/$PREFIX*.tar.gz | wc -l) ") of bottles, passing out" >&2
 	exit 0;
 fi
 

@@ -26,7 +26,6 @@ $brew rm --force $FORMULA 2>/dev/null
 # Install dependencies first as bottles when possible
 deps=$($brew deps -n $1)
 for dep in $deps; do
-	base=$(basename $dep)
 	# Check to see if this depdency can be installed via bottle
 	if [[ ! -z $($brew info $dep | grep bottled) ]]; then
 		# If so, install it!
