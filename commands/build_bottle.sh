@@ -10,6 +10,9 @@ echo "Building $FORMULA at" $(date)
 
 # I guess we'll keep doing things in /usr/local for now
 brew=$(which brew)
+# Do this explicitly to escape the virtualenv sandbox.  :/
+PATH=$(echo $PATH | tr ':' '\n' | grep -v sandbox | tr '\n' ':')
+
 if [[ ! -f $brew ]]; then
 	git clone https://github.com/Homebrew/homebrew.git homebrew
 	$brew tap staticfloat/julia
