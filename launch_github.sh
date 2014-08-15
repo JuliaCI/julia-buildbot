@@ -8,6 +8,5 @@ if [[ -z "$GITHUB_SECRET" ]]; then
 	exit 1
 fi
 
-# We don't worry about the buildbot secret, since ingress on port 9989 is disallowed
-echo ./github_buildbot.py -p 8000 --secret=$GITHUB_SECRET --auth=github:github.julialang42
+# We don't worry about the buildbot secret
 ./github_buildbot.py -p 8000 --secret=$GITHUB_SECRET --auth=github:github.julialang42
