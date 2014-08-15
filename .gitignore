@@ -2,3 +2,5 @@
 sandbox/
 master/
 !master/master.cfg
+GITHUB_SECRET.sh
+github_buildbot.log
