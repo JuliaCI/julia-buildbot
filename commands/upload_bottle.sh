@@ -21,7 +21,7 @@ fi
 
 function upload()
 {
-	aws put "x-amz-acl: public-read" juliabottles "$1"
+	~/bin/aws put "x-amz-acl: public-read" juliabottles "$1"
 }
 
 
