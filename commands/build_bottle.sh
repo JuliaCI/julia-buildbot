@@ -13,14 +13,8 @@ brew=$(which brew)
 # Do this explicitly to escape the virtualenv sandbox.  :/
 PATH=$(echo $PATH | tr ':' '\n' | grep -v sandbox | tr '\n' ':')
 
-if [[ ! -f $brew ]]; then
-	git clone https://github.com/Homebrew/homebrew.git homebrew
-	$brew tap staticfloat/julia
-	$brew tap staticfloat/juliadeps
-fi
-
 # Update our caches!
-$brew update
+#$brew update
 
 # Remove everything first, so we always start clean
 $brew rm --force $($brew deps $FORMULA) 2>/dev/null
