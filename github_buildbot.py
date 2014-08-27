@@ -134,7 +134,7 @@ class GitHubBuildBot(resource.Resource):
                 Hook.
         """
         changes = None
-        branch = payload['ref'].split('/')[-1]
+        branch = '/'.join(payload['ref'].split('/')[2:])
 
         if payload['deleted'] is True:
             logging.info("Branch %r deleted, ignoring", branch)
