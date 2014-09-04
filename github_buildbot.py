@@ -138,6 +138,8 @@ class GitHubBuildBot(resource.Resource):
 
         if payload['deleted'] is True:
             logging.info("Branch %r deleted, ignoring", branch)
+        elif branch != 'master':
+            logging.info("Branch %r not master, ignoring", branch)
         else:
             changes = []
 
