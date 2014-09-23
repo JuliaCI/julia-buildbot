@@ -121,7 +121,7 @@ Julia into external programs or debugging Julia itself.
 
 %prep
 %setup -qn %{name}
-%patch0 -p 1
+#%patch0 -p 1
 
 # .gitignore files make rpmlint complain
 find . -name ".git*" -exec rm {} \;
