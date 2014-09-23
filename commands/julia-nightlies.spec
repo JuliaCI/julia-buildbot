@@ -28,7 +28,7 @@ Source1:        https://github.com/JuliaLang/libuv/archive/%{uvcommit}/archive/l
 Source2:        https://github.com/JuliaLang/Rmath/archive/%{Rmathcommit}/archive/Rmath.tar.gz
 # Temporary until utf8proc RPM includes mojibake patches
 Source3:        https://github.com/JuliaLang/libmojibake/archive/%{mojibakecommit}/archive/libmojibake.tar.gz
-#Patch0:         %{name}_juliadoc.patch
+Patch0:         %{name}_juliadoc.patch
 Provides:       bundled(libuv) = %{uvversion}
 Provides:       bundled(Rmath) = %{Rmathversion}
 BuildRequires:  arpack-devel
@@ -121,7 +121,7 @@ Julia into external programs or debugging Julia itself.
 
 %prep
 %setup -qn %{name}
-#%patch0 -p 1
+%patch0 -p 1
 
 # .gitignore files make rpmlint complain
 find . -name ".git*" -exec rm {} \;
