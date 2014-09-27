@@ -265,6 +265,7 @@ desktop-file-validate %{buildroot}%{_datarootdir}/applications/%{name}.desktop
 %files doc
 %doc %{_docdir}/julia/examples/
 %doc %{_docdir}/julia/html/
+%doc %{_docdir}/julia/tabcomplete.jl
 
 %files devel
 %{_bindir}/julia-debug
