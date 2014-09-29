@@ -1,0 +1,3 @@
+CC=/opt/rh/devtoolset-2/root/usr/bin/gcc
+CXX=/opt/rh/devtoolset-2/root/usr/bin/g++
+FC=/opt/rh/devtoolset-2/root/usr/bin/gfortran
