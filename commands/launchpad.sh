@@ -67,6 +67,9 @@ git submodule update
 # Hack to get around our lack of packaging of dsfmt
 make -C deps get-dsfmt
 
+# We need virtualenv as well
+make -C deps get-virtualenv
+
 # We're going to compile LLVM on our own.  :(
 make -C deps get-llvm
 
