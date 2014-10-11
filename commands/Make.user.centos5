@@ -1,4 +1,5 @@
-CC=/opt/rh/devtoolset-2/root/usr/bin/gcc
-CXX=/opt/rh/devtoolset-2/root/usr/bin/g++
-FC=/opt/rh/devtoolset-2/root/usr/bin/gfortran
-TAGGED_RELEASE_BANNER="Official http://julialang.org/ release"
+override CC=/opt/rh/devtoolset-2/root/usr/bin/gcc
+override CXX=/opt/rh/devtoolset-2/root/usr/bin/g++
+override FC=/opt/rh/devtoolset-2/root/usr/bin/gfortran
+override TAGGED_RELEASE_BANNER="Official http://julialang.org/ release"
+override VERBOSE=1
