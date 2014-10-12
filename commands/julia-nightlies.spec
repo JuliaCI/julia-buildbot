@@ -301,6 +301,7 @@ desktop-file-validate %{buildroot}%{_datarootdir}/applications/%{name}.desktop
 %{_libdir}/julia/
 %exclude %{_libdir}/julia/libjulia-debug.so
 %{_mandir}/man1/julia.1*
+%{_datarootdir}/appdata/julia.appdata.xml
 %{_datarootdir}/applications/%{name}.desktop
 %{_datarootdir}/icons/hicolor/scalable/apps/%{name}.svg
 %{_datarootdir}/icons/hicolor/16x16/apps/%{name}.png
