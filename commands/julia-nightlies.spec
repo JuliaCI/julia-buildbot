@@ -28,28 +28,46 @@ Source1:        https://github.com/JuliaLang/libuv/archive/%{uvcommit}/archive/l
 Source2:        https://github.com/JuliaLang/Rmath/archive/%{Rmathcommit}/archive/Rmath.tar.gz
 # Temporary until utf8proc RPM includes mojibake patches
 Source3:        https://github.com/JuliaLang/libmojibake/archive/%{mojibakecommit}/archive/libmojibake.tar.gz
-Patch0:         julia_juliadoc.patch
+Patch0:         %{name}_juliadoc.patch
 Provides:       bundled(libuv) = %{uvversion}
 Provides:       bundled(Rmath) = %{Rmathversion}
 BuildRequires:  arpack-devel
 BuildRequires:  desktop-file-utils
+%if 0%{?rhel} && 0%{?rhel} <= 6
+BuildRequires:  devtoolset-2-binutils
+BuildRequires:  devtoolset-2-build
+BuildRequires:  devtoolset-2-gcc
+BuildRequires:  devtoolset-2-gcc-c++
+%endif
 BuildRequires:  double-conversion-devel >= 1.1.1
 BuildRequires:  dSFMT-devel
 BuildRequires:  fftw-devel >= 3.3.2
 BuildRequires:  gcc-gfortran
 # Needed to test package installation
 BuildRequires:  git
-BuildRequires:  gmp-devel
+%if 0%{?rhel} && 0%{?rhel} <= 6
+BuildRequires:  gmp5-devel >= 5.0
+%else
+BuildRequires:  gmp-devel >= 5.0
+%endif
 BuildRequires:  ImageMagick
 BuildRequires:  libunwind-devel
 BuildRequires:  llvm-devel
 BuildRequires:  llvm-static
-BuildRequires:  mpfr-devel
+%if 0%{?rhel} && 0%{?rhel} <= 6
+BuildRequires:  mpfr3-devel >= 3.0
+%else
+BuildRequires:  mpfr-devel >= 3.0
+%endif
 BuildRequires:  openblas-devel
 BuildRequires:  openlibm-devel >= 0.4
 BuildRequires:  openspecfun-devel >= 0.4
 BuildRequires:  patchelf
+%if 0%{?rhel} && 0%{?rhel} <= 6
+BuildRequires:  pcre1-devel >= 8.31
+%else
 BuildRequires:  pcre-devel >= 8.31
+%endif
 BuildRequires:  perl
 # To build HTML documentation
 BuildRequires:  python-pip
@@ -62,18 +80,37 @@ BuildRequires:  zlib-devel
 Requires:       arpack
 Requires:       dSFMT
 Requires:       fftw >= 3.3.2
-Requires:       gmp
+# Needed for package installation
+Requires:       git
+%if 0%{?rhel} && 0%{?rhel} <= 6
+Requires:       gmp5 >= 5.0
+%else
+Requires:       gmp >= 5.0
+%endif
 Requires:       julia-common = %{version}-%{release}
-Requires:       mpfr
+%if 0%{?rhel} && 0%{?rhel} <= 6
+Requires:       mpfr3 >= 3.0
+%else
+Requires:       mpfr >= 3.0
+%endif
 Requires:       openblas-threads
 Requires:       openlibm >= 0.4
 Requires:       openspecfun >= 0.4
+%if 0%{?rhel} && 0%{?rhel} <= 6
+Requires:       pcre1 >= 8.31
+%else
 Requires:       pcre >= 8.31
+%endif
 # Currently, Julia, openlibm and openblas do not build on non-x86 architectures
 # https://github.com/JuliaLang/julia/issues/3134
 # https://github.com/JuliaLang/openlibm/issues/18
 # https://github.com/xianyi/OpenBLAS/issues/17
 ExclusiveArch:  %{ix86} x86_64
+%if 0%{?rhel} && 0%{?rhel} <= 5
+%global buildroot %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
+%global _datarootdir %{_datadir}
+BuildRoot:      %{buildroot}
+%endif
 
 %description
 Julia is a high-level, high-performance dynamic programming language
@@ -91,7 +128,9 @@ the julia executable and the standard library.
 %package common
 Summary:        Julia architecture-independent files
 Group:          Development/Languages
+%if !(0%{?rhel} && 0%{?rhel} <= 5)
 BuildArch:      noarch
+%endif
 Requires:       julia = %{version}-%{release}
 
 %description common
@@ -100,7 +139,9 @@ Contains architecture-independent files required to run Julia.
 %package doc
 Summary:        Julia documentation and code examples
 Group:          Documentation
+%if !(0%{?rhel} && 0%{?rhel} <= 5)
 BuildArch:      noarch
+%endif
 Requires:       julia = %{version}-%{release}
 
 %description doc
@@ -151,9 +192,15 @@ popd
 %global commonopts USE_SYSTEM_LLVM=1 USE_SYSTEM_LIBUNWIND=1 USE_SYSTEM_READLINE=1 USE_SYSTEM_PCRE=1 USE_SYSTEM_OPENSPECFUN=1 USE_SYSTEM_LIBM=0 USE_SYSTEM_OPENLIBM=1 USE_SYSTEM_BLAS=1 USE_SYSTEM_LAPACK=1 USE_SYSTEM_FFTW=1 USE_SYSTEM_GMP=1 USE_SYSTEM_MPFR=1 USE_SYSTEM_ARPACK=1 USE_SYSTEM_SUITESPARSE=1 USE_SYSTEM_ZLIB=1 USE_SYSTEM_GRISU=1 USE_SYSTEM_DSFMT=1 USE_SYSTEM_LIBUV=0 USE_SYSTEM_RMATH=0 USE_LLVM_SHLIB=1 USE_SYSTEM_UTF8PROC=0 LIBBLAS=-lopenblasp LIBBLASNAME=libopenblasp.so.0 LIBLAPACK=-lopenblasp LIBLAPACKNAME=libopenblasp.so.0 VERBOSE=1 USE_BLAS64=0 MARCH=%{march} prefix=%{_prefix} bindir=%{_bindir} libdir=%{_libdir} libexecdir=%{_libexecdir} datarootdir=%{_datarootdir} includedir=%{_includedir} sysconfdir=%{_sysconfdir} build_prefix=%{julia_builddir} build_bindir=%{julia_builddir}%{_bindir} build_libdir=%{julia_builddir}%{_libdir} build_private_libdir=%{julia_builddir}%{_libdir}/julia build_libexecdir=%{julia_builddir}%{_libexecdir} build_datarootdir=%{julia_builddir}%{_datarootdir} build_includedir=%{julia_builddir}%{_includedir} build_sysconfdir=%{julia_builddir}%{_sysconfdir}
 
 %build
+%if 0%{?rhel} && 0%{?rhel} <= 6
+. /opt/rh/devtoolset-2/enable
+%endif
+
 make %{?_smp_mflags} CFLAGS="%{optflags}" CXXFLAGS="%{optflags}" FFLAGS="%{optflags}" %commonopts
 
+%if !(0%{?rhel} && 0%{?rhel} <= 6)
 make -C doc html
+%endif
 
 %check
 pushd test
@@ -185,17 +232,24 @@ mv %{buildroot}%{_datarootdir}/julia/examples %{buildroot}%{_docdir}/julia/
 
 cp -p CONTRIBUTING.md LICENSE.md NEWS.md README.md %{buildroot}%{_docdir}/julia/
 
+%if !(0%{?rhel} && 0%{?rhel} <= 6)
 # Install HTML manual and remove unwanted files
 # https://github.com/JuliaLang/julia/issues/8378
 pushd %{buildroot}%{_docdir}/julia/
     mv %{_builddir}/%{name}/doc/_build/html/ html/
     rm html/.buildinfo html/objects.inv
 popd
+%endif
 
 pushd %{buildroot}%{_docdir}/julia
-    rm -R devdocs/ images/ juliadoc/ man/ manual/ stdlib/ _build/
+    rm -R devdocs/ images/ juliadoc/ man/ manual/ stdlib/
+
+%if !(0%{?rhel} && 0%{?rhel} <= 6)
+    rm -R _build/
+%endif
+
     # helpdb.jl is duplicated at %{_datarootdir}/julia/helpdb.jl
-    rm conf.py DocCheck.jl helpdb.jl index.rst latex.rst NEWS-update.jl requirements.txt
+    rm conf.py DocCheck.jl helpdb.jl index.rst latex.rst NEWS-update.jl requirements.txt tabcomplete.jl
 popd
 
 pushd %{buildroot}%{_prefix}/share/man/man1/
@@ -231,6 +285,9 @@ Icon=%{name}
 Terminal=true
 Type=Application
 Categories=Science;Math;
+%if 0%{?rhel} && 0%{?rhel} <= 5
+Encoding=UTF-8
+%endif
 EOF
 desktop-file-validate %{buildroot}%{_datarootdir}/applications/%{name}.desktop
 
@@ -264,8 +321,9 @@ desktop-file-validate %{buildroot}%{_datarootdir}/applications/%{name}.desktop
 
 %files doc
 %doc %{_docdir}/julia/examples/
+%if !(0%{?rhel} && 0%{?rhel} <= 6)
 %doc %{_docdir}/julia/html/
-%doc %{_docdir}/julia/tabcomplete.jl
+%endif
 
 %files devel
 %{_bindir}/julia-debug
@@ -278,18 +336,26 @@ desktop-file-validate %{buildroot}%{_datarootdir}/applications/%{name}.desktop
 /sbin/ldconfig
 # Julia currently needs the unversioned .so files:
 # https://github.com/JuliaLang/julia/issues/6742
-ln -sf /usr/lib64/libdSFMT.so.2 %{_libdir}/julia/libdSFMT.so
-ln -sf /usr/lib64/libopenlibm.so.1 %{_libdir}/julia/libopenlibm.so
-ln -sf /usr/lib64/libopenspecfun.so.1 %{_libdir}/julia/libopenspecfun.so
+ln -sf %{_libdir}/libarpack.so.2 %{_libdir}/julia/libarpack.so
+ln -sf %{_libdir}/libdSFMT.so.2 %{_libdir}/julia/libdSFMT.so
+ln -sf %{_libdir}/libgmp.so.10 %{_libdir}/julia/libgmp.so
+ln -sf %{_libdir}/libmpfr.so.4 %{_libdir}/julia/libmpfr.so
+ln -sf %{_libdir}/libopenlibm.so.1 %{_libdir}/julia/libopenlibm.so
+ln -sf %{_libdir}/libopenspecfun.so.1 %{_libdir}/julia/libopenspecfun.so
+ln -sf %{_libdir}/libpcre.so.1 %{_libdir}/julia/libpcre.so
 /bin/touch --no-create %{_datarootdir}/icons/hicolor &>/dev/null || :
 exit 0
 
 %postun
 /sbin/ldconfig
 if [ $1 -eq 0 ] ; then
+    rm -f %{_libdir}/julia/libarpack.so
     rm -f %{_libdir}/julia/libdSFMT.so
+    rm -f %{_libdir}/julia/libgmp.so
+    rm -f %{_libdir}/julia/libmpfr.so
     rm -f %{_libdir}/julia/libopenlibm.so
     rm -f %{_libdir}/julia/libopenspecfun.so
+    rm -f %{_libdir}/julia/libpcre.so
     /bin/touch --no-create %{_datarootdir}/icons/hicolor &>/dev/null
     /usr/bin/gtk-update-icon-cache %{_datarootdir}/icons/hicolor &>/dev/null || :
 fi
@@ -299,6 +365,17 @@ exit 0
 /usr/bin/gtk-update-icon-cache %{_datarootdir}/icons/hicolor &>/dev/null || :
 
 %changelog
+* Sun Oct 12 2014 Milan Bouchet-Valat <nalimilan@club.fr> - 0.3.1-3+copr
+- Add support for EPEL5 and 6.
+
+* Sun Oct 12 2014 Milan Bouchet-Valat <nalimilan@club.fr> - 0.3.1-3
+- Fix missing symlinks to libarpack, libpcre, libgmp and libmpfr, which could
+  prevent Julia from working correcly if the -devel packages were missing.
+- Fix invalid hard-coded reference to /usr/lib64.
+
+* Fri Sep 26 2014 Milan Bouchet-Valat <nalimilan@club.fr> - 0.3.1-2
+- Add git to dependencies, as it is needed to install packages.
+
 * Mon Sep 22 2014 Milan Bouchet-Valat <nalimilan@club.fr> - 0.3.1-1
 - New upstream version.
 - Depend on openblas-threads instead of openblas.
