@@ -75,7 +75,7 @@ make -C doc helpdb.jl
 # We're going to compile LLVM on our own.  :(
 make -C deps get-llvm
 
-# Work around our lack of git on buildd servers
+# Work around our lack of git on build servers
 make -C base version_git.jl.phony
 
 # Make it blaringly obvious to everyone that this is a git build when they start up Julia-
