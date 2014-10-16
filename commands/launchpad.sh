@@ -68,8 +68,8 @@ git submodule update
 make -C deps get-dsfmt
 
 # Let's build the documentation, so that we don't have to do so on the debian servers
-make -C doc html SPHINXOPTS="-W -n"
-make -C doc latex SPHINXOPTS="-W -n"
+make -C doc html
+make -C doc latex
 make -C doc helpdb.jl
 
 # We're going to compile LLVM on our own.  :(
