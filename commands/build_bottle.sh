@@ -38,3 +38,7 @@ $brew install -v --build-bottle $FORMULA
 
 # Bottle it!
 $brew bottle -v $FORMULA
+
+# Clean up after ourselves
+$brew rm --force $($brew deps $FORMULA) 2>/dev/null
+$brew rm --force $FORMULA 2>/dev/null
