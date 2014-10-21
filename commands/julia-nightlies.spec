@@ -220,12 +220,6 @@ popd
 %install
 make %commonopts DESTDIR=%{buildroot} install
 
-# Move documentation to docdir
-# https://github.com/JuliaLang/julia/issues/8367
-mkdir -p %{buildroot}%{_docdir}
-mv %{buildroot}%{_datarootdir}/julia/doc %{buildroot}%{_docdir}/julia/
-mv %{buildroot}%{_datarootdir}/julia/examples %{buildroot}%{_docdir}/julia/
-
 cp -p CONTRIBUTING.md LICENSE.md NEWS.md README.md %{buildroot}%{_docdir}/julia/
 
 %if !(0%{?rhel} && 0%{?rhel} <= 6)
