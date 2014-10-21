@@ -220,10 +220,6 @@ popd
 %install
 make %commonopts DESTDIR=%{buildroot} install
 
-# Not useful and not functional out of the Julia source tree
-find %{buildroot}%{_datarootdir}/julia -name "Makefile" -exec rm {} \;
-rm %{buildroot}%{_datarootdir}/julia/base/version_git.sh
-
 # Move documentation to docdir
 # https://github.com/JuliaLang/julia/issues/8367
 mkdir -p %{buildroot}%{_docdir}
@@ -247,9 +243,6 @@ pushd %{buildroot}%{_docdir}/julia
 %if !(0%{?rhel} && 0%{?rhel} <= 6)
     rm -R _build/
 %endif
-
-    # helpdb.jl is duplicated at %{_datarootdir}/julia/helpdb.jl
-    rm conf.py DocCheck.jl helpdb.jl index.rst latex.rst NEWS-update.jl requirements.txt tabcomplete.jl
 popd
 
 pushd %{buildroot}%{_prefix}/share/man/man1/
