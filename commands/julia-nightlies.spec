@@ -232,11 +232,7 @@ popd
 %endif
 
 pushd %{buildroot}%{_docdir}/julia
-    rm -R devdocs/ images/ juliadoc/ man/ manual/ stdlib/
-
-%if !(0%{?rhel} && 0%{?rhel} <= 6)
-    rm -R _build/
-%endif
+    rm -R devdocs/ manual/ stdlib/
 popd
 
 pushd %{buildroot}%{_prefix}/share/man/man1/
