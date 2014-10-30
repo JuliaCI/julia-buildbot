@@ -101,10 +101,10 @@ Requires:       pcre1 >= 8.31
 %else
 Requires:       pcre >= 8.31
 %endif
-# Currently, Julia, openlibm and openblas do not build on non-x86 architectures
-# https://github.com/JuliaLang/julia/issues/3134
-# https://github.com/JuliaLang/openlibm/issues/18
-# https://github.com/xianyi/OpenBLAS/issues/17
+# Currently, Julia does not work properly on non-x86 architectures
+# https://bugzilla.redhat.com/show_bug.cgi?id=1158024
+# https://bugzilla.redhat.com/show_bug.cgi?id=1158026
+# https://bugzilla.redhat.com/show_bug.cgi?id=1158025
 ExclusiveArch:  %{ix86} x86_64
 %if 0%{?rhel} && 0%{?rhel} <= 5
 %global buildroot %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
