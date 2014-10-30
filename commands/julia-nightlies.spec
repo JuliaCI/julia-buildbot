@@ -298,7 +298,7 @@ desktop-file-validate %{buildroot}%{_datarootdir}/applications/%{name}.desktop
 %{_datarootdir}/julia/base/
 %exclude %{_datarootdir}/julia/base/build.h
 
-%{_datarootdir}/julia/helpdb.jl
+%{_docdir}/julia/helpdb.jl
 
 %dir %{_sysconfdir}/julia/
 %config(noreplace) %{_sysconfdir}/julia/juliarc.jl
