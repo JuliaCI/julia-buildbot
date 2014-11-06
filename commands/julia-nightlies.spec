@@ -69,6 +69,7 @@ BuildRequires:  pcre1-devel >= 8.31
 BuildRequires:  pcre-devel >= 8.31
 %endif
 BuildRequires:  perl
+BuildRequires:  cmake
 # To build HTML documentation
 BuildRequires:  python-pip
 BuildRequires:  python-sphinx
@@ -349,6 +350,9 @@ exit 0
 /usr/bin/gtk-update-icon-cache %{_datarootdir}/icons/hicolor &>/dev/null || :
 
 %changelog
+* Wed Nov 5 2014 Tony Kelman <tony@kelman.net> - 0.3.1-4+copr
+- Add cmake to BuildRequires.
+
 * Sun Oct 12 2014 Milan Bouchet-Valat <nalimilan@club.fr> - 0.3.1-3+copr
 - Add support for EPEL5 and 6.
 
