@@ -43,7 +43,7 @@ BuildRequires:  double-conversion-devel >= 1.1.1
 BuildRequires:  dSFMT-devel
 BuildRequires:  fftw-devel >= 3.3.2
 BuildRequires:  gcc-gfortran
-# Needed to test package installation
+# Needed to build Sphinx documentation
 BuildRequires:  git
 %if 0%{?rhel} && 0%{?rhel} <= 6
 BuildRequires:  gmp5-devel >= 5.0
@@ -51,6 +51,7 @@ BuildRequires:  gmp5-devel >= 5.0
 BuildRequires:  gmp-devel >= 5.0
 %endif
 BuildRequires:  ImageMagick
+BuildRequires:  libgit2-devel >= 0.21
 BuildRequires:  libunwind-devel
 BuildRequires:  llvm-devel
 BuildRequires:  llvm-static
@@ -80,14 +81,13 @@ BuildRequires:  zlib-devel
 Requires:       arpack
 Requires:       dSFMT
 Requires:       fftw >= 3.3.2
-# Needed for package installation
-Requires:       git
 %if 0%{?rhel} && 0%{?rhel} <= 6
 Requires:       gmp5 >= 5.0
 %else
 Requires:       gmp >= 5.0
 %endif
 Requires:       julia-common = %{version}-%{release}
+Requires:       libgit2 >= 0.21
 %if 0%{?rhel} && 0%{?rhel} <= 6
 Requires:       mpfr3 >= 3.0
 %else
@@ -189,7 +189,7 @@ popd
 # USE_BLAS64=0 means that BLAS was built with 32-bit integers, even if the library is 64 bits
 # About build, build_libdir and build_bindir, see https://github.com/JuliaLang/julia/issues/5063#issuecomment-32628111
 %global julia_builddir %{_builddir}/%{name}/build
-%global commonopts USE_SYSTEM_LLVM=1 USE_SYSTEM_LIBUNWIND=1 USE_SYSTEM_READLINE=1 USE_SYSTEM_PCRE=1 USE_SYSTEM_OPENSPECFUN=1 USE_SYSTEM_LIBM=0 USE_SYSTEM_OPENLIBM=1 USE_SYSTEM_BLAS=1 USE_SYSTEM_LAPACK=1 USE_SYSTEM_FFTW=1 USE_SYSTEM_GMP=1 USE_SYSTEM_MPFR=1 USE_SYSTEM_ARPACK=1 USE_SYSTEM_SUITESPARSE=1 USE_SYSTEM_ZLIB=1 USE_SYSTEM_GRISU=1 USE_SYSTEM_DSFMT=1 USE_SYSTEM_LIBUV=0 USE_SYSTEM_RMATH=0 USE_LLVM_SHLIB=1 USE_SYSTEM_UTF8PROC=0 LIBBLAS=-lopenblasp LIBBLASNAME=libopenblasp.so.0 LIBLAPACK=-lopenblasp LIBLAPACKNAME=libopenblasp.so.0 VERBOSE=1 USE_BLAS64=0 MARCH=%{march} prefix=%{_prefix} bindir=%{_bindir} libdir=%{_libdir} libexecdir=%{_libexecdir} datarootdir=%{_datarootdir} includedir=%{_includedir} sysconfdir=%{_sysconfdir} build_prefix=%{julia_builddir} build_bindir=%{julia_builddir}%{_bindir} build_libdir=%{julia_builddir}%{_libdir} build_private_libdir=%{julia_builddir}%{_libdir}/julia build_libexecdir=%{julia_builddir}%{_libexecdir} build_datarootdir=%{julia_builddir}%{_datarootdir} build_includedir=%{julia_builddir}%{_includedir} build_sysconfdir=%{julia_builddir}%{_sysconfdir}
+%global commonopts USE_SYSTEM_LLVM=1 USE_SYSTEM_LIBUNWIND=1 USE_SYSTEM_READLINE=1 USE_SYSTEM_PCRE=1 USE_SYSTEM_OPENSPECFUN=1 USE_SYSTEM_LIBM=0 USE_SYSTEM_OPENLIBM=1 USE_SYSTEM_BLAS=1 USE_SYSTEM_LAPACK=1 USE_SYSTEM_FFTW=1 USE_SYSTEM_GMP=1 USE_SYSTEM_MPFR=1 USE_SYSTEM_ARPACK=1 USE_SYSTEM_SUITESPARSE=1 USE_SYSTEM_ZLIB=1 USE_SYSTEM_GRISU=1 USE_SYSTEM_DSFMT=1 USE_SYSTEM_LIBUV=0 USE_SYSTEM_RMATH=0 USE_LLVM_SHLIB=1 USE_SYSTEM_UTF8PROC=0 USE_SYSTEM_LIBGIT2=1 LIBBLAS=-lopenblasp LIBBLASNAME=libopenblasp.so.0 LIBLAPACK=-lopenblasp LIBLAPACKNAME=libopenblasp.so.0 VERBOSE=1 USE_BLAS64=0 MARCH=%{march} prefix=%{_prefix} bindir=%{_bindir} libdir=%{_libdir} libexecdir=%{_libexecdir} datarootdir=%{_datarootdir} includedir=%{_includedir} sysconfdir=%{_sysconfdir} build_prefix=%{julia_builddir} build_bindir=%{julia_builddir}%{_bindir} build_libdir=%{julia_builddir}%{_libdir} build_private_libdir=%{julia_builddir}%{_libdir}/julia build_libexecdir=%{julia_builddir}%{_libexecdir} build_datarootdir=%{julia_builddir}%{_datarootdir} build_includedir=%{julia_builddir}%{_includedir} build_sysconfdir=%{julia_builddir}%{_sysconfdir}
 
 %build
 %if 0%{?rhel} && 0%{?rhel} <= 6
@@ -322,6 +322,7 @@ desktop-file-validate %{buildroot}%{_datarootdir}/applications/%{name}.desktop
 # https://github.com/JuliaLang/julia/issues/6742
 ln -sf %{_libdir}/libarpack.so.2 %{_libdir}/julia/libarpack.so
 ln -sf %{_libdir}/libdSFMT.so.2 %{_libdir}/julia/libdSFMT.so
+ln -sf %{_libdir}/libgit2.so.0 %{_libdir}/julia/libgit2.so
 ln -sf %{_libdir}/libgmp.so.10 %{_libdir}/julia/libgmp.so
 ln -sf %{_libdir}/libmpfr.so.4 %{_libdir}/julia/libmpfr.so
 ln -sf %{_libdir}/libopenlibm.so.1 %{_libdir}/julia/libopenlibm.so
@@ -335,6 +336,7 @@ exit 0
 if [ $1 -eq 0 ] ; then
     rm -f %{_libdir}/julia/libarpack.so
     rm -f %{_libdir}/julia/libdSFMT.so
+    rm -f %{_libdir}/julia/libgit2.so
     rm -f %{_libdir}/julia/libgmp.so
     rm -f %{_libdir}/julia/libmpfr.so
     rm -f %{_libdir}/julia/libopenlibm.so
