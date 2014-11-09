@@ -44,6 +44,7 @@ BuildRequires:  dSFMT-devel
 BuildRequires:  fftw-devel >= 3.3.2
 BuildRequires:  gcc-gfortran
 # Needed to build Sphinx documentation
+# and to test package management until the switch  to libgit2
 BuildRequires:  git
 %if 0%{?rhel} && 0%{?rhel} <= 6
 BuildRequires:  gmp5-devel >= 5.0
@@ -81,6 +82,8 @@ BuildRequires:  zlib-devel
 Requires:       arpack
 Requires:       dSFMT
 Requires:       fftw >= 3.3.2
+# Needed for package management until the switch  to libgit2
+Requires:       git
 %if 0%{?rhel} && 0%{?rhel} <= 6
 Requires:       gmp5 >= 5.0
 %else
