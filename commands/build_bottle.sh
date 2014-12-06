@@ -15,7 +15,7 @@ PATH=$(echo $PATH | tr ':' '\n' | grep -v sandbox | tr '\n' ':')
 
 # Update our caches!
 $brew update
-$brew pull 34303 --bottle
+#$brew pull 34303 --bottle
 
 # Remove everything first, so we always start clean
 $brew rm --force $($brew deps $FORMULA) 2>/dev/null
