@@ -14,6 +14,7 @@ brew=$(which brew)
 PATH=$(echo $PATH | tr ':' '\n' | grep -v sandbox | tr '\n' ':')
 
 # Update our caches!
+(cd $(dirname $(which brew)) && git reset --hard origin/master)
 $brew update
 #$brew pull 34303 --bottle
 
