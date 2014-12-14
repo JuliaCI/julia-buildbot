@@ -16,11 +16,16 @@ PATH=$(echo $PATH | tr ':' '\n' | grep -v sandbox | tr '\n' ':')
 # Update our caches!
 (cd $(dirname $(which brew)) && git reset --hard origin/master)
 $brew update
-#$brew pull 34303 --bottle
+
+# Check out the "staging" branch while building
+BUILD_BRANCH="staging"
+TAP=$(dirname $(dirname $FORMULA))/homebrew-$(basename $(dirname $FORMULA))
+(cd $(dirname $(dirname $brew))/Library/Taps/$TAP && git fetch && git checkout $BUILD_BRANCH && git reset --hard origin/$BUILD_BRANCH)
 
 # Remove everything first, so we always start clean
 $brew rm --force $($brew deps $FORMULA) 2>/dev/null
 $brew rm --force $FORMULA 2>/dev/null
+$brew cleanup --cached
 
 # Install dependencies first as bottles when possible
 deps=$($brew deps -n $1)
