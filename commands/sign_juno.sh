@@ -18,17 +18,23 @@ if [[ "$(uname)" == "Darwin" ]]; then
 	curl -L "$OSX_URL" > $FILENAME
 
 	# Mount it as read-write
+	echo "Mounting $FILENAME..."
 	hdiutil attach $FILENAME -shadow shadow.dmg
 
 	# Go in and sign it!
+	echo "Signing Juno.app..."
 	~/unlock_keychain.sh
 	codesign -f -s "AFB379C0B4CBD9DB9A762797FC2AB5460A2B0DBE" --deep /Volumes/Juno/Juno.app
+	codesign -v --deep /Volumes/Juno/Juno.app
 	if [[ $? != 0 ]]; then
 		exit $?
 	fi
 
 	# Umount, create new .dmg
+	echo "Unmounting /Volumes/Juno..."
 	hdiutil detach /Volumes/Juno
+
+	echo "Creating ${FILENAME%.*}-signed.dmg..."
 	hdiutil convert $FILENAME -format UDZO -o ${FILENAME%.*}-signed.dmg -shadow -imagekey zlib-level=9
 else
 	# First, clean everything out
