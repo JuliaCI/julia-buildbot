@@ -19,7 +19,7 @@ if [[ "$(uname)" == "Darwin" ]]; then
 
 	# Mount it as read-write
 	echo "Mounting $FILENAME..."
-	hdiutil attach $FILENAME -shadow shadow.dmg
+	hdiutil attach $FILENAME -shadow
 
 	# Go in and sign it!
 	echo "Signing Juno.app..."
