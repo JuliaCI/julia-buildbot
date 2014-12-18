@@ -298,6 +298,7 @@ desktop-file-validate %{buildroot}%{_datarootdir}/applications/%{name}.desktop
 
 %files common
 %dir %{_datarootdir}/julia/
+%{_datarootdir}/julia/*.jl
 %{_datarootdir}/julia/base/
 %exclude %{_datarootdir}/julia/base/build.h
 
