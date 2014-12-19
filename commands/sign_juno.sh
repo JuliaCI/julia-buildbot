@@ -25,7 +25,7 @@ if [[ "$(uname)" == "Darwin" ]]; then
 	echo "Signing Juno.app..."
 	~/unlock_keychain.sh
 	codesign -f -s "AFB379C0B4CBD9DB9A762797FC2AB5460A2B0DBE" --deep /Volumes/Juno/Juno.app
-	codesign -v --deep /Volumes/Juno/Juno.app
+	codesign --deep --display --verbose=4 /Volumes/Juno/Juno.app
 	if [[ $? != 0 ]]; then
 		exit $?
 	fi
