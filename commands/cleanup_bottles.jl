@@ -95,5 +95,5 @@ end
 # Iterate through to_delete and, well, delete them!
 for b in to_delete
     println("deleting juliabottles/$b")
-    run(`aws rm juliabottles/$b`)
+    #run(`aws rm juliabottles/$b`)
 end
