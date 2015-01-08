@@ -3,8 +3,14 @@
 # Homebrew has a nice way of dealing with version numbers, so let's just use that here
 import Base: isless, show
 
+force = false
+if "--force" in ARGS || "-f" in ARGS
+    force = true
+end
+
 if length(ARGS) != 1
-    println("Usage: cleanup_bottles.jl <bucket>")
+    println("Usage: cleanup_bottles.jl [--force/-f] <bucket>")
+    println("  --force means don't ask before deleting")
     exit(-1)
 end
 bucket = ARGS[1]
@@ -98,7 +104,29 @@ end
 
 
 # Iterate through to_delete and, well, delete them!
-for b in to_delete
-    println("deleting juliabottles/$b")
-    run(`aws rm juliabottles/$b`)
+if length(to_delete) > 0
+    println("Found $(length(to_delete)) bottles to delete:")
+    for b in to_delete
+        println("$bucket/$b")
+    end
+
+    if !force
+        response = nothing
+
+        while !(response in ["y", "n"])
+            print("Proceed? [y/n]: ")
+            response = chomp(readline())
+        end
+
+        if response == "n"
+            exit(0)
+        end
+    end
+
+    for b in to_delete
+        println("Deleting $bucket/$b")
+        run(`aws rm $bucket/$b`)
+    end
+else
+    println("No bottles to delete!")
 end
