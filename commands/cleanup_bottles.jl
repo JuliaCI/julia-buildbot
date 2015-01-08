@@ -1,16 +1,21 @@
 #!/usr/bin/env julia
 
 # Homebrew has a nice way of dealing with version numbers, so let's just use that here
-import Homebrew: make_version
 import Base: isless, show
+
+if length(ARGS) != 1
+    println("Usage: cleanup_bottles.jl <bucket>")
+    exit(-1)
+end
+bucket = ARGS[1]
 
 immutable Bottle
     name::String
-    version::VersionNumber
+    version::String
     platform::String
-    revision::Int64
+    bottle_revision::Int64
 
-    Bottle(n,v,p,r) = new(n,make_version(n,v),p, r == nothing ? 0 : int64(r))
+    Bottle(n,v,p,r) = new(n,v,p, r == nothing ? 0 : int64(r))
 end
 
 function isless(a::Bottle, b::Bottle)
@@ -23,12 +28,12 @@ function isless(a::Bottle, b::Bottle)
     if a.version != b.version
         return isless(a.version, b.version)
     end
-    return isless(a.revision, b.revision)
+    return isless(a.bottle_revision, b.bottle_revision)
 end
 
 function show(io::IO, x::Bottle)
-    revision = x.revision > 0 ? "$(x.revision)." : ""
-    print(io, "$(x.name)-$(x.version).$(x.platform).bottle.$(revision)tar.gz")
+    bottle_revision = x.bottle_revision > 0 ? "$(x.bottle_revision)." : ""
+    print(io, "$(x.name)-$(x.version).$(x.platform).bottle.$(bottle_revision)tar.gz")
 end
 
 
@@ -38,11 +43,11 @@ function parsebottle(filename)
     filename = replace(filename, ' ', '+')
 
     # This matches (name)-(version).(platform).bottle.(revision).tar.gz
-    #     name: freeform
-    #  version: decimal
-    # platform: freeform
-    # revision: integer
-    bottle_regex = r"^(.*)-([0-9._]+)\.([^\.]+).bottle.(?:([0-9]+)\.)?tar.gz"
+    #            name: freeform
+    #         version: freeform
+    #        platform: freeform
+    # bottle revision: integer
+    bottle_regex = r"^(.+)-(.+)\.([^\.]+).bottle.(?:([0-9]+)\.)?tar.gz"
     m = match(bottle_regex, filename)
     if m == nothing
         println("Skipping $filename because we can't parse it as a bottle...")
@@ -54,7 +59,7 @@ end
 
 
 # Get list of bottles
-all_bottles = split(readchomp(`aws ls juliabottles --simple` |> `cut -f3-`),'\n')
+all_bottles = split(readchomp(`aws ls $bucket --simple` |> `cut -f3-`),'\n')
 all_bottles = filter(x -> x != nothing, map(parsebottle, all_bottles))
 
 # Bin them by name:
@@ -95,5 +100,5 @@ end
 # Iterate through to_delete and, well, delete them!
 for b in to_delete
     println("deleting juliabottles/$b")
-    #run(`aws rm juliabottles/$b`)
+    run(`aws rm juliabottles/$b`)
 end
