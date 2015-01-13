@@ -96,6 +96,14 @@ julia_tarball_factory.addSteps([
     	command=["curl", "-L", "-H", "Content-type: application/json", "-d", Interpolate('{"target": "linux-%(prop:tar_arch)s", "url":"https://s3.amazonaws.com/julianightlies/bin/linux/%(prop:up_arch)s/%(prop:majmin)s/julia-%(prop:version)s-%(prop:shortcommit)s-linux%(prop:bits)s.tar.gz", "version": "%(prop:shortcommit)s"}'), "https://status.julialang.org/put/nightly"],
     	doStepIf=is_nightly_build
     ),
+
+    # Trigger a download of this file onto another slave for coverage purposes
+    Trigger(schedulerNames="Julia Coverage Testing",
+        set_properties={
+            'url': Interpolate('https://s3.amazonaws.com/julianightlies/bin/linux/%(prop:up_arch)s/%(prop:majmin)s/julia-%(prop:version)s-%(prop:shortcommit)s-linux%(prop:bits)s.tar.gz'),
+            'shortcommit': Property('shortcommit'),
+        },
+        waitForFinish=False)
 ])
 
 
