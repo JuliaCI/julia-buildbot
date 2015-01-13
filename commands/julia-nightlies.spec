@@ -206,19 +206,7 @@ make -C doc html
 %endif
 
 %check
-pushd test
-# make all
-# Backtrace test fails with LLVM 3.4, disabled for now
-# https://github.com/JuliaLang/julia/issues/8099
-    make %commonopts core keywordargs numbers strings collections hashing \
-         remote iobuffer arrayops reduce reducedim \
-         simdloop linalg blas fft dsp sparse bitarray random \
-         math functional bigint sorting statistics spawn parallel arpack file \
-         resolve suitesparse complex version pollfd mpfr broadcast \
-         socket floatapprox priorityqueue readdlm regex float16 combinatorics \
-         sysinfo rounding ranges mod2pi euler show lineedit \
-         replcompletions repl test goto
-popd
+make %commonopts test
 
 %install
 make %commonopts DESTDIR=%{buildroot} install
