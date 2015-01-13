@@ -4,7 +4,7 @@
 
 # Add a dependent scheduler for running coverage after we build tarballs
 julia_coverage_builders = ["coverage_ubuntu14.04-x64"]
-julia_coverage_scheduler = Triggerable(name="Julia Coverage Testing", builderNames=julia_coverage_slaves)
+julia_coverage_scheduler = Triggerable(name="Julia Coverage Testing", builderNames=julia_coverage_builders)
 c['schedulers'].append(julia_coverage_scheduler)
 
 run_coverage_cmd = """
