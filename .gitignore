@@ -3,5 +3,6 @@ sandbox/
 master/*
 !master/*.py
 !master/master.cfg
+master/buildbot_secret.py
 GITHUB_SECRET.sh
 github_buildbot.log
