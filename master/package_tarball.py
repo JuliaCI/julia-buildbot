@@ -103,7 +103,9 @@ julia_tarball_factory.addSteps([
             'url': Interpolate('https://s3.amazonaws.com/julianightlies/bin/linux/%(prop:up_arch)s/%(prop:majmin)s/julia-%(prop:version)s-%(prop:shortcommit)s-linux%(prop:bits)s.tar.gz'),
             'shortcommit': Property('shortcommit'),
         },
-        waitForFinish=False)
+        waitForFinish=False,
+        doStepIf=should_run_coverage
+    )
 ])
 
 
