@@ -82,6 +82,8 @@ julia_coverage_factory.addSteps([
     ShellCommand(
         name="Merge and submit",
         command=[Interpolate("julia-%(prop:shortcommit)s/bin/julia"), "-e", merge_cov_cmd]
+        env={'REPO_TOKEN':COVERAGE_REPO_TOKEN},
+        logEnviron=False,
     ),
 ])
 
