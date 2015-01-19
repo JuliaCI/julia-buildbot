@@ -15,7 +15,7 @@ homebrew_nightly_factory.addSteps([
 	),
 	ShellCommand(
 		name="Update tap",
-		command=["bash", "-c", "cd /usr/local/Library/taps/staticfloat/homebrew-julia && git fetch && git reset --hard origin master"]
+		command=["bash", "-c", "cd /usr/local/Library/taps/staticfloat/homebrew-julia && git fetch && git reset --hard origin/master"]
 	),
 	ShellCommand(
 		name="Update brew",
