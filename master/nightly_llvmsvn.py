@@ -28,11 +28,11 @@ llvmsvn_build_factory.addSteps([
     # make clean first, and nuke llvm
     ShellCommand(
     	name="make cleanall",
-    	command=["make", "LLVM_VER=svn", "VERBOSE=1", "cleanall"]
+    	command=["make", "LLVM_VER=svn", "CC=ccache gcc", "CXX=ccache g++", "FC=ccache gfortran", "VERBOSE=1", "cleanall"]
     ),
     ShellCommand(
     	name="make distclean-llvm",
-    	command=["make", "LLVM_VER=svn", "VERBOSE=1", "-C", "deps", "distclean-llvm"]
+    	command=["make", "LLVM_VER=svn", "CC=ccache gcc", "CXX=ccache g++", "FC=ccache gfortran", "VERBOSE=1", "-C", "deps", "distclean-llvm"]
     ),
 
     # Make!
