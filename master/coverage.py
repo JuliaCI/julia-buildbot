@@ -16,7 +16,8 @@ CoverageBase.runtests(CoverageBase.testnames())
 analyze_cov_cmd = """
 import CoverageBase
 using Coverage, HDF5, JLD
-results=Coveralls.process_folder(joinpath(CoverageBase.julia_top(), "base"))
+cd(joinpath(CoverageBase.julia_top()))
+results=Coveralls.process_folder("base"))
 save("coverage.jld", "results", results)
 """
 
