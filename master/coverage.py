@@ -44,6 +44,12 @@ julia_coverage_factory.addSteps([
         command=["/bin/bash", "-c", Interpolate("curl -L %(prop:url)s | tar zx")],
     ),
 
+    # Remove sys.so
+    ShellCommand(
+        name="Delete sys.so",
+        command=["rm", "-f", Interpolate("julia-%(prop:shortcommit)s/lib/julia/sys.so")],
+    ),
+
     # Run Julia, gathering coverage statistics and then analyzing them into a .jld file
     ShellCommand(
         name="Run inlined tests",
