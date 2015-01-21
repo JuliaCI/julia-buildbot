@@ -45,8 +45,7 @@ for name in all_names:
             flags += 'XC_HOST=x86_64-w64-mingw32 '
     else:
         # We're going to try compiling everything with ccache to speed up buildtimes
-        # Note that even on OSX we say "ccache gcc" because gcc is a wrapper for clang
-        flags += 'CC="ccache gcc" CXX="ccache g++" FC="ccache gfortran" '
+        flags += 'USECCACHE=1 '
 
     # On OSX, core2 is the minimum MARCH we support
     if name[:3] == "osx":
