@@ -68,7 +68,7 @@ julia_coverage_factory.addSteps([
     ),
     ShellCommand(
         name="Move coverage.jld -> coverage_inlined.jld",
-        command=["mv", "coverage.jld", "coverage_inlined.jld"]
+        command=["mv", Interpolate("julia-%(prop:shortcommit)s/share/julia/coverage.jld"), "coverage_inlined.jld"]
     ),
 
     # Do the coverage stats for non-inlined tests now
@@ -82,7 +82,7 @@ julia_coverage_factory.addSteps([
     ),
     ShellCommand(
         name="Move coverage.jld -> coverage_noninlined.jld",
-        command=["mv", "coverage.jld", "coverage_noninlined.jld"]
+        command=["mv", Interpolate("julia-%(prop:shortcommit)s/share/julia/coverage.jld"), "coverage_noninlined.jld"]
     ),
 
     # Merge final results and submit!
