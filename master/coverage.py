@@ -23,6 +23,7 @@ save("coverage.jld", "results", results)
 
 merge_cov_cmd = """
 using Coverage, CoverageBase, HDF5, JLD
+cd(joinpath(CoverageBase.julia_top()))
 r1 = load("coverage_noninlined.jld", "results")
 r2 = load("coverage_inlined.jld", "results")
 r = CoverageBase.merge_coverage(r1, r2)
@@ -68,7 +69,7 @@ julia_coverage_factory.addSteps([
     ),
     ShellCommand(
         name="Move coverage.jld -> coverage_inlined.jld",
-        command=["mv", Interpolate("julia-%(prop:shortcommit)s/share/julia/coverage.jld"), "coverage_inlined.jld"]
+        command=["mv", Interpolate("julia-%(prop:shortcommit)s/share/julia/coverage.jld"), Interpolate("julia-%(prop:shortcommit)s/share/julia/coverage_inlined.jld")]
     ),
 
     # Do the coverage stats for non-inlined tests now
@@ -82,7 +83,7 @@ julia_coverage_factory.addSteps([
     ),
     ShellCommand(
         name="Move coverage.jld -> coverage_noninlined.jld",
-        command=["mv", Interpolate("julia-%(prop:shortcommit)s/share/julia/coverage.jld"), "coverage_noninlined.jld"]
+        command=["mv", Interpolate("julia-%(prop:shortcommit)s/share/julia/coverage.jld"), Interpolate("julia-%(prop:shortcommit)s/share/julia/coverage_noninlined.jld")]
     ),
 
     # Merge final results and submit!
