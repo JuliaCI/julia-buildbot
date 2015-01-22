@@ -26,9 +26,6 @@ for name in all_names:
     # Everything should be VERBOSE
     flags = 'VERBOSE=1 '
 
-    # Everything should be parallelized!
-    flags += '-j4 '
-
     # Add on the banner
     flags += 'TAGGED_RELEASE_BANNER="Official http://julialang.org/ release" '
 
