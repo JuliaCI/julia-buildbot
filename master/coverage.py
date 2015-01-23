@@ -27,7 +27,7 @@ cd(joinpath(CoverageBase.julia_top()))
 r1 = load("coverage_noninlined.jld", "results")
 r2 = load("coverage_inlined.jld", "results")
 r = CoverageBase.merge_coverage(r1, r2)
-gitinfo = Coveralls.manual_git_info(Base.GIT_VERSION_INFO.commit, Base.GIT_VERSION_INFO.branch, "https://github.com/JuliaLang/julia.git")
+gitinfo = Coveralls.manual_git_info(Base.GIT_VERSION_INFO.commit, Base.GIT_VERSION_INFO.branch, "https://github.com/JuliaLang/julia.git", %(prop:commitmessage)s)
 Coveralls.submit_token(r, gitinfo)
 """
 
@@ -90,7 +90,7 @@ julia_coverage_factory.addSteps([
     # Merge final results and submit!
     ShellCommand(
         name="Merge and submit",
-        command=[Interpolate("julia-%(prop:shortcommit)s/bin/julia"), "-e", merge_cov_cmd],
+        command=[Interpolate("julia-%(prop:shortcommit)s/bin/julia"), "-e", Interpolate(merge_cov_cmd)],
         env={'REPO_TOKEN':COVERAGE_REPO_TOKEN},
         logEnviron=False,
     ),

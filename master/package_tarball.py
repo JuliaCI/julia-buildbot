@@ -63,6 +63,11 @@ julia_tarball_factory.addSteps([
     	command=["./julia", "-e", "println(Base.GIT_VERSION_INFO.commit[1:10])"],
     	property="shortcommit"
     ),
+    SetPropertyFromCommand(
+        name="Get commitmessage",
+        command=["git", "log", "-1", "--pretty=format:'%s'"],
+        property="commitmessage"
+    ),
     
     # Upload the result!
     MasterShellCommand(
@@ -101,6 +106,7 @@ julia_tarball_factory.addSteps([
     Trigger(schedulerNames=["Julia Coverage Testing"],
         set_properties={
             'url': Interpolate('https://s3.amazonaws.com/julianightlies/bin/linux/%(prop:up_arch)s/%(prop:majmin)s/julia-%(prop:version)s-%(prop:shortcommit)s-linux%(prop:bits)s.tar.gz'),
+            'commitmessage': Property('commitmessage'),
             'shortcommit': Property('shortcommit'),
         },
         waitForFinish=False,
