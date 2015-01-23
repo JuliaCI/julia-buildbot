@@ -22,13 +22,25 @@ save("coverage.jld", "results", results)
 """
 
 merge_cov_cmd = """
-using Coverage, CoverageBase, HDF5, JLD
+using Coverage, CoverageBase, HDF5, JLD, Compat
 cd(joinpath(CoverageBase.julia_top()))
 r1 = load("coverage_noninlined.jld", "results")
 r2 = load("coverage_inlined.jld", "results")
 r = CoverageBase.merge_coverage(r1, r2)
-gitinfo = Coveralls.manual_git_info(Base.GIT_VERSION_INFO.commit, Base.GIT_VERSION_INFO.branch, "https://github.com/JuliaLang/julia.git", "%(prop:commitmessage)s")
-Coveralls.submit_token(r, gitinfo)
+git_info = @compat Dict(
+    "branch" => Base.GIT_VERSION_INFO.branch,
+    "remotes" => [
+        @compat Dict(
+            "name" => "origin",
+            "url" => "https://github.com/JuliaLang/julia.git"
+        )
+    ],
+    "head" => @compat Dict(
+        "id" => Base.GIT_VERSION_INFO.commit,
+        "message" => "%(prop:commitmessage)s"
+    )
+)
+Coveralls.submit_token(r, git_info)
 """
 
 # Steps to download a linux tarball, extract it, run coverage on it, and upload coverage stats
