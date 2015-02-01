@@ -199,7 +199,8 @@ popd
 . /opt/rh/devtoolset-2/enable
 %endif
 
-make %{?_smp_mflags} CFLAGS="%{optflags}" CXXFLAGS="%{optflags}" FFLAGS="%{optflags}" %commonopts
+# If debug is not built here, it is built during make install
+make %{?_smp_mflags} CFLAGS="%{optflags}" CXXFLAGS="%{optflags}" FFLAGS="%{optflags}" %commonopts release debug
 
 %if !(0%{?rhel} && 0%{?rhel} <= 6)
 make -C doc html
