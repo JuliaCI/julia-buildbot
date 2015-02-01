@@ -53,9 +53,9 @@ BuildRequires:  gmp-devel >= 5.0
 %endif
 BuildRequires:  ImageMagick
 %if 0%{?rhel} && 0%{?rhel} == 6
-Requires:       libgit2-devel >= 1:0.21
+BuildRequires:  libgit2-devel >= 1:0.21
 %else
-Requires:       libgit2-devel >= 0.21
+BuildRequires:  libgit2-devel >= 0.21
 %endif
 BuildRequires:  libunwind-devel
 BuildRequires:  llvm-devel
