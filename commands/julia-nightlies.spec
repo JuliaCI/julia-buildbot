@@ -52,7 +52,11 @@ BuildRequires:  gmp5-devel >= 5.0
 BuildRequires:  gmp-devel >= 5.0
 %endif
 BuildRequires:  ImageMagick
-BuildRequires:  libgit2-devel >= 0.21
+%if 0%{?rhel} && 0%{?rhel} == 6
+Requires:       libgit2-devel >= 1:0.21
+%else
+Requires:       libgit2-devel >= 0.21
+%endif
 BuildRequires:  libunwind-devel
 BuildRequires:  llvm-devel
 BuildRequires:  llvm-static
@@ -90,7 +94,11 @@ Requires:       gmp5 >= 5.0
 Requires:       gmp >= 5.0
 %endif
 Requires:       julia-common = %{version}-%{release}
+%if 0%{?rhel} && 0%{?rhel} == 6
+Requires:       libgit2 >= 1:0.21
+%else
 Requires:       libgit2 >= 0.21
+%endif
 %if 0%{?rhel} && 0%{?rhel} <= 6
 Requires:       mpfr3 >= 3.0
 %else
