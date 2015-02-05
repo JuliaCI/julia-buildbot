@@ -207,8 +207,11 @@ popd
 . /opt/rh/devtoolset-2/enable
 %endif
 
+make %{?_smp_mflags} CFLAGS="%{optflags}" CXXFLAGS="%{optflags}" FFLAGS="%{optflags}" %commonopts release
 # If debug is not built here, it is built during make install
-make %{?_smp_mflags} CFLAGS="%{optflags}" CXXFLAGS="%{optflags}" FFLAGS="%{optflags}" %commonopts release debug
+# And both targets cannot be on the same call currently:
+# https://github.com/JuliaLang/julia/issues/10088
+make %{?_smp_mflags} CFLAGS="%{optflags}" CXXFLAGS="%{optflags}" FFLAGS="%{optflags}" %commonopts release
 
 %if !(0%{?rhel} && 0%{?rhel} <= 6)
 make -C doc html
