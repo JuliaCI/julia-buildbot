@@ -65,7 +65,7 @@ julia_tarball_factory.addSteps([
     ),
     SetPropertyFromCommand(
         name="Get commitmessage",
-        command=["git", "log", "-1", "--pretty=format:'%s'"],
+        command=["git", "log", "-1", "--pretty=format:%s"],
         property="commitmessage"
     ),
     
