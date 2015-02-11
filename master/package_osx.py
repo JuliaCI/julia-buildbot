@@ -37,7 +37,8 @@ julia_dmg_factory.addSteps([
     # Make sure gcc and cmake are installed though!
     ShellCommand(
     	name="Install necessary brew dependencies",
-    	command=["brew", "install", "gcc", "cmake"]
+    	command=["brew", "install", "gcc", "cmake"],
+        flunkOnFailure=False
     ),
 
     # make clean first
