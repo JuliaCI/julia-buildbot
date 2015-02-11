@@ -40,6 +40,8 @@ git_info = @compat Dict(
         "message" => "%(prop:commitmessage)s"
     )
 )
+println("git_info: ")
+println(git_info)
 Coveralls.submit_token(r, git_info)
 """
 
