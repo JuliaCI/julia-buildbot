@@ -31,7 +31,7 @@ for name in all_names:
 
     if name[-3:] == 'x86':
         deb_arch = 'i386'
-        tar_arch = 'i386'
+        tar_arch = 'i686'
         march = 'i686'
         up_arch = 'x86'
         bits = '32'
