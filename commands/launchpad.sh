@@ -74,6 +74,7 @@ make -C doc helpdb.jl
 
 # We're going to compile LLVM on our own.  :(
 make -C deps get-llvm
+make -C deps get-Rmath-julia
 
 # Work around our lack of git on buildd servers
 make -C base version_git.jl.phony
