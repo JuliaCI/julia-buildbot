@@ -211,7 +211,7 @@ make %{?_smp_mflags} CFLAGS="%{optflags}" CXXFLAGS="%{optflags}" FFLAGS="%{optfl
 # If debug is not built here, it is built during make install
 # And both targets cannot be on the same call currently:
 # https://github.com/JuliaLang/julia/issues/10088
-make %{?_smp_mflags} CFLAGS="%{optflags}" CXXFLAGS="%{optflags}" FFLAGS="%{optflags}" %commonopts release
+make %{?_smp_mflags} CFLAGS="%{optflags}" CXXFLAGS="%{optflags}" FFLAGS="%{optflags}" %commonopts debug
 
 %if !(0%{?rhel} && 0%{?rhel} <= 6)
 make -C doc html
