@@ -71,6 +71,12 @@ julia_coverage_factory.addSteps([
         command=["rm", "-f", Interpolate("julia-%(prop:shortcommit)s/lib/julia/sys.so")],
     ),
 
+    # Update packages
+    ShellCommand(
+        name="Update packages",
+        command=[Interpolate("julia-%(prop:shortcommit)s/bin/julia"), "-e", "Pkg.update()"],
+    ),
+
     # Run Julia, gathering coverage statistics and then analyzing them into a .jld file
     ShellCommand(
         name="Run inlined tests",
