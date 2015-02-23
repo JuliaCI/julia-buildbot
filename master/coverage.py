@@ -73,6 +73,13 @@ julia_coverage_factory.addSteps([
         command=[Interpolate("julia-%(prop:shortcommit)s/bin/julia"), "-e", "Pkg.update()"],
     ),
 
+    # Test CoverageBase to make sure everything's on the up-and-up
+    ShellCommand(
+        name="Test CoverageBase.jl",
+        command=[Interpolate("julia-%(prop:shortcommit)s/bin/julia"), "-e", "Pkg.test(\"CoverageBase\")"],
+        haltOnFailure=True,
+    ),
+
     # Run Julia, gathering coverage statistics and then analyzing them into a .jld file
     ShellCommand(
         name="Run inlined tests",
