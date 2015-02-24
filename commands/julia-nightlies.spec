@@ -2,8 +2,7 @@
 %global uvshortcommit %(c=%{uvcommit}; echo ${c:0:7})
 %global uvversion 0.11.22
 
-%global Rmathcommit e432b0c4b01c560353412b3f097d179eef5c0ba2
-%global Rmathshortcommit %(c=%{Rmathcommit}; echo ${c:0:7})
+%global Rmathjuliaversion 0.1
 %global Rmathversion 3.0.1
 
 %global mojibakecommit bc357b276f1fd7124bbb31a4e212a30e57520eee
@@ -25,7 +24,7 @@ Source0:        https://github.com/JuliaLang/julia/archive/master/julia.tar.gz
 # Julia currently uses a custom version of libuv, patches are not yet upstream
 Source1:        https://github.com/JuliaLang/libuv/archive/%{uvcommit}/archive/libuv.tar.gz
 # Julia currently uses a custom version of Rmath, called Rmath-julia, with a custom RNG system (temporary)
-Source2:        https://github.com/JuliaLang/Rmath/archive/%{Rmathcommit}/archive/Rmath.tar.gz
+Source2:        wget https://github.com/JuliaLang/Rmath-julia/archive/v%{Rmathjuliaversion}.tar.gz#/Rmath-julia-%{Rmathjuliaversion}.tar.gz
 # Temporary until utf8proc RPM includes mojibake patches
 Source3:        https://github.com/JuliaLang/libmojibake/archive/%{mojibakecommit}/archive/libmojibake.tar.gz
 Patch0:         %{name}_juliadoc.patch
@@ -75,10 +74,6 @@ BuildRequires:  pcre1-devel >= 8.31
 BuildRequires:  pcre-devel >= 8.31
 %endif
 BuildRequires:  perl
-# To build HTML documentation
-BuildRequires:  python-pip
-BuildRequires:  python-sphinx
-BuildRequires:  python-sphinx_rtd_theme
 BuildRequires:  suitesparse-devel
 BuildRequires:  zlib-devel
 # Dependencies loaded at run time by Julia code
@@ -213,10 +208,6 @@ make %{?_smp_mflags} CFLAGS="%{optflags}" CXXFLAGS="%{optflags}" FFLAGS="%{optfl
 # https://github.com/JuliaLang/julia/issues/10088
 make %{?_smp_mflags} CFLAGS="%{optflags}" CXXFLAGS="%{optflags}" FFLAGS="%{optflags}" %commonopts debug
 
-%if !(0%{?rhel} && 0%{?rhel} <= 6)
-make -C doc html
-%endif
-
 %check
 make %commonopts test
 
@@ -224,19 +215,6 @@ make %commonopts test
 make %commonopts DESTDIR=%{buildroot} install
 
 cp -p CONTRIBUTING.md LICENSE.md NEWS.md README.md %{buildroot}%{_docdir}/julia/
-
-%if !(0%{?rhel} && 0%{?rhel} <= 6)
-# Install HTML manual and remove unwanted files
-# https://github.com/JuliaLang/julia/issues/8378
-pushd %{buildroot}%{_docdir}/julia/
-    mv %{_builddir}/%{name}/doc/_build/html/ html/
-    rm html/.buildinfo html/objects.inv
-popd
-%endif
-
-pushd %{buildroot}%{_docdir}/julia
-    rm -R devdocs/ manual/ stdlib/
-popd
 
 pushd %{buildroot}%{_prefix}/share/man/man1/
     ln -s julia.1.gz julia-debug.1.gz
@@ -308,10 +286,7 @@ desktop-file-validate %{buildroot}%{_datarootdir}/applications/%{name}.desktop
 %config(noreplace) %{_sysconfdir}/julia/juliarc.jl
 
 %files doc
-%doc %{_docdir}/julia/examples/
-%if !(0%{?rhel} && 0%{?rhel} <= 6)
-%doc %{_docdir}/julia/html/
-%endif
+%doc %{_docdir}/julia/
 
 %files devel
 %{_bindir}/julia-debug
