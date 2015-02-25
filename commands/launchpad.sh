@@ -94,6 +94,9 @@ cp -r ../julia-${JULIA_GIT_BRANCH}/* .
 # Throw the debian directory into here as well, instead of relying on launchpad
 cp -r ../debian-${DEBIAN_GIT_BRANCH}/debian .
 
+# Run this again in an attempt to get the timestamps correct
+make doc/_build/html
+
 # Also, increment the current debian changelog, so we get git version tagged binaries
 dch -v "${JULIA_VERSION}+$DATECOMMIT" "nightly git build"
 
