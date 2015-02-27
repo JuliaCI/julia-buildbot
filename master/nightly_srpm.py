@@ -67,14 +67,11 @@ julia_srpm_package_factory.addSteps([
         command=["/bin/bash", "-c", "cd deps/libuv && git archive -o ../../../SOURCES/libuv.tar.gz --prefix=libuv/ HEAD"]
     ),
     ShellCommand(
-        name="Tarballify Rmath",
-        command=["/bin/bash", "-c", "cd deps/Rmath && git archive -o ../../../SOURCES/Rmath.tar.gz --prefix=Rmath/ HEAD"]
-    ),
-    ShellCommand(
+        name="Tarballify libmojibake",
         command=["/bin/bash", "-c", "cd deps/libmojibake && git archive -o ../../../SOURCES/libmojibake.tar.gz --prefix=libmojibake/ HEAD"]
     ),
 
-    # Build SRPM
+    # Prepare .spec file
     ShellCommand(
         name="mkdir SPECS",
         command=["mkdir", "-p", "../SPECS"]
@@ -87,6 +84,14 @@ julia_srpm_package_factory.addSteps([
         name="replace datecommit and juliaversion in .spec",
         command=["/bin/bash", "-c", Interpolate("sed -i -e 's/%%{datecommit}/%(prop:datecommit)s/g' -e 's/%%{juliaversion}/%(prop:juliaversion)s/g' ../SPECS/julia-nightlies.spec")]
     ),
+
+    # Download non-submodule dependencies (currently Rmath-julia)
+    ShellCommand(
+        name="Download missing tarballs",
+        command=["/bin/bash", "-c", "cd ../SOURCES && spectool -g ../SPECS/julia-nightlies.spec"]
+    ),
+
+    # Build SRPM
     ShellCommand(
         name="Build SRPM",
         command=["/bin/bash", "-c", "rpmbuild -bs SPECS/julia-nightlies.spec --define '_topdir .' --define '_source_filedigest_algorithm md5' --define '_binary_filedigest_algorithm md5'"],
