@@ -24,7 +24,7 @@ Source0:        https://github.com/JuliaLang/julia/archive/master/julia.tar.gz
 # Julia currently uses a custom version of libuv, patches are not yet upstream
 Source1:        https://github.com/JuliaLang/libuv/archive/%{uvcommit}/archive/libuv.tar.gz
 # Julia currently uses a custom version of Rmath, called Rmath-julia, with a custom RNG system (temporary)
-Source2:        wget https://github.com/JuliaLang/Rmath-julia/archive/v%{Rmathjuliaversion}.tar.gz#/Rmath-julia-%{Rmathjuliaversion}.tar.gz
+Source2:        https://github.com/JuliaLang/Rmath-julia/archive/v%{Rmathjuliaversion}.tar.gz#/Rmath-julia-%{Rmathjuliaversion}.tar.gz
 # Temporary until utf8proc RPM includes mojibake patches
 Source3:        https://github.com/JuliaLang/libmojibake/archive/%{mojibakecommit}/archive/libmojibake.tar.gz
 Patch0:         %{name}_juliadoc.patch
