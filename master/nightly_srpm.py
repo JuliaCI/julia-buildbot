@@ -37,11 +37,21 @@ julia_srpm_package_factory.addSteps([
     	command=["make", "-C", "base", "version_git.jl.phony"]
     ),
 
-    # Get Julia version and date of commit
+    # Get Julia version, commit and date of commit
     SetPropertyFromCommand(
     	name="Get Julia version",
     	command=["/bin/bash", "-c", "echo $(cat ./VERSION | cut -f1 -d'-')"],
     	property="juliaversion"
+    ),
+    SetPropertyFromCommand(
+        name="Get full Julia version",
+        command=["/bin/bash", "-c", "echo $(cat ./VERSION)"],
+        property="juliafullversion"
+    ),
+    SetPropertyFromCommand(
+        name="Get commit",
+        command=["/bin/bash", "-c", "echo $(git rev-parse --short=10 HEAD)"],
+        property="juliacommit"
     ),
     SetPropertyFromCommand(
     	name="Get date of commit",
@@ -60,7 +70,7 @@ julia_srpm_package_factory.addSteps([
     ),
     ShellCommand(
         name="Tarballify julia",
-        command=["git", "archive", "-o", "../SOURCES/julia.tar.gz", "--prefix=julia/", "HEAD"]
+        command=["/bin/bash", "-c", Interpolate("make light-source-dist && mv julia-%(prop:juliafullversion)s_%(prop:juliacommit)s.tar.gz ../SOURCES/julia.tar.gz")]
     ),
     ShellCommand(
         name="Tarballify libuv",
