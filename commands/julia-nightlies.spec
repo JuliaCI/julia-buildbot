@@ -300,13 +300,16 @@ desktop-file-validate %{buildroot}%{_datarootdir}/applications/%{name}.desktop
 # Julia currently needs the unversioned .so files:
 # https://github.com/JuliaLang/julia/issues/6742
 ln -sf %{_libdir}/libarpack.so.2 %{_libdir}/julia/libarpack.so
+ln -sf %{_libdir}/libcholmod.so.2 %{_libdir}/julia/libcholmod.so
 ln -sf %{_libdir}/libdSFMT.so.2 %{_libdir}/julia/libdSFMT.so
 ln -sf %{_libdir}/libgit2.so.0 %{_libdir}/julia/libgit2.so
+ln -sf %{_libdir}/libfftw3_threads.so.2 %{_libdir}/julia/libfftw3_threads.so
 ln -sf %{_libdir}/libgmp.so.10 %{_libdir}/julia/libgmp.so
 ln -sf %{_libdir}/libmpfr.so.4 %{_libdir}/julia/libmpfr.so
 ln -sf %{_libdir}/libopenlibm.so.1 %{_libdir}/julia/libopenlibm.so
 ln -sf %{_libdir}/libopenspecfun.so.1 %{_libdir}/julia/libopenspecfun.so
 ln -sf %{_libdir}/libpcre.so.1 %{_libdir}/julia/libpcre.so
+ln -sf %{_libdir}/libumfpack.so.5 %{_libdir}/julia/libumfpack.so
 /bin/touch --no-create %{_datarootdir}/icons/hicolor &>/dev/null || :
 exit 0
 
@@ -314,13 +317,16 @@ exit 0
 /sbin/ldconfig
 if [ $1 -eq 0 ] ; then
     rm -f %{_libdir}/julia/libarpack.so
+    rm -f %{_libdir}/julia/libcholmod.so
     rm -f %{_libdir}/julia/libdSFMT.so
     rm -f %{_libdir}/julia/libgit2.so
+    rm -f %{_libdir}/julia/libfftw3_threads.so
     rm -f %{_libdir}/julia/libgmp.so
     rm -f %{_libdir}/julia/libmpfr.so
     rm -f %{_libdir}/julia/libopenlibm.so
     rm -f %{_libdir}/julia/libopenspecfun.so
     rm -f %{_libdir}/julia/libpcre.so
+    rm -f %{_libdir}/julia/libumfpack.so
     /bin/touch --no-create %{_datarootdir}/icons/hicolor &>/dev/null
     /usr/bin/gtk-update-icon-cache %{_datarootdir}/icons/hicolor &>/dev/null || :
 fi
@@ -330,6 +336,9 @@ exit 0
 /usr/bin/gtk-update-icon-cache %{_datarootdir}/icons/hicolor &>/dev/null || :
 
 %changelog
+* Mon Mar 2 2015 Milan Bouchet-Valat <nalimilan@club.fr> - 0.3.6-2
+- Fix loading libcholmod, libfftw3_threads and libumfpack.
+
 * Sun Oct 12 2014 Milan Bouchet-Valat <nalimilan@club.fr> - 0.3.1-3+copr
 - Add support for EPEL5 and 6.
 
