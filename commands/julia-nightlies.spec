@@ -176,7 +176,10 @@ find . -name ".git*" -exec rm {} \;
 pushd deps
     tar xzf %SOURCE1
     tar xzf %SOURCE2
-    tar xzf %SOURCE3
+    # Julia downloads tarballs for external dependencies even when the folder is present:
+    # we need to copy the tarball and let the build process unpack it
+    # https://github.com/JuliaLang/julia/pull/10280
+    cp -p %SOURCE3 .
 
     # systemtap 2.5 no longer accepts this option
     # https://github.com/joyent/libuv/issues/1478
