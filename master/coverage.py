@@ -61,16 +61,22 @@ julia_coverage_factory.addSteps([
         command=["/bin/bash", "-c", Interpolate("curl -L %(prop:url)s | tar zx")],
     ),
 
-    # Remove sys.so
+    # Ensure CoverageBase is installed
     ShellCommand(
-        name="Delete sys.so",
-        command=["rm", "-f", Interpolate("julia-%(prop:shortcommit)s/lib/julia/sys.so")],
+        name="Install CoverageBase",
+        command=[Interpolate("julia-%(prop:shortcommit)s/bin/julia"), "-e", "Pkg.add(\"CoverageBase\")"],
     ),
 
     # Update packages
     ShellCommand(
         name="Update packages",
         command=[Interpolate("julia-%(prop:shortcommit)s/bin/julia"), "-e", "Pkg.update()"],
+    ),
+
+    # Remove sys.so
+    ShellCommand(
+        name="Delete sys.so",
+        command=["rm", "-f", Interpolate("julia-%(prop:shortcommit)s/lib/julia/sys.so")],
     ),
 
     # Test CoverageBase to make sure everything's on the up-and-up
