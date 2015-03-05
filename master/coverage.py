@@ -66,6 +66,10 @@ julia_coverage_factory.addSteps([
         name="Install CoverageBase",
         command=[Interpolate("julia-%(prop:shortcommit)s/bin/julia"), "-e", "Pkg.add(\"CoverageBase\")"],
     ),
+    ShellCommand(
+        name="Checkout master",
+        command=[Interpolate("julia-%(prop:shortcommit)s/bin/julia"), "-e", "Pkg.checkout(\"CoverageBase\", \"master\")"],
+    ),
 
     # Update packages
     ShellCommand(
