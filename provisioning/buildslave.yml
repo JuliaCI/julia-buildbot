@@ -1,0 +1,4 @@
+---
+- hosts: buildslaves
+  roles:
+    - role: julia_buildslave
