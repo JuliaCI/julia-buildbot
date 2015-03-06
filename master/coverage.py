@@ -78,7 +78,7 @@ julia_coverage_factory.addSteps([
     # Update packages
     ShellCommand(
         name="Update packages",
-        command=[Interpolate("julia-%(prop:shortcommit)s/bin/julia"), "-e", "Pkg.update()"],
+        command=[Interpolate("julia-%(prop:shortcommit)s/bin/julia"), "-e", "Pkg.update(); Pkg.build()"],
     ),
 
     # Remove sys.so
