@@ -63,6 +63,10 @@ julia_coverage_factory.addSteps([
 
     # Ensure CoverageBase is installed
     ShellCommand(
+        name="Install hdf5",
+        command=["sudo", "apt-get", "install", "-y", "hdf5-tools"],
+    ),
+    ShellCommand(
         name="Install CoverageBase",
         command=[Interpolate("julia-%(prop:shortcommit)s/bin/julia"), "-e", "Pkg.add(\"CoverageBase\")"],
     ),
