@@ -64,8 +64,8 @@ git checkout -B ${JULIA_GIT_BRANCH} ${COMMIT}
 git submodule init
 git submodule update
 
-# Hack to get around our lack of packaging of dsfmt and libgit2
-make -C deps get-dsfmt get-libgit2 get-unwind
+# Get dependencies
+make -C deps getall
 
 # Let's build the documentation, so that we don't have to do so on the debian servers
 make -C doc html
