@@ -101,7 +101,7 @@ make doc/_build/html
 dch -v "${JULIA_VERSION}+$DATECOMMIT" "nightly git build"
 
 bzr add
-bzr ci -m "Manual import commit ${DATECOMMIT} from ${JULIA_GIT_URL}/${JULIA_GIT_BRANCH}" || true
+bzr ci -m "Manual import commit ${DATECOMMIT} from ${JULIA_GIT_URL}" || true
 bzr push lp:${TEAM}/${PROJECT}/${BZR_BRANCH}
 cd ..
 
