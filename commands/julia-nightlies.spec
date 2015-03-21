@@ -64,10 +64,14 @@ BuildRequires:  mpfr3-devel >= 3.0
 %else
 BuildRequires:  mpfr-devel >= 3.0
 %endif
+%ifarch %{arm}
+BuildRequires:  blas-devel
+BuildRequires:  lapack-devel
+%else
 BuildRequires:  openblas-devel
+%endif
 BuildRequires:  openlibm-devel >= 0.4
 BuildRequires:  openspecfun-devel >= 0.4
-BuildRequires:  patchelf
 %if 0%{?rhel} && 0%{?rhel} <= 6
 BuildRequires:  pcre1-devel >= 8.31
 %else
@@ -99,7 +103,12 @@ Requires:       mpfr3 >= 3.0
 %else
 Requires:       mpfr >= 3.0
 %endif
+%ifarch %{arm}
+Requires:       blas
+Requires:       lapack
+%else
 Requires:       openblas-threads
+%endif
 Requires:       openlibm >= 0.4
 Requires:       openspecfun >= 0.4
 %if 0%{?rhel} && 0%{?rhel} <= 6
@@ -107,7 +116,7 @@ Requires:       pcre1 >= 8.31
 %else
 Requires:       pcre >= 8.31
 %endif
-# Currently, Julia does not work properly on non-x86 architectures
+# Currently, Julia does not work properly architectures other than x86
 # https://bugzilla.redhat.com/show_bug.cgi?id=1158024
 # https://bugzilla.redhat.com/show_bug.cgi?id=1158026
 # https://bugzilla.redhat.com/show_bug.cgi?id=1158025
@@ -190,15 +199,29 @@ popd
 # (i386 does not work yet: https://github.com/JuliaLang/julia/issues/7185)
 # Without specifying MARCH, the Julia system image would only work on native CPU
 %ifarch %ix86
-%global march pentium4
+%global march MARCH=pentium4
+%endif
+%ifarch x86_64
+%global march MARCH=x86-64
+%endif
+%ifarch %{arm}
+# gcc and LLVM do not support the same targets
+%global march MARCH=$(echo %optflags | grep -Po 'march=\\K[^ ]*') JULIA_CPU_TARGET=cortex-a8
 %else
-%global march x86-64
+%global march MARCH=$(echo %optflags | grep -Po 'march=\\K[^ ]*') JULIA_CPU_TARGET=generic
+%endif
+
+# OpenBLAS is not available on ARM, and need to pass -fsigned-char there
+%ifarch %{arm}
+%global archspecific LIBBLAS=-lblas LIBBLASNAME=liblblas.so.3 LIBLAPACK=-llapack LIBLAPACKNAME=liblapack.so.3 JCFLAGS="-fsigned-char -std=gnu99 -pipe -fPIC -fno-strict-aliasing -D_FILE_OFFSET_BITS=64" %{march}
+%else
+%global archspecific LIBBLAS=-lopenblasp LIBBLASNAME=libopenblasp.so.0 LIBLAPACK=-lopenblasp LIBLAPACKNAME=libopenblasp.so.0 %{march}
 %endif
 
 # USE_BLAS64=0 means that BLAS was built with 32-bit integers, even if the library is 64 bits
 # About build, build_libdir and build_bindir, see https://github.com/JuliaLang/julia/issues/5063#issuecomment-32628111
 %global julia_builddir %{_builddir}/%{name}/build
-%global commonopts USE_SYSTEM_LLVM=1 USE_SYSTEM_LIBUNWIND=1 USE_SYSTEM_READLINE=1 USE_SYSTEM_PCRE=1 USE_SYSTEM_OPENSPECFUN=1 USE_SYSTEM_LIBM=0 USE_SYSTEM_OPENLIBM=1 USE_SYSTEM_BLAS=1 USE_SYSTEM_LAPACK=1 USE_SYSTEM_FFTW=1 USE_SYSTEM_GMP=1 USE_SYSTEM_MPFR=1 USE_SYSTEM_ARPACK=1 USE_SYSTEM_SUITESPARSE=1 USE_SYSTEM_ZLIB=1 USE_SYSTEM_GRISU=1 USE_SYSTEM_DSFMT=1 USE_SYSTEM_LIBUV=0 USE_SYSTEM_RMATH=0 USE_LLVM_SHLIB=1 USE_SYSTEM_UTF8PROC=0 USE_SYSTEM_LIBGIT2=1 LIBBLAS=-lopenblasp LIBBLASNAME=libopenblasp.so.0 LIBLAPACK=-lopenblasp LIBLAPACKNAME=libopenblasp.so.0 VERBOSE=1 USE_BLAS64=0 MARCH=%{march} prefix=%{_prefix} bindir=%{_bindir} libdir=%{_libdir} libexecdir=%{_libexecdir} datarootdir=%{_datarootdir} includedir=%{_includedir} sysconfdir=%{_sysconfdir} build_prefix=%{julia_builddir} build_bindir=%{julia_builddir}%{_bindir} build_libdir=%{julia_builddir}%{_libdir} build_private_libdir=%{julia_builddir}%{_libdir}/julia build_libexecdir=%{julia_builddir}%{_libexecdir} build_datarootdir=%{julia_builddir}%{_datarootdir} build_includedir=%{julia_builddir}%{_includedir} build_sysconfdir=%{julia_builddir}%{_sysconfdir}
+%global commonopts USE_SYSTEM_LLVM=1 USE_SYSTEM_LIBUNWIND=1 USE_SYSTEM_READLINE=1 USE_SYSTEM_PCRE=1 USE_SYSTEM_OPENSPECFUN=1  USE_SYSTEM_OPENLIBM=1 USE_SYSTEM_BLAS=1 USE_SYSTEM_LAPACK=1 USE_SYSTEM_FFTW=1 USE_SYSTEM_GMP=1 USE_SYSTEM_MPFR=1 USE_SYSTEM_ARPACK=1 USE_SYSTEM_SUITESPARSE=1 USE_SYSTEM_ZLIB=1 USE_SYSTEM_GRISU=1 USE_SYSTEM_DSFMT=1 USE_SYSTEM_LIBUV=0 USE_SYSTEM_RMATH=0 USE_LLVM_SHLIB=1 USE_SYSTEM_UTF8PROC=0 USE_SYSTEM_LIBGIT2=1 USE_SYSTEM_PATCHELF=1 VERBOSE=1 USE_BLAS64=0 %{archspecific} prefix=%{_prefix} bindir=%{_bindir} libdir=%{_libdir} libexecdir=%{_libexecdir} datarootdir=%{_datarootdir} includedir=%{_includedir} sysconfdir=%{_sysconfdir} build_prefix=%{julia_builddir} build_bindir=%{julia_builddir}%{_bindir} build_libdir=%{julia_builddir}%{_libdir} build_private_libdir=%{julia_builddir}%{_libdir}/julia build_libexecdir=%{julia_builddir}%{_libexecdir} build_datarootdir=%{julia_builddir}%{_datarootdir} build_includedir=%{julia_builddir}%{_includedir} build_sysconfdir=%{julia_builddir}%{_sysconfdir}
 
 %build
 %if 0%{?rhel} && 0%{?rhel} <= 6
