@@ -70,7 +70,7 @@ julia_srpm_package_factory.addSteps([
     ),
     ShellCommand(
         name="Tarballify julia",
-        command=["/bin/bash", "-c", Interpolate("make light-source-dist && mv julia-%(prop:juliafullversion)s_%(prop:juliacommit)s.tar.gz ../SOURCES/julia.tar.gz")]
+        command=["/bin/bash", "-c", Interpolate("make light-source-dist && tar xzf julia-%(prop:juliafullversion)s_%(prop:juliacommit)s.tar.gz && mv $(basename $(pwd)) julia && tar czf ../SOURCES/julia.tar.gz julia && rm -R julia/ julia-%(prop:juliafullversion)s_%(prop:juliacommit)s.tar.gz")]
     ),
     ShellCommand(
         name="Tarballify libuv",
