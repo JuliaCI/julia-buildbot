@@ -5,10 +5,6 @@
 %global Rmathjuliaversion 0.1
 %global Rmathversion 3.0.1
 
-%global mojibakecommit bc357b276f1fd7124bbb31a4e212a30e57520eee
-%global mojibakeshortcommit %(c=%{mojibakecommit}; echo ${c:0:7})
-
-
 Name:           julia
 Version:        %{juliaversion}
 Release:        0.%{datecommit}%{?dist}
@@ -25,8 +21,6 @@ Source0:        https://github.com/JuliaLang/julia/archive/master/julia.tar.gz
 Source1:        https://github.com/JuliaLang/libuv/archive/%{uvcommit}/archive/libuv.tar.gz
 # Julia currently uses a custom version of Rmath, called Rmath-julia, with a custom RNG system (temporary)
 Source2:        https://github.com/JuliaLang/Rmath-julia/archive/v%{Rmathjuliaversion}.tar.gz#/Rmath-julia-%{Rmathjuliaversion}.tar.gz
-# Temporary until utf8proc RPM includes mojibake patches
-Source3:        https://github.com/JuliaLang/libmojibake/archive/%{mojibakecommit}/archive/libmojibake.tar.gz
 Patch0:         %{name}_juliadoc.patch
 Provides:       bundled(libuv) = %{uvversion}
 Provides:       bundled(Rmath) = %{Rmathversion}
@@ -42,8 +36,7 @@ BuildRequires:  double-conversion-devel >= 1.1.1
 BuildRequires:  dSFMT-devel
 BuildRequires:  fftw-devel >= 3.3.2
 BuildRequires:  gcc-gfortran
-# Needed to build Sphinx documentation
-# and to test package management until the switch  to libgit2
+# Needed to test package management until the switch  to libgit2
 BuildRequires:  git
 %if 0%{?rhel} && 0%{?rhel} <= 6
 BuildRequires:  gmp5-devel >= 5.0
@@ -79,6 +72,7 @@ BuildRequires:  pcre-devel >= 8.31
 %endif
 BuildRequires:  perl
 BuildRequires:  suitesparse-devel
+BuildRequires:  utf8proc-devel >= 1.2
 BuildRequires:  zlib-devel
 # Dependencies loaded at run time by Julia code
 # and thus not detected by find-requires
@@ -184,7 +178,6 @@ find . -name ".git*" -exec rm {} \;
 
 pushd deps
     tar xzf %SOURCE1
-    tar xzf %SOURCE3
     # Julia downloads tarballs for external dependencies even when the folder is present:
     # we need to copy the tarball and let the build process unpack it
     # https://github.com/JuliaLang/julia/pull/10280
@@ -221,7 +214,7 @@ popd
 # USE_BLAS64=0 means that BLAS was built with 32-bit integers, even if the library is 64 bits
 # About build, build_libdir and build_bindir, see https://github.com/JuliaLang/julia/issues/5063#issuecomment-32628111
 %global julia_builddir %{_builddir}/%{name}/build
-%global commonopts USE_SYSTEM_LLVM=1 USE_SYSTEM_LIBUNWIND=1 USE_SYSTEM_READLINE=1 USE_SYSTEM_PCRE=1 USE_SYSTEM_OPENSPECFUN=1  USE_SYSTEM_OPENLIBM=1 USE_SYSTEM_BLAS=1 USE_SYSTEM_LAPACK=1 USE_SYSTEM_FFTW=1 USE_SYSTEM_GMP=1 USE_SYSTEM_MPFR=1 USE_SYSTEM_ARPACK=1 USE_SYSTEM_SUITESPARSE=1 USE_SYSTEM_ZLIB=1 USE_SYSTEM_GRISU=1 USE_SYSTEM_DSFMT=1 USE_SYSTEM_LIBUV=0 USE_SYSTEM_RMATH=0 USE_LLVM_SHLIB=1 USE_SYSTEM_UTF8PROC=0 USE_SYSTEM_LIBGIT2=1 USE_SYSTEM_PATCHELF=1 VERBOSE=1 USE_BLAS64=0 %{archspecific} prefix=%{_prefix} bindir=%{_bindir} libdir=%{_libdir} libexecdir=%{_libexecdir} datarootdir=%{_datarootdir} includedir=%{_includedir} sysconfdir=%{_sysconfdir} build_prefix=%{julia_builddir} build_bindir=%{julia_builddir}%{_bindir} build_libdir=%{julia_builddir}%{_libdir} build_private_libdir=%{julia_builddir}%{_libdir}/julia build_libexecdir=%{julia_builddir}%{_libexecdir} build_datarootdir=%{julia_builddir}%{_datarootdir} build_includedir=%{julia_builddir}%{_includedir} build_sysconfdir=%{julia_builddir}%{_sysconfdir}
+%global commonopts USE_SYSTEM_LLVM=1 USE_SYSTEM_LIBUNWIND=1 USE_SYSTEM_READLINE=1 USE_SYSTEM_PCRE=1 USE_SYSTEM_OPENSPECFUN=1  USE_SYSTEM_OPENLIBM=1 USE_SYSTEM_BLAS=1 USE_SYSTEM_LAPACK=1 USE_SYSTEM_FFTW=1 USE_SYSTEM_GMP=1 USE_SYSTEM_MPFR=1 USE_SYSTEM_ARPACK=1 USE_SYSTEM_SUITESPARSE=1 USE_SYSTEM_ZLIB=1 USE_SYSTEM_GRISU=1 USE_SYSTEM_DSFMT=1 USE_SYSTEM_LIBUV=0 USE_SYSTEM_RMATH=0 USE_LLVM_SHLIB=1 USE_SYSTEM_UTF8PROC=1 USE_SYSTEM_LIBGIT2=1 USE_SYSTEM_PATCHELF=1 VERBOSE=1 USE_BLAS64=0 %{archspecific} prefix=%{_prefix} bindir=%{_bindir} libdir=%{_libdir} libexecdir=%{_libexecdir} datarootdir=%{_datarootdir} includedir=%{_includedir} sysconfdir=%{_sysconfdir} build_prefix=%{julia_builddir} build_bindir=%{julia_builddir}%{_bindir} build_libdir=%{julia_builddir}%{_libdir} build_private_libdir=%{julia_builddir}%{_libdir}/julia build_libexecdir=%{julia_builddir}%{_libexecdir} build_datarootdir=%{julia_builddir}%{_datarootdir} build_includedir=%{julia_builddir}%{_includedir} build_sysconfdir=%{julia_builddir}%{_sysconfdir}
 
 %build
 %if 0%{?rhel} && 0%{?rhel} <= 6
