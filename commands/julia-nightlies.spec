@@ -191,7 +191,7 @@ popd
 # Required so that the image is not optimized for the build CPU
 # (i386 does not work yet: https://github.com/JuliaLang/julia/issues/7185)
 # Without specifying MARCH, the Julia system image would only work on native CPU
-%ifarch %ix86
+%ifarch %{ix86}
 %global march MARCH=pentium4
 %endif
 %ifarch x86_64
@@ -199,9 +199,10 @@ popd
 %endif
 %ifarch %{arm}
 # gcc and LLVM do not support the same targets
-%global march MARCH=$(echo %optflags | grep -Po 'march=\\K[^ ]*') JULIA_CPU_TARGET=cortex-a8
-%else
 %global march MARCH=$(echo %optflags | grep -Po 'march=\\K[^ ]*') JULIA_CPU_TARGET=generic
+%endif
+%ifarch armv7hl
+%global march MARCH=$(echo %optflags | grep -Po 'march=\\K[^ ]*') JULIA_CPU_TARGET=cortex-a8
 %endif
 
 # OpenBLAS is not available on ARM, and need to pass -fsigned-char there
