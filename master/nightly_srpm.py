@@ -58,6 +58,11 @@ julia_srpm_package_factory.addSteps([
     	command=["/bin/bash", "-c", "echo $(git log --pretty=format:'%cd' --date=short -n 1 | tr -d '-')"],
     	property="datecommit"
     ),
+    SetPropertyFromCommand(
+        name="Get libuv branch",
+        command=["/bin/bash", "-c", "cat deps/libuv.version | cut -f2 -d'=' | head -n 1"],
+        property="libuvbranch"
+    ),
 
     # Build tarballs for Julia and all dependencies
     ShellCommand(
@@ -76,10 +81,6 @@ julia_srpm_package_factory.addSteps([
         name="Tarballify libuv",
         command=["/bin/bash", "-c", "cd deps/libuv && git archive -o ../../../SOURCES/libuv.tar.gz --prefix=libuv/ HEAD"]
     ),
-    ShellCommand(
-        name="Tarballify libmojibake",
-        command=["/bin/bash", "-c", "cd deps/libmojibake && git archive -o ../../../SOURCES/libmojibake.tar.gz --prefix=libmojibake/ HEAD"]
-    ),
 
     # Prepare .spec file
     ShellCommand(
@@ -92,10 +93,10 @@ julia_srpm_package_factory.addSteps([
     ),
     ShellCommand(
         name="replace datecommit and juliaversion in .spec",
-        command=["/bin/bash", "-c", Interpolate("sed -i -e 's/%%{datecommit}/%(prop:datecommit)s/g' -e 's/%%{juliaversion}/%(prop:juliaversion)s/g' ../SPECS/julia-nightlies.spec")]
+        command=["/bin/bash", "-c", Interpolate("sed -i -e 's/%%{datecommit}/%(prop:datecommit)s/g' -e 's/%%{juliaversion}/%(prop:juliaversion)s/g' -e 's/%%{uvbranch}/%(prop:libuvbranch)s/g' ../SPECS/julia-nightlies.spec")]
     ),
 
-    # Download non-submodule dependencies (currently Rmath-julia)
+    # Download non-submodule dependencies (currently Rmath-julia and libuv)
     ShellCommand(
         name="Download missing tarballs",
         command=["/bin/bash", "-c", "cd ../SOURCES && spectool -g ../SPECS/julia-nightlies.spec"]

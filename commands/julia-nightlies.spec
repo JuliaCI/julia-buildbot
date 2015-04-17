@@ -1,6 +1,5 @@
-%global uvcommit 5d608abc3c2e9dc37da04030a0e07ba0af5ae57d
-%global uvshortcommit %(c=%{uvcommit}; echo ${c:0:7})
-%global uvversion 0.11.22
+%global uvbranch %{libuvbranch}
+%global uvversion 0.11.26
 
 %global Rmathjuliaversion 0.1
 %global Rmathversion 3.0.1
@@ -18,7 +17,7 @@ URL:            http://julialang.org/
 # These URLs are bogus, just here to help rpmbuild to find the needed files
 Source0:        https://github.com/JuliaLang/julia/archive/master/julia.tar.gz
 # Julia currently uses a custom version of libuv, patches are not yet upstream
-Source1:        https://github.com/JuliaLang/libuv/archive/%{uvcommit}/archive/libuv.tar.gz
+Source1:        https://github.com/JuliaLang/libuv/archive/%{uvbranch}/archive/libuv.tar.gz
 # Julia currently uses a custom version of Rmath, called Rmath-julia, with a custom RNG system (temporary)
 Source2:        https://github.com/JuliaLang/Rmath-julia/archive/v%{Rmathjuliaversion}.tar.gz#/Rmath-julia-%{Rmathjuliaversion}.tar.gz
 Patch0:         %{name}_juliadoc.patch
