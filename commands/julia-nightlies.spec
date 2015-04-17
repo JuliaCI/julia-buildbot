@@ -15,11 +15,11 @@ Group:          Development/Languages
 License:        MIT and LGPLv2+ and GPLv2+
 URL:            http://julialang.org/
 # These URLs are bogus, just here to help rpmbuild to find the needed files
-Source0:        https://github.com/JuliaLang/julia/archive/master/julia.tar.gz
+Source0:        https://api.github.com/repos/JuliaLang/julia/tarball/master#/julia.tar.gz
 # Julia currently uses a custom version of libuv, patches are not yet upstream
-Source1:        https://github.com/JuliaLang/libuv/archive/%{uvbranch}/archive/libuv.tar.gz
+Source1:        https://api.github.com/repos/JuliaLang/libuv/tarball/%{uvbranch}#/libuv-%{uvbranch}.tar.gz
 # Julia currently uses a custom version of Rmath, called Rmath-julia, with a custom RNG system (temporary)
-Source2:        https://github.com/JuliaLang/Rmath-julia/archive/v%{Rmathjuliaversion}.tar.gz#/Rmath-julia-%{Rmathjuliaversion}.tar.gz
+Source2:        https://api.github.com/repos/JuliaLang/Rmath-julia/tarball/v%{Rmathjuliaversion}#/Rmath-julia-%{Rmathjuliaversion}.tar.gz
 Patch0:         %{name}_juliadoc.patch
 Provides:       bundled(libuv) = %{uvversion}
 Provides:       bundled(Rmath) = %{Rmathversion}
@@ -176,15 +176,11 @@ Julia into external programs or debugging Julia itself.
 find . -name ".git*" -exec rm {} \;
 
 pushd deps
-    tar xzf %SOURCE1
     # Julia downloads tarballs for external dependencies even when the folder is present:
     # we need to copy the tarball and let the build process unpack it
     # https://github.com/JuliaLang/julia/pull/10280
+    cp -p %SOURCE1 .
     cp -p %SOURCE2 .
-
-    # systemtap 2.5 no longer accepts this option
-    # https://github.com/joyent/libuv/issues/1478
-    sed -i 's/-xnolibs//' libuv/Makefile.in
 popd
 
 # Required so that the image is not optimized for the build CPU
