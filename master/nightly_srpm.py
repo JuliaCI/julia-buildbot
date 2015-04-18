@@ -77,10 +77,6 @@ julia_srpm_package_factory.addSteps([
         name="Tarballify julia",
         command=["/bin/bash", "-c", Interpolate("make light-source-dist && tar xzf julia-%(prop:juliafullversion)s_%(prop:juliacommit)s.tar.gz && mv $(basename $(pwd)) julia && tar czf ../SOURCES/julia.tar.gz julia && rm -R julia/ julia-%(prop:juliafullversion)s_%(prop:juliacommit)s.tar.gz")]
     ),
-    ShellCommand(
-        name="Tarballify libuv",
-        command=["/bin/bash", "-c", "cd deps/libuv && git archive -o ../../../SOURCES/libuv.tar.gz --prefix=libuv/ HEAD"]
-    ),
 
     # Prepare .spec file
     ShellCommand(
