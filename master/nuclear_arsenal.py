@@ -45,7 +45,7 @@ nuclear_factory.useProgress = True
 nuclear_factory.addSteps([
     ShellCommand(
     	name="Do your thing, Duke",
-    	command=["/bin/bash", "-c", "sudo rm -rf ../../{package_,build_}*"]
+    	command=["/bin/bash", "-c", "if [ `uname` = Darwin ]; then sudo rm -rf ../../{package_,build_}*; else rm -rf ../../{package_,build_}*; fi"]
     )
 ])
 
