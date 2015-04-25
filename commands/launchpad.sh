@@ -65,7 +65,7 @@ git submodule init
 git submodule update
 
 # Get dependencies
-make -C deps getall
+make NO_GIT=1 -C deps getall
 
 # Let's build the documentation, so that we don't have to do so on the debian servers
 make -C doc html
