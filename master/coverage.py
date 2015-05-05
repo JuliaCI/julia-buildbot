@@ -117,7 +117,8 @@ julia_coverage_factory.addSteps([
     # Do the coverage stats for non-inlined tests now
     ShellCommand(
         name="Run non-inlined tests",
-        command=[Interpolate("julia-%(prop:shortcommit)s/bin/julia"), "--code-coverage=all", "--inline=no", "-e", run_coverage_cmd]
+        command=[Interpolate("julia-%(prop:shortcommit)s/bin/julia"), "--code-coverage=all", "--inline=no", "-e", run_coverage_cmd],
+        timeout=3600,
     ),
     ShellCommand(
         name="Gather non-inlined test results",
