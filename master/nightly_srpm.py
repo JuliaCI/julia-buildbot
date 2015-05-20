@@ -148,7 +148,7 @@ julia_srpm_package_factory.addSteps([
 # Add SRPM packager
 c['builders'].append(BuilderConfig(
     name="package_srpm",
-    slavenames=["centos7.0-x64"],
+    slavenames=["centos7.1-x64"],
     category="Packaging",
     factory=julia_srpm_package_factory,
 ))

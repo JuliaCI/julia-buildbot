@@ -3,7 +3,7 @@
 ###############################################################################
 
 # Add a scheduler for julia continuous integration (Omit windows for now)
-julia_quickbuilders = ["build_" + z for z in ubuntu_names + ["centos7.0-x64"] + ["osx10.9"]]
+julia_quickbuilders = ["build_" + z for z in ubuntu_names + ["centos7.1-x64"] + ["osx10.9"]]
 quickbuild_scheduler = AnyBranchScheduler(name="julia quickbuild", treeStableTimer=1, builderNames=julia_quickbuilders)
 c['schedulers'].append(quickbuild_scheduler)
 
@@ -38,7 +38,7 @@ quickbuild_factory.addSteps([
 ])
 
 # Add builders that link to the factory above
-for name in ubuntu_names + ["osx10.9"] + ["centos7.0-x64"]:
+for name in ubuntu_names + ["osx10.9"] + ["centos7.1-x64"]:
     c['builders'].append(BuilderConfig(
         name="build_%s"%(name),
         slavenames=[name],
