@@ -34,12 +34,6 @@ julia_tarball_factory.addSteps([
     	command=["/bin/bash", "-c", Interpolate("make %(prop:flags)s cleanall")]
     ),
 
-    # Copy over our Make.user
-    FileDownload(
-    	mastersrc="../commands/Make.user.centos5",
-    	slavedest="Make.user"
-    ),
-
     # Make!
     ShellCommand(
     	name="make",
