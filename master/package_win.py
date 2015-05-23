@@ -46,8 +46,8 @@ win_package_factory.addSteps([
         haltOnFailure = True
     ),
     ShellCommand(
-        name="make dist",
-        command=["/bin/bash", "-c", Interpolate("make %(prop:flags)s dist")],
+        name="make binary-dist",
+        command=["/bin/bash", "-c", Interpolate("make %(prop:flags)s binary-dist")],
         haltOnFailure = True
     ),
 

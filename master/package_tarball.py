@@ -7,7 +7,7 @@ julia_tarball_packagers = ["package_tarball32", "package_tarball64"]
 tarball_package_scheduler = Dependent(name="Julia Tarball package", builderNames=julia_tarball_packagers, upstream=quickbuild_scheduler)
 c['schedulers'].append(tarball_package_scheduler)
 
-# Steps to build a make-dist tarball that should work on just about every linux ever
+# Steps to build a `make binary-dist` tarball that should work on just about every linux ever
 julia_tarball_factory = BuildFactory()
 julia_tarball_factory.useProgress = True
 julia_tarball_factory.addSteps([
@@ -36,8 +36,8 @@ julia_tarball_factory.addSteps([
 
     # Make!
     ShellCommand(
-    	name="make",
-    	command=["/bin/bash", "-c", Interpolate("make %(prop:flags)s dist")],
+    	name="make binary-dist",
+    	command=["/bin/bash", "-c", Interpolate("make %(prop:flags)s binary-dist")],
     	haltOnFailure = True
     ),
 
