@@ -1,4 +1,4 @@
-%global uvbranch %{libuvbranch}
+%global uvcommit %{libuvcommit}
 %global uvversion 0.11.26
 
 %global Rmathjuliaversion 0.1
@@ -17,7 +17,7 @@ URL:            http://julialang.org/
 # These URLs are bogus, just here to help rpmbuild to find the needed files
 Source0:        https://api.github.com/repos/JuliaLang/julia/tarball/master#/julia.tar.gz
 # Julia currently uses a custom version of libuv, patches are not yet upstream
-Source1:        https://api.github.com/repos/JuliaLang/libuv/tarball/%{uvbranch}#/libuv-%{uvbranch}.tar.gz
+Source1:        https://api.github.com/repos/JuliaLang/libuv/tarball/%{uvcommit}#/libuv-%{uvcommit}.tar.gz
 # Julia currently uses a custom version of Rmath, called Rmath-julia, with a custom RNG system (temporary)
 Source2:        https://api.github.com/repos/JuliaLang/Rmath-julia/tarball/v%{Rmathjuliaversion}#/Rmath-julia-%{Rmathjuliaversion}.tar.gz
 Patch0:         %{name}_juliadoc.patch
@@ -64,14 +64,10 @@ BuildRequires:  openblas-devel
 %endif
 BuildRequires:  openlibm-devel >= 0.4
 BuildRequires:  openspecfun-devel >= 0.4
-%if 0%{?rhel} && 0%{?rhel} <= 6
-BuildRequires:  pcre1-devel >= 8.31
-%else
-BuildRequires:  pcre-devel >= 8.31
-%endif
+BuildRequires:  pcre2-devel
 BuildRequires:  perl
 BuildRequires:  suitesparse-devel
-BuildRequires:  utf8proc-devel >= 1.2
+BuildRequires:  utf8proc-devel >= 1.3
 BuildRequires:  zlib-devel
 # Dependencies loaded at run time by Julia code
 # and thus not detected by find-requires
@@ -104,11 +100,8 @@ Requires:       openblas-threads
 %endif
 Requires:       openlibm >= 0.4
 Requires:       openspecfun >= 0.4
-%if 0%{?rhel} && 0%{?rhel} <= 6
-Requires:       pcre1 >= 8.31
-%else
-Requires:       pcre >= 8.31
-%endif
+Requires:       pcre2
+BuildRequires:  utf8proc >= 1.3
 # Currently, Julia does not work properly architectures other than x86
 # https://bugzilla.redhat.com/show_bug.cgi?id=1158024
 # https://bugzilla.redhat.com/show_bug.cgi?id=1158026
@@ -323,7 +316,7 @@ ln -sf %{_libdir}/libgmp.so.10 %{_libdir}/julia/libgmp.so
 ln -sf %{_libdir}/libmpfr.so.4 %{_libdir}/julia/libmpfr.so
 ln -sf %{_libdir}/libopenlibm.so.1 %{_libdir}/julia/libopenlibm.so
 ln -sf %{_libdir}/libopenspecfun.so.1 %{_libdir}/julia/libopenspecfun.so
-ln -sf %{_libdir}/libpcre.so.1 %{_libdir}/julia/libpcre.so
+ln -sf %{_libdir}/libpcre2-8.so.0 %{_libdir}/julia/libpcre2-8.so
 ln -sf %{_libdir}/libumfpack.so.5 %{_libdir}/julia/libumfpack.so
 /bin/touch --no-create %{_datarootdir}/icons/hicolor &>/dev/null || :
 exit 0
@@ -340,7 +333,7 @@ if [ $1 -eq 0 ] ; then
     rm -f %{_libdir}/julia/libmpfr.so
     rm -f %{_libdir}/julia/libopenlibm.so
     rm -f %{_libdir}/julia/libopenspecfun.so
-    rm -f %{_libdir}/julia/libpcre.so
+    rm -f %{_libdir}/julia/libpcre2-8.so
     rm -f %{_libdir}/julia/libumfpack.so
     /bin/touch --no-create %{_datarootdir}/icons/hicolor &>/dev/null
     /usr/bin/gtk-update-icon-cache %{_datarootdir}/icons/hicolor &>/dev/null || :

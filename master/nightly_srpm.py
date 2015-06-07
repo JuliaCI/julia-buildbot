@@ -59,9 +59,9 @@ julia_srpm_package_factory.addSteps([
     	property="datecommit"
     ),
     SetPropertyFromCommand(
-        name="Get libuv branch",
-        command=["/bin/bash", "-c", "cat deps/libuv.version | cut -f2 -d'=' | head -n 1"],
-        property="libuvbranch"
+        name="Get libuv commit",
+        command=["/bin/bash", "-c", "cat deps/libuv.version | cut -f2 -d'=' | tail -n 1"],
+        property="libuvcommit"
     ),
 
     # Build tarballs for Julia and all dependencies
@@ -89,7 +89,7 @@ julia_srpm_package_factory.addSteps([
     ),
     ShellCommand(
         name="replace datecommit and juliaversion in .spec",
-        command=["/bin/bash", "-c", Interpolate("sed -i -e 's/%%{datecommit}/%(prop:datecommit)s/g' -e 's/%%{juliaversion}/%(prop:juliaversion)s/g' -e 's/%%{uvbranch}/%(prop:libuvbranch)s/g' ../SPECS/julia-nightlies.spec")]
+        command=["/bin/bash", "-c", Interpolate("sed -i -e 's/%%{datecommit}/%(prop:datecommit)s/g' -e 's/%%{juliaversion}/%(prop:juliaversion)s/g' -e 's/%%{uvcommit}/%(prop:libuvcommit)s/g' ../SPECS/julia-nightlies.spec")]
     ),
 
     # Download non-submodule dependencies (currently Rmath-julia and libuv)
