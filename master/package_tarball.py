@@ -62,6 +62,26 @@ julia_tarball_factory.addSteps([
         command=["git", "log", "-1", "--pretty=format:%s"],
         property="commitmessage"
     ),
+    SetPropertyFromCommand(
+        name="Get commitname",
+        command=["git", "log", "-1", "--pretty=format:%cN"],
+        property="commitname"
+    ),
+    SetPropertyFromCommand(
+        name="Get commitemail",
+        command=["git", "log", "-1", "--pretty=format:%cE"],
+        property="commitemail"
+    ),
+    SetPropertyFromCommand(
+        name="Get authorname",
+        command=["git", "log", "-1", "--pretty=format:%aN"],
+        property="commitname"
+    ),
+    SetPropertyFromCommand(
+        name="Get authoremail",
+        command=["git", "log", "-1", "--pretty=format:%aE"],
+        property="commitemail"
+    ),
     
     # Upload the result!
     MasterShellCommand(
@@ -101,6 +121,10 @@ julia_tarball_factory.addSteps([
         set_properties={
             'url': Interpolate('https://s3.amazonaws.com/julianightlies/bin/linux/%(prop:up_arch)s/%(prop:majmin)s/julia-%(prop:version)s-%(prop:shortcommit)s-linux%(prop:bits)s.tar.gz'),
             'commitmessage': Property('commitmessage'),
+            'commitname': Property('commitname'),
+            'commitemail': Property('commitemail'),
+            'authorname': Property('authorname'),
+            'authoremail': Property('authoremail'),
             'shortcommit': Property('shortcommit'),
         },
         waitForFinish=False,

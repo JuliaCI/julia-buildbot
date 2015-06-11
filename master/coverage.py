@@ -37,7 +37,11 @@ git_info = @compat Dict(
     ],
     "head" => @compat Dict(
         "id" => Base.GIT_VERSION_INFO.commit,
-        "message" => "%(prop:commitmessage)s"
+        "message" => "%(prop:commitmessage)s",
+        "committer_name" => "%(prop:commitname)s",
+        "committer_email" => "%(prop:commitemail)s",
+        "author_name" => "%(prop:authorname)s",
+        "author_email" => "%(prop:authoremail)s",
     )
 )
 println("git_info: ")
