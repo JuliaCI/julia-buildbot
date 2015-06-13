@@ -75,12 +75,12 @@ julia_tarball_factory.addSteps([
     SetPropertyFromCommand(
         name="Get authorname",
         command=["git", "log", "-1", "--pretty=format:%aN"],
-        property="commitname"
+        property="authorname"
     ),
     SetPropertyFromCommand(
         name="Get authoremail",
         command=["git", "log", "-1", "--pretty=format:%aE"],
-        property="commitemail"
+        property="authoremail"
     ),
     
     # Upload the result!
