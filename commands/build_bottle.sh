@@ -20,6 +20,11 @@ $brew update
 # Check out the "staging" branch while building
 BUILD_BRANCH="staging"
 TAP=$(dirname $(dirname $FORMULA))/homebrew-$(basename $(dirname $FORMULA))
+
+if [[ ! -d $(dirname $(dirname $brew))/Library/Taps/$TAP ]]; then
+	brew tap $(dirname $FORMULA)
+fi
+
 (cd $(dirname $(dirname $brew))/Library/Taps/$TAP && git reset --hard && git fetch && git checkout $BUILD_BRANCH; git reset --hard origin/$BUILD_BRANCH)
 
 # Remove everything first, so we always start clean
