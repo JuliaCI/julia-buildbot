@@ -3,7 +3,7 @@
 ###############################################################################
 
 # Add a dependent scheduler for OSX packaging
-julia_dmg_packagers = ["package_" + z for z in ["osx10.9"]]
+julia_dmg_packagers = ["package_" + z for z in ["osx10.9-x64"]]
 osx_package_scheduler = Dependent(name="Julia OSX package", builderNames=julia_dmg_packagers, upstream=quickbuild_scheduler)
 c['schedulers'].append(osx_package_scheduler)
 
@@ -129,8 +129,8 @@ julia_dmg_factory.addSteps([
 
 # Add my osx julia packager (we only need one!)
 c['builders'].append(BuilderConfig(
-    name="package_%s"%("osx10.9"),
-    slavenames=["osx10.9"],
+    name="package_%s"%("osx10.9-x64"),
+    slavenames=["osx10.9-x64"],
     category="Packaging",
     factory=julia_dmg_factory,
 ))

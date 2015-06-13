@@ -9,7 +9,7 @@ for version in ["14.04", "12.04"]:
     for arch in ["x64", "x86"]:
         ubuntu_names += ["ubuntu%s-%s"%(version, arch)]
 
-osx_names = ["osx10.8", "osx10.9", "osx10.10"]
+osx_names = ["osx10.8-x64", "osx10.9-x64", "osx10.10-x64"]
 centos_names = ["centos5.11-x64", "centos5.11-x86", "centos7.1-x64"]
 win_names = ["win8.1-x64", "win8.1-x86"]
 all_names = ubuntu_names + osx_names + centos_names + win_names

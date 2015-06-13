@@ -40,7 +40,7 @@ homebrew_nightly_factory.addSteps([
 # Add Homebrew nightly builder
 c['builders'].append(BuilderConfig(
 	name="homebrew_nightly_build",
-	slavenames=["osx10.9"],
+	slavenames=["osx10.9-x64"],
 	category="Nightlies",
 	factory=homebrew_nightly_factory
 ))
