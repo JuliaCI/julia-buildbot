@@ -5,9 +5,9 @@
 llvmsvn_nightly_scheduler = Nightly(name="Julia LLVM SVN Build", builderNames=["build_llvmsvn_nightly-x86", "build_llvmsvn_nightly-x64"], hour=[0,8,16], branch="master", onlyIfChanged=True)
 c['schedulers'].append(llvmsvn_nightly_scheduler)
 
-llvmsvn_build_factory = BuildFactory()
-llvmsvn_build_factory.useProgress = True
-llvmsvn_build_factory.addSteps([
+julia_llvmsvn_factory = BuildFactory()
+julia_llvmsvn_factory.useProgress = True
+julia_llvmsvn_factory.addSteps([
     # Clone julia
     Git(
     	name="Julia checkout",
@@ -25,27 +25,34 @@ llvmsvn_build_factory.addSteps([
     	flunkOnFailure=False
     ),
 
+    # Add our particular configuration to flags
+    SetPropertyFromCommand(
+        name="Add configuration to flags",
+        command=["echo", Interpolate("%(prop:flags)s LLVM_VER=svn")],
+        property="flags"
+    ),
+
     # make clean first, and nuke llvm
     ShellCommand(
     	name="make cleanall",
-    	command=["make", "LLVM_VER=svn", "CC=ccache gcc", "CXX=ccache g++", "FC=ccache gfortran", "VERBOSE=1", "cleanall"]
+    	command=["/bin/bash", "-c", Interpolate("make %(prop:flags)s cleanall")]
     ),
     ShellCommand(
     	name="make distclean-llvm",
-    	command=["make", "LLVM_VER=svn", "CC=ccache gcc", "CXX=ccache g++", "FC=ccache gfortran", "VERBOSE=1", "-C", "deps", "distclean-llvm"]
+    	command=["/bin/bash", "-c", Interpolate("make %(prop:flags)s cleanall -C distclean-llvm")]
     ),
 
     # Make!
     ShellCommand(
     	name="make",
-    	command=["make", "LLVM_VER=svn", "VERBOSE=1"],
+    	command=["/bin/bash", "-c", Interpolate("make %(prop:flags)s")]
     	haltOnFailure = True
     ),
 
     # Test!
     ShellCommand(
     	name="make testall",
-    	command=["make", "LLVM_VER=svn", "VERBOSE=1", "testall"]
+    	command=["/bin/bash", "-c", Interpolate("make %(prop:flags)s testall")]
     )
 ])
 
@@ -54,5 +61,5 @@ for arch in ["x86", "x64"]:
         name="build_llvmsvn_nightly-%s"%(arch),
         slavenames=["ubuntu14.04-%s"%(arch)],
         category="Nightlies",
-        factory=llvmsvn_build_factory
+        factory=julia_llvmsvn_factory
     ))
