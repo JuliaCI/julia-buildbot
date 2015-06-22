@@ -73,8 +73,8 @@ julia_dmg_factory.addSteps([
 
     # Actually package the darn thing
     ShellCommand(
-    	name="Unlock keychain",
-    	command=["/bin/bash", "/Users/vagrant/unlock_keychain.sh"]
+        name="Unlock keychain",
+        command=["/bin/bash", "~/unlock_keychain.sh"]
     ),
     ShellCommand(
     	name="make .app",
