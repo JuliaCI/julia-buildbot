@@ -31,7 +31,7 @@ julia_dmg_factory.addSteps([
     # Unlink brew dependencies
     ShellCommand(
     	name="Unlink brew dependencies",
-    	command=["brew", "unlink", "llvm33-julia", "arpack-julia", "suite-sparse-julia", "openblas-julia", "gettext"],
+    	command=["brew", "unlink", "llvm33-julia", "arpack-julia", "suite-sparse-julia", "openblas-julia"],
     	flunkOnFailure=False
     ),
     # Make sure gcc and cmake are installed though!
