@@ -73,12 +73,8 @@ julia_dmg_factory.addSteps([
 
     # Actually package the darn thing
     ShellCommand(
-        name="Unlock keychain",
-        command=["/bin/bash", "~/unlock_keychain.sh"]
-    ),
-    ShellCommand(
     	name="make .app",
-    	command=["/bin/bash", "-c", Interpolate("make %(prop:flags)s -C contrib/mac/app")],
+    	command=["/bin/bash", "-c", Interpolate("~/unlock_keychain.sh && make %(prop:flags)s -C contrib/mac/app")],
     	haltOnFailure=True
     ),
 
