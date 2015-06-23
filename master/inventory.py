@@ -51,6 +51,10 @@ for name in all_names:
     if name[:3] == "osx":
         march = "core2"
 
+    # On ancient CentOS systems, O_CLOEXEC makes LLVM sad
+    if name[:10] == "centos-5.11":
+        flags += 'CFLAGS="-DO_CLOEXEC=0"'
+
     # Add MARCH to flags
     flags += "MARCH=%s "%(march)
     c['slaves'] += [BuildSlave(name, 'julialang42', max_builds=1,
