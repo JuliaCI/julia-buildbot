@@ -53,7 +53,7 @@ for name in all_names:
 
     # On ancient CentOS systems, O_CLOEXEC makes LLVM sad
     if name[:10] == "centos-5.11":
-        flags += 'CFLAGS="-DO_CLOEXEC=0"'
+        flags += 'CFLAGS="-DO_CLOEXEC=0" '
 
     # Add MARCH to flags
     flags += "MARCH=%s "%(march)
