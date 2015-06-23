@@ -52,7 +52,7 @@ for name in all_names:
         march = "core2"
 
     # On ancient CentOS systems, O_CLOEXEC makes LLVM sad
-    if name[:10] == "centos-5.11":
+    if name[:10] == "centos5.11":
         flags += 'CFLAGS="-DO_CLOEXEC=0" '
 
     # Add MARCH to flags
