@@ -25,7 +25,7 @@ if [[ ! -d $(dirname $(dirname $brew))/Library/Taps/$TAP ]]; then
 	brew tap $(dirname $FORMULA)
 fi
 
-(cd $(dirname $(dirname $brew))/Library/Taps/$TAP && git reset --hard && git fetch && git checkout $BUILD_BRANCH; git reset --hard origin/$BUILD_BRANCH)
+(cd $(dirname $(dirname $brew))/Library/Taps/$TAP && git reset --hard && git fetch && git checkout -b $BUILD_BRANCH -t origin/$BUILD_BRANCH; git reset --hard origin/$BUILD_BRANCH)
 
 # Remove everything first, so we always start clean
 $brew rm --force $($brew deps $FORMULA) 2>/dev/null
