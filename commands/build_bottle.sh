@@ -23,6 +23,7 @@ TAP=$(dirname $(dirname $FORMULA))/homebrew-$(basename $(dirname $FORMULA))
 
 if [[ ! -d $(dirname $(dirname $brew))/Library/Taps/$TAP ]]; then
 	brew tap $(dirname $FORMULA)
+	(cd $(dirname $(dirname $brew))/Library/Taps/$TAP && git remote set-branches --add origin staging)
 fi
 
 (cd $(dirname $(dirname $brew))/Library/Taps/$TAP && git reset --hard && git fetch && git checkout -b $BUILD_BRANCH -t origin/$BUILD_BRANCH; git reset --hard origin/$BUILD_BRANCH)
