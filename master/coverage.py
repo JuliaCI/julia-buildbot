@@ -85,12 +85,6 @@ julia_coverage_factory.addSteps([
         command=[Interpolate("julia-%(prop:shortcommit)s/bin/julia"), "-e", "Pkg.update(); Pkg.build()"],
     ),
 
-    # Remove sys.so
-    ShellCommand(
-        name="Delete sys.so",
-        command=["rm", "-f", Interpolate("julia-%(prop:shortcommit)s/lib/julia/sys.so")],
-    ),
-
     # Test CoverageBase to make sure everything's on the up-and-up
     ShellCommand(
         name="Test CoverageBase.jl",
@@ -101,7 +95,7 @@ julia_coverage_factory.addSteps([
     # Run Julia, gathering coverage statistics and then analyzing them into a .jld file
     ShellCommand(
         name="Run inlined tests",
-        command=[Interpolate("julia-%(prop:shortcommit)s/bin/julia"), "--code-coverage=all", "-e", run_coverage_cmd]
+        command=[Interpolate("julia-%(prop:shortcommit)s/bin/julia"), "--precompiled=no", "--code-coverage=all", "-e", run_coverage_cmd]
     ),
     ShellCommand(
         name="Gather inlined test results",
@@ -121,7 +115,7 @@ julia_coverage_factory.addSteps([
     # Do the coverage stats for non-inlined tests now
     ShellCommand(
         name="Run non-inlined tests",
-        command=[Interpolate("julia-%(prop:shortcommit)s/bin/julia"), "--code-coverage=all", "--inline=no", "-e", run_coverage_cmd],
+        command=[Interpolate("julia-%(prop:shortcommit)s/bin/julia"), "--precompiled=no", "--code-coverage=all", "--inline=no", "-e", run_coverage_cmd],
         timeout=3600,
     ),
     ShellCommand(
