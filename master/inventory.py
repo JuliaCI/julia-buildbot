@@ -52,8 +52,10 @@ for name in all_names:
         march = "core2"
 
     # On ancient CentOS systems, O_CLOEXEC makes LLVM sad
+    # and old cmake has issues linking openssl in libgit2
     if name[:10] == "centos5.11":
         flags += 'DEPS_CXXFLAGS="-DO_CLOEXEC=0" '
+        flags += 'CMAKE=cmake28 '
 
     # Add MARCH to flags
     flags += "MARCH=%s "%(march)
