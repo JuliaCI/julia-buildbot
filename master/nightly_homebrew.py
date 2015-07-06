@@ -2,7 +2,7 @@
 # Define everything needed to perform nightly homebrew builds
 ###############################################################################
 
-homebrew_nightly_scheduler = Nightly(name="Julia Homebrew Build", builderNames=["homebrew_nightly_build"], hour=[0,8,16], branch="master", onlyIfChanged=True )
+homebrew_nightly_scheduler = Nightly(name="Julia Homebrew Build", builderNames=["nightly_homebrew"], hour=[0,12], branch="master", onlyIfChanged=True )
 c['schedulers'].append(homebrew_nightly_scheduler)
 
 homebrew_nightly_factory = BuildFactory()
@@ -43,7 +43,7 @@ homebrew_nightly_factory.addSteps([
 
 # Add Homebrew nightly builder
 c['builders'].append(BuilderConfig(
-	name="homebrew_nightly_build",
+	name="nightly_homebrew",
 	slavenames=["osx10.9-x64"],
 	category="Nightlies",
 	factory=homebrew_nightly_factory

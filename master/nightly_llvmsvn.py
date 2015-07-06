@@ -2,7 +2,7 @@
 # Define everything needed to build nightly Julia builds against LLVM SVN
 ###############################################################################
 
-llvmsvn_nightly_scheduler = Nightly(name="Julia LLVM SVN Build", builderNames=["build_llvmsvn_nightly-x86", "build_llvmsvn_nightly-x64"], hour=[0,8,16], branch="master", onlyIfChanged=True)
+llvmsvn_nightly_scheduler = Nightly(name="Julia LLVM SVN Build", builderNames=["nightly_llvmsvn-x86", "nightly_llvmsvn-x64"], hour=[0,12], branch="master", onlyIfChanged=True)
 c['schedulers'].append(llvmsvn_nightly_scheduler)
 
 julia_llvmsvn_factory = BuildFactory()
@@ -58,7 +58,7 @@ julia_llvmsvn_factory.addSteps([
 
 for arch in ["x86", "x64"]:
     c['builders'].append(BuilderConfig(
-        name="build_llvmsvn_nightly-%s"%(arch),
+        name="nightly_llvmsvn-%s"%(arch),
         slavenames=["ubuntu14.04-%s"%(arch)],
         category="Nightlies",
         factory=julia_llvmsvn_factory

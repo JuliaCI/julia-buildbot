@@ -2,9 +2,9 @@
 # Define everything needed to build nightly Julia builds against LLVM SVN for Cxx.jl
 ###############################################################################
 
-julia_cxx_packagers = ["package_cxx32", "package_cxx64"]
-cxx_package_scheduler = Dependent(name="Julia Cxx package", builderNames=julia_cxx_packagers, upstream=quickbuild_scheduler)
-c['schedulers'].append(cxx_package_scheduler)
+julia_cxx_builders = ["nightly_cxx32", "nightly_cxx64"]
+cxx_nightly_scheduler = Nightly(name="Julia Cxx package", builderNames=julia_cxx_builders, hour=[0,12], branch="master", onlyIfChanged=True )
+c['schedulers'].append(cxx_nightly_scheduler)
 
 julia_cxx_factory = BuildFactory()
 julia_cxx_factory.useProgress = True
@@ -87,15 +87,15 @@ julia_cxx_factory.addSteps([
 
 # Add linux tarball builders
 c['builders'].append(BuilderConfig(
-    name="package_cxx32",
+    name="nightly_cxx32",
     slavenames=["centos5.11-x86"],
     category="Packaging",
     factory=julia_cxx_factory
 ))
 
 c['builders'].append(BuilderConfig(
-    name="package_cxx64",
+    name="nightly_cxx64",
     slavenames=["centos5.11-x64"],
-    category="Packaging",
+    category="Nightlies",
     factory=julia_cxx_factory
 ))

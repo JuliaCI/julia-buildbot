@@ -3,8 +3,8 @@
 ###############################################################################
 
 # Add a dependent scheduler for SRPM packaging
-julia_srpm_packagers  = ["package_srpm"]
-srpm_package_scheduler = Nightly(name="Julia SRPM package", builderNames=julia_srpm_packagers, branch="master", hour=0, onlyIfChanged=True)
+julia_srpm_builders  = ["nightly_srpm"]
+srpm_package_scheduler = Nightly(name="Julia SRPM package", builderNames=julia_srpm_builders, branch="master", hour=[0], onlyIfChanged=True)
 c['schedulers'].append(srpm_package_scheduler)
 
 julia_srpm_package_factory = BuildFactory()
@@ -147,8 +147,8 @@ julia_srpm_package_factory.addSteps([
 
 # Add SRPM packager
 c['builders'].append(BuilderConfig(
-    name="package_srpm",
+    name="nightly_srpm",
     slavenames=["centos7.1-x64"],
-    category="Packaging",
+    category="Nightlies",
     factory=julia_srpm_package_factory,
 ))
