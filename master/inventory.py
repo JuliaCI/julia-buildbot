@@ -43,9 +43,9 @@ for name in all_names:
             flags += 'XC_HOST=i686-w64-mingw32 '
         else:
             flags += 'XC_HOST=x86_64-w64-mingw32 '
-    else:
+    #else:
         # We're going to try compiling everything with ccache to speed up buildtimes
-        flags += 'USECCACHE=1 '
+        #flags += 'USECCACHE=1 '
 
     # On OSX, core2 is the minimum MARCH we support
     if name[:3] == "osx":
