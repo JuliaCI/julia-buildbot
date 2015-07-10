@@ -49,11 +49,11 @@ git_info = @compat Dict(
 )
 
 # Submit to Coveralls
-ENV['REPO_TOKEN'] = ENV['COVERALLS_REPO_TOKEN']
+ENV["REPO_TOKEN"] = ENV["COVERALLS_REPO_TOKEN"]
 Coveralls.submit_token(coveralls_results, git_info)
 
 # Submit to codecov
-ENV['REPO_TOKEN'] = ENV['CODECOV_REPO_TOKEN']
+ENV["REPO_TOKEN"] = ENV["CODECOV_REPO_TOKEN"]
 Codecov.submit_token(codecov_results)
 """
 
