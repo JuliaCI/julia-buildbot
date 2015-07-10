@@ -135,12 +135,12 @@ julia_coverage_factory.addSteps([
         command=[Interpolate("julia-%(prop:shortcommit)s/bin/julia"), "-e", analyze_cov_cmd]
     ),
     ShellCommand(
-        name="Move coverage_coveralls.jld -> coverage_coveralls_noninlined.jld",
-        command=["mv", Interpolate("julia-%(prop:shortcommit)s/share/julia/coverage_coveralls.jld"), Interpolate("julia-%(prop:shortcommit)s/share/julia/coverage_coveralls_noninlined.jld")]
+        name="Move coveralls.jld -> coveralls_noninlined.jld",
+        command=["mv", Interpolate("julia-%(prop:shortcommit)s/share/julia/coveralls.jld"), Interpolate("julia-%(prop:shortcommit)s/share/julia/coveralls_noninlined.jld")]
     ),
     ShellCommand(
-        name="Move coverage_codecov.jld -> coverage_codecov_noninlined.jld",
-        command=["mv", Interpolate("julia-%(prop:shortcommit)s/share/julia/coverage_codecov.jld"), Interpolate("julia-%(prop:shortcommit)s/share/julia/coverage_codecov_noninlined.jld")]
+        name="Move codecov.jld -> codecov_noninlined.jld",
+        command=["mv", Interpolate("julia-%(prop:shortcommit)s/share/julia/codecov.jld"), Interpolate("julia-%(prop:shortcommit)s/share/julia/codecov_noninlined.jld")]
     ),
 
     # Merge final results and submit!
