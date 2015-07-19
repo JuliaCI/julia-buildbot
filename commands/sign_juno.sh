@@ -39,10 +39,10 @@ if [[ "$(uname)" == "Darwin" ]]; then
 else
 	if [[ "$(hostname)" == "win81x86" ]]; then
 		WIN_URL="$WIN32_URL"
-		FOLDER_NAME="windows32"
+		FOLDER_NAME="juno-windows32"
 	else
 		WIN_URL="$WIN64_URL"
-		FOLDER_NAME="windows64"
+		FOLDER_NAME="juno-windows64"
 	fi
 
 	# First, clean everything out
