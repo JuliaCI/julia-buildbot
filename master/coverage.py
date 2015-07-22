@@ -73,24 +73,26 @@ julia_coverage_factory.addSteps([
         command=["/bin/bash", "-c", Interpolate("curl -L %(prop:url)s | tar zx")],
     ),
 
-    # Ensure CoverageBase is installed
+    # Ensure HDF5 is installed
     ShellCommand(
         name="Install hdf5",
         command=["sudo", "apt-get", "install", "-y", "hdf5-tools"],
-    ),
-    ShellCommand(
-        name="Install CoverageBase",
-        command=[Interpolate("julia-%(prop:shortcommit)s/bin/julia"), "-e", "Pkg.add(\"CoverageBase\")"],
-    ),
-    ShellCommand(
-        name="Checkout master",
-        command=[Interpolate("julia-%(prop:shortcommit)s/bin/julia"), "-e", "Pkg.checkout(\"CoverageBase\", \"master\")"],
     ),
 
     # Update packages
     ShellCommand(
         name="Update packages",
         command=[Interpolate("julia-%(prop:shortcommit)s/bin/julia"), "-e", "Pkg.update(); Pkg.build()"],
+    ),
+
+    # Install Coverage, CoverageBase
+    ShellCommand(
+        name="Install Coverage and checkout latest master",
+        command=[Interpolate("julia-%(prop:shortcommit)s/bin/julia"), "-e", "Pkg.add(\"Coverage\"); Pkg.checkout(\"Coverage\", \"master\")"],
+    ),
+    ShellCommand(
+        name="Install CoverageBase and checkout latest master",
+        command=[Interpolate("julia-%(prop:shortcommit)s/bin/julia"), "-e", "Pkg.add(\"CoverageBase\"); Pkg.checkout(\"CoverageBase\", \"master\")"],
     ),
 
     # Test CoverageBase to make sure everything's on the up-and-up
