@@ -27,7 +27,7 @@ merge_cov_cmd = """
 using Coverage, CoverageBase, HDF5, JLD, Compat
 cd(joinpath(CoverageBase.julia_top()))
 coveralls_results = CoverageBase.merge_coverage(load("coveralls_noninlined.jld", "results"), load("coveralls_inlined.jld", "results"))
-codecov_results = CoverageBase.merge_coverage(load("codecov_noninlined.jld", "results"), load("codecov_inlined.jld", "results"))
+codecov_results = CoverageBase.merge_coverage_codecov(load("codecov_noninlined.jld", "results"), load("codecov_inlined.jld", "results"))
 
 # Create git_info for Coveralls
 git_info = @compat Dict(
