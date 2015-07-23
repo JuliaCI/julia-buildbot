@@ -54,7 +54,7 @@ Coveralls.submit_token(coveralls_results, git_info)
 
 # Submit to codecov
 ENV["REPO_TOKEN"] = ENV["CODECOV_REPO_TOKEN"]
-Codecov.submit_token(codecov_results)
+Codecov.submit_token(codecov_results, Base.GIT_VERSION_INFO.commit, Base.GIT_VERSION_INFO.branch)
 """
 
 # Steps to download a linux tarball, extract it, run coverage on it, and upload coverage stats
