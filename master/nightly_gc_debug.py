@@ -2,7 +2,7 @@
 # Define everything needed to build nightly Julia for gc debugging
 ###############################################################################
 
-gc_debug_nightly_scheduler = Nightly(name="Julia GC Debug Build", builderNames=["nightly_gc_debug-x86", "nightly_gc_debug-x64"], hour=[0,12], branch="master", onlyIfChanged=True)
+gc_debug_nightly_scheduler = Nightly(name="Julia GC Debug Build", builderNames=["nightly_gc_debug-x86", "nightly_gc_debug-x64"], hour=[3], branch="master", onlyIfChanged=True)
 c['schedulers'].append(gc_debug_nightly_scheduler)
 
 julia_gc_debug_factory = BuildFactory()
