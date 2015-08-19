@@ -70,7 +70,6 @@ make NO_GIT=1 -C deps getall
 # Let's build the documentation, so that we don't have to do so on the debian servers
 make -C doc html
 make -C doc latex
-make -C doc helpdb.jl
 
 # We're going to compile LLVM on our own.  :(
 make -C deps get-llvm
