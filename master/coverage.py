@@ -17,17 +17,14 @@ analyze_cov_cmd = """
 import CoverageBase
 using Coverage, HDF5, JLD
 cd(joinpath(CoverageBase.julia_top()))
-results=Coveralls.process_folder("base")
-save("coveralls.jld", "results", results)
-results=Codecov.process_folder("base")
-save("codecov.jld", "results", results)
+results=Coverage.process_folder("base")
+save("coverage.jld", "results", results)
 """
 
 merge_cov_cmd = """
 using Coverage, CoverageBase, HDF5, JLD, Compat
 cd(joinpath(CoverageBase.julia_top()))
-coveralls_results = CoverageBase.merge_coverage(load("coveralls_noninlined.jld", "results"), load("coveralls_inlined.jld", "results"))
-codecov_results = CoverageBase.merge_coverage_codecov(load("codecov_noninlined.jld", "results"), load("codecov_inlined.jld", "results"))
+results = CoverageBase.merge_coverage(load("coverage_noninlined.jld", "results"), load("coverage_inlined.jld", "results"))
 
 # Create git_info for Coveralls
 git_info = @compat Dict(
@@ -50,11 +47,11 @@ git_info = @compat Dict(
 
 # Submit to Coveralls
 ENV["REPO_TOKEN"] = ENV["COVERALLS_REPO_TOKEN"]
-Coveralls.submit_token(coveralls_results, git_info)
+Coveralls.submit_token(results, git_info)
 
 # Submit to codecov
 ENV["REPO_TOKEN"] = ENV["CODECOV_REPO_TOKEN"]
-Codecov.submit_token(codecov_results, Base.GIT_VERSION_INFO.commit, Base.GIT_VERSION_INFO.branch)
+Codecov.submit_token(results, Base.GIT_VERSION_INFO.commit, Base.GIT_VERSION_INFO.branch)
 """
 
 # Steps to download a linux tarball, extract it, run coverage on it, and upload coverage stats
@@ -118,12 +115,8 @@ julia_coverage_factory.addSteps([
         command=["/bin/bash", "-c", "find . -name *.cov | xargs rm -f"]
     ),
     ShellCommand(
-        name="Move coveralls.jld -> coveralls_inlined.jld",
-        command=["mv", Interpolate("julia-%(prop:shortcommit)s/share/julia/coveralls.jld"), Interpolate("julia-%(prop:shortcommit)s/share/julia/coveralls_inlined.jld")]
-    ),
-    ShellCommand(
-        name="Move codecov.jld -> codecov_inlined.jld",
-        command=["mv", Interpolate("julia-%(prop:shortcommit)s/share/julia/codecov.jld"), Interpolate("julia-%(prop:shortcommit)s/share/julia/codecov_inlined.jld")]
+        name="Move coverage.jld -> coverage_inlined.jld",
+        command=["mv", Interpolate("julia-%(prop:shortcommit)s/share/julia/coverage.jld"), Interpolate("julia-%(prop:shortcommit)s/share/julia/coverage_inlined.jld")]
     ),
 
     # Do the coverage stats for non-inlined tests now
@@ -137,14 +130,9 @@ julia_coverage_factory.addSteps([
         command=[Interpolate("julia-%(prop:shortcommit)s/bin/julia"), "-e", analyze_cov_cmd]
     ),
     ShellCommand(
-        name="Move coveralls.jld -> coveralls_noninlined.jld",
-        command=["mv", Interpolate("julia-%(prop:shortcommit)s/share/julia/coveralls.jld"), Interpolate("julia-%(prop:shortcommit)s/share/julia/coveralls_noninlined.jld")]
+        name="Move coverage.jld -> coverage_noninlined.jld",
+        command=["mv", Interpolate("julia-%(prop:shortcommit)s/share/julia/coverage.jld"), Interpolate("julia-%(prop:shortcommit)s/share/julia/coverage_noninlined.jld")]
     ),
-    ShellCommand(
-        name="Move codecov.jld -> codecov_noninlined.jld",
-        command=["mv", Interpolate("julia-%(prop:shortcommit)s/share/julia/codecov.jld"), Interpolate("julia-%(prop:shortcommit)s/share/julia/codecov_noninlined.jld")]
-    ),
-
     # Merge final results and submit!
     ShellCommand(
         name="Merge and submit",
