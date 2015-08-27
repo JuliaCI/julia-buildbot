@@ -7,6 +7,11 @@ julia_coverage_builders = ["coverage_ubuntu14.04-x64"]
 julia_coverage_scheduler = Triggerable(name="Julia Coverage Testing", builderNames=julia_coverage_builders)
 c['schedulers'].append(julia_coverage_scheduler)
 
+c['schedulers'].append(ForceScheduler(
+    name="coverage build",
+    builderNames=julia_coverage_builders,
+))
+
 run_coverage_cmd = """
 import CoverageBase
 using Base.Test
