@@ -11,10 +11,12 @@ c['schedulers'].append(ForceScheduler(
     name="coverage build",
     builderNames=julia_coverage_builders,
     reason=FixedParameter(name="reason", default=""),
+    revision=FixedParameter(name="revision", default=""),
     branch=FixedParameter(name="branch", default=""),
     repository=FixedParameter(name="repository", default=""),
-    project=FixedParameter(name="project", default="Packaging"),
+    project=FixedParameter(name="project", default="Coverage"),
     properties=[
+        StringParameter(name="url", default="https://status.julialang.org/download/linux-x86_64"),
     ]
 ))
 
@@ -75,7 +77,7 @@ julia_coverage_factory.addSteps([
         command=["/bin/bash", "-c", "rm -rf *"]
     ),
 
-    # Download the latest tarball and extract it
+    # Download the appropriate tarball and extract it
     ShellCommand(
         name="download/extract tarball",
         command=["/bin/bash", "-c", Interpolate("curl -L %(prop:url)s | tar zx")],
