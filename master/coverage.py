@@ -92,7 +92,7 @@ julia_coverage_factory.addSteps([
     # Find Julia directory (so we don't have to know the shortcommit)
     SetPropertyFromCommand(
         name="Find Julia executable",
-        command=["/bin/bash", "-c", "ls julia-*"],
+        command=["/bin/bash", "-c", "echo julia-*"],
         property="juliadir"
     ),
 
