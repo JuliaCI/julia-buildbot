@@ -89,37 +89,44 @@ julia_coverage_factory.addSteps([
         command=["sudo", "apt-get", "install", "-y", "hdf5-tools"],
     ),
 
+    # Find Julia directory (so we don't have to know the shortcommit)
+    SetPropertyFromCommand(
+        name="Find Julia executable",
+        command=["/bin/bash", "-c", "ls julia-*"],
+        property="juliadir"
+    ),
+
     # Update packages
     ShellCommand(
         name="Update packages",
-        command=[Interpolate("julia-*/bin/julia"), "-e", "Pkg.update(); Pkg.build()"],
+        command=[Interpolate("%(prop:juliadir)s/bin/julia"), "-e", "Pkg.update(); Pkg.build()"],
     ),
 
     # Install Coverage, CoverageBase
     ShellCommand(
         name="Install Coverage and checkout latest master",
-        command=[Interpolate("julia-*/bin/julia"), "-e", "Pkg.add(\"Coverage\"); Pkg.checkout(\"Coverage\", \"master\")"],
+        command=[Interpolate("%(prop:juliadir)s/bin/julia"), "-e", "Pkg.add(\"Coverage\"); Pkg.checkout(\"Coverage\", \"master\")"],
     ),
     ShellCommand(
         name="Install CoverageBase and checkout latest master",
-        command=[Interpolate("julia-*/bin/julia"), "-e", "Pkg.add(\"CoverageBase\"); Pkg.checkout(\"CoverageBase\", \"master\")"],
+        command=[Interpolate("%(prop:juliadir)s/bin/julia"), "-e", "Pkg.add(\"CoverageBase\"); Pkg.checkout(\"CoverageBase\", \"master\")"],
     ),
 
     # Test CoverageBase to make sure everything's on the up-and-up
     ShellCommand(
         name="Test CoverageBase.jl",
-        command=[Interpolate("julia-*/bin/julia"), "-e", "Pkg.test(\"CoverageBase\")"],
+        command=[Interpolate("%(prop:juliadir)s/bin/julia"), "-e", "Pkg.test(\"CoverageBase\")"],
         haltOnFailure=True,
     ),
 
     # Run Julia, gathering coverage statistics and then analyzing them into a .jld file
     ShellCommand(
         name="Run inlined tests",
-        command=[Interpolate("julia-*/bin/julia"), "--precompiled=no", "--code-coverage=all", "-e", run_coverage_cmd]
+        command=[Interpolate("%(prop:juliadir)s/bin/julia"), "--precompiled=no", "--code-coverage=all", "-e", run_coverage_cmd]
     ),
     ShellCommand(
         name="Gather inlined test results",
-        command=[Interpolate("julia-*/bin/julia"), "-e", analyze_cov_cmd]
+        command=[Interpolate("%(prop:juliadir)s/bin/julia"), "-e", analyze_cov_cmd]
     ),
 
     # Clear out all .cov files, so that we can run the non-inlined tests without fear of interference
@@ -129,27 +136,27 @@ julia_coverage_factory.addSteps([
     ),
     ShellCommand(
         name="Move coverage.jld -> coverage_inlined.jld",
-        command=["mv", Interpolate("julia-*/share/julia/coverage.jld"), Interpolate("julia-*/share/julia/coverage_inlined.jld")]
+        command=["mv", Interpolate("%(prop:juliadir)s/share/julia/coverage.jld"), Interpolate("%(prop:juliadir)s/share/julia/coverage_inlined.jld")]
     ),
 
     # Do the coverage stats for non-inlined tests now
     ShellCommand(
         name="Run non-inlined tests",
-        command=[Interpolate("julia-*/bin/julia"), "--precompiled=no", "--code-coverage=all", "--inline=no", "-e", run_coverage_cmd],
+        command=[Interpolate("%(prop:juliadir)s/bin/julia"), "--precompiled=no", "--code-coverage=all", "--inline=no", "-e", run_coverage_cmd],
         timeout=3600,
     ),
     ShellCommand(
         name="Gather non-inlined test results",
-        command=[Interpolate("julia-*/bin/julia"), "-e", analyze_cov_cmd]
+        command=[Interpolate("%(prop:juliadir)s/bin/julia"), "-e", analyze_cov_cmd]
     ),
     ShellCommand(
         name="Move coverage.jld -> coverage_noninlined.jld",
-        command=["mv", Interpolate("julia-*/share/julia/coverage.jld"), Interpolate("julia-*/share/julia/coverage_noninlined.jld")]
+        command=["mv", Interpolate("%(prop:juliadir)s/share/julia/coverage.jld"), Interpolate("%(prop:juliadir)s/share/julia/coverage_noninlined.jld")]
     ),
     # Merge final results and submit!
     ShellCommand(
         name="Merge and submit",
-        command=[Interpolate("julia-*/bin/julia"), "-e", Interpolate(merge_cov_cmd)],
+        command=[Interpolate("%(prop:juliadir)s/bin/julia"), "-e", Interpolate(merge_cov_cmd)],
         env={'COVERALLS_REPO_TOKEN':COVERALLS_REPO_TOKEN, 'CODECOV_REPO_TOKEN':CODECOV_REPO_TOKEN},
         logEnviron=False,
     ),
