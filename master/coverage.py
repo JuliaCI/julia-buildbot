@@ -10,6 +10,12 @@ c['schedulers'].append(julia_coverage_scheduler)
 c['schedulers'].append(ForceScheduler(
     name="coverage build",
     builderNames=julia_coverage_builders,
+    reason=FixedParameter(name="reason", default=""),
+    branch=FixedParameter(name="branch", default=""),
+    repository=FixedParameter(name="repository", default=""),
+    project=FixedParameter(name="project", default="Packaging"),
+    properties=[
+    ]
 ))
 
 run_coverage_cmd = """
