@@ -5,7 +5,7 @@
 # Add a manual scheduler for signing juno
 juno_scheduler = ForceScheduler(
     name="juno signing",
-    builderNames=["juno_osx10.9-x64", "juno_win8.1-x86", "juno_win8.1-x64"],
+    builderNames=["juno_osx10.9-x64", "juno_win6.2-x86", "juno_win6.2-x64"],
     reason=FixedParameter(name="reason", default=""),
     branch=FixedParameter(name="branch", default=""),
     revision=FixedParameter(name="revision", default=""),
@@ -38,7 +38,7 @@ sign_juno_factory.addSteps([
     MasterShellCommand(name="Cleanup", command=["rm", "-f", Interpolate("/tmp/bottle_cache/%(prop:filename)s")])
 ])
 
-for name in ["osx10.9-x64", "win8.1-x86", "win8.1-x64"]:
+for name in ["osx10.9-x64", "win6.2-x86", "win6.2-x64"]:
     c['builders'].append(BuilderConfig(
         name="juno_%s"%(name),
         slavenames=[name],
