@@ -80,7 +80,7 @@ win_package_factory.addSteps([
     ),
     ShellCommand(
         name="Sign exe",
-        command=["/bin/bash", "/home/vagrant/sign.sh", Interpolate("%(prop:filename)s")]
+        command=["/bin/bash", "-c", Interpolate("~/sign.sh %(prop:filename)s")]
     ),
 
     FileUpload(
