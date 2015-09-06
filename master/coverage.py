@@ -16,7 +16,7 @@ c['schedulers'].append(ForceScheduler(
     repository=FixedParameter(name="repository", default=""),
     project=FixedParameter(name="project", default="Coverage"),
     properties=[
-        StringParameter(name="url", default="https://status.julialang.org/download/linux-x86_64"),
+        StringParameter(name="url", size=30, default="https://status.julialang.org/download/linux-x86_64"),
     ]
 ))
 
