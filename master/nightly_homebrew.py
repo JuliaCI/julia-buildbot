@@ -35,7 +35,7 @@ homebrew_nightly_factory.addSteps([
 		command=["/usr/local/bin/julia", "-e", "println(Base.GIT_VERSION_INFO.commit[1:10])"],
 		property="shortcommit"
 	),
-	ShellCommand(
+	MasterShellCommand(
 		name="Report success",
 		command=["curl", "-L", "-H", "Content-type: application/json", "-d", Interpolate('{"target": "Homebrew", "version": "%(prop:shortcommit)s"}'), "https://status.julialang.org/put/nightly"]
 	)

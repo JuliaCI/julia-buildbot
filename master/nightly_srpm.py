@@ -138,7 +138,7 @@ julia_srpm_package_factory.addSteps([
         command=["/bin/bash", "-c", Interpolate("echo %(prop:revision)s | cut -c1-10")],
         property="shortcommit"
     ),
-    ShellCommand(
+    MasterShellCommand(
         name="Report success",
         command=["curl", "-L", "-H", "Content-type: application/json", "-d", Interpolate('{"target": "Copr", "url": "https://s3.amazonaws.com/julianightlies/bin/srpm/%(prop:filename)s", "version": "%(prop:shortcommit)s"}'), "https://status.julialang.org/put/nightly"]
     )

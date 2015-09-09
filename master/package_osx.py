@@ -115,7 +115,7 @@ julia_dmg_factory.addSteps([
     ),
 
     # Report back to the mothership
-    ShellCommand(
+    MasterShellCommand(
     	name="Report success",
     	command=["curl", "-L", "-H", "Content-type: application/json", "-d", Interpolate('{"target": "osx10.7+", "url": "https://s3.amazonaws.com/julianightlies/bin/osx/x64/%(prop:majmin)s/julia-%(prop:version)s-%(prop:shortcommit)s-osx.dmg", "version": "%(prop:shortcommit)s"}'), "https://status.julialang.org/put/nightly"],
     	doStepIf=is_nightly_build
