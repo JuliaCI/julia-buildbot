@@ -31,8 +31,8 @@ fi
 # Remove everything first, so we always start clean
 $brew rm --force $($brew deps $FORMULA) 2>/dev/null
 $brew rm --force $FORMULA 2>/dev/null
-$brew cleanup --cached
-rm -vf $($brew --cache)/*bottle.*tar.gz
+#$brew cleanup --cached
+#rm -vf $($brew --cache)/*bottle.*tar.gz
 
 # Install dependencies first as bottles when possible
 deps=$($brew deps -n $1)
