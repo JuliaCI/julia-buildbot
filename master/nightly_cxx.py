@@ -2,7 +2,7 @@
 # Define everything needed to build nightly Julia builds against LLVM SVN for Cxx.jl
 ###############################################################################
 
-julia_cxx_builders = ["nightly_cxx32", "nightly_cxx64"]
+julia_cxx_builders = ["nightly_cxx64"]
 cxx_nightly_scheduler = Nightly(name="Julia Cxx package", builderNames=julia_cxx_builders, hour=[0,12], branch="master", onlyIfChanged=True )
 c['schedulers'].append(cxx_nightly_scheduler)
 
