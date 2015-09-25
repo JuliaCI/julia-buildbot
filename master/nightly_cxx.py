@@ -86,16 +86,16 @@ julia_cxx_factory.addSteps([
 
 
 # Add linux tarball builders
-c['builders'].append(BuilderConfig(
-    name="nightly_cxx32",
-    slavenames=["ubuntu12.04-x86"],
-    category="Packaging",
-    factory=julia_cxx_factory
-))
+#c['builders'].append(BuilderConfig(
+#    name="nightly_cxx32",
+#    slavenames=["ubuntu12.04-x86"],
+#    category="Packaging",
+#    factory=julia_cxx_factory
+#))
 
 c['builders'].append(BuilderConfig(
     name="nightly_cxx64",
-    slavenames=["ubuntu12.04-x64"],
+    slavenames=["centos6.7-x64"],
     category="Nightlies",
     factory=julia_cxx_factory
 ))
