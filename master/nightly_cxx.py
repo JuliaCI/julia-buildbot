@@ -49,6 +49,21 @@ julia_cxx_factory.addSteps([
         command=["/bin/bash", "-c", Interpolate("make %(prop:flags)s binary-dist")],
         haltOnFailure = True
     ),
+    SetPropertyFromCommand(
+        name="Get major/minor version",
+        command=["./julia", "-e", "println(\"$(VERSION.major).$(VERSION.minor)\")"],
+        property="majmin"
+    ),
+    SetPropertyFromCommand(
+        name="Get major/minor/patch version",
+        command=["./julia", "-e", "println(\"$(VERSION.major).$(VERSION.minor).$(VERSION.patch)\")"],
+        property="version"
+    ),
+    SetPropertyFromCommand(
+        name="Get shortcommit",
+        command=["./julia", "-e", "println(Base.GIT_VERSION_INFO.commit[1:10])"],
+        property="shortcommit"
+    ),
 
     # Upload the result!
     MasterShellCommand(
