@@ -71,7 +71,7 @@ julia_cxx_factory.addSteps([
         command=["mkdir", "-p", "/tmp/julia_package"]
     ),
     FileUpload(
-        slavesrc=Interpolate("juliacxx-%(prop:shortcommit)s-Linux-%(prop:tar_arch)s.tar.gz"),
+        slavesrc=Interpolate("julia-%(prop:shortcommit)s-Linux-%(prop:tar_arch)s.tar.gz"),
         masterdest=Interpolate("/tmp/julia_package/juliacxx-%(prop:shortcommit)s-Linux-%(prop:tar_arch)s.tar.gz")
     ),
 
