@@ -6,6 +6,18 @@ julia_cxx_builders = ["nightly_cxx64"]
 cxx_nightly_scheduler = Nightly(name="Julia Cxx package", builderNames=julia_cxx_builders, hour=[0,12], branch="master", onlyIfChanged=True )
 c['schedulers'].append(cxx_nightly_scheduler)
 
+cxx_force_scheduler = ForceScheduler(
+    name="Julia Cxx building",
+    builderNames=["nightly_cxx64"],
+    reason=FixedParameter(name="reason", default=""),
+    branch=FixedParameter(name="branch", default=""),
+    repository=FixedParameter(name="repository", default=""),
+    project=FixedParameter(name="project", default="Juno"),
+    properties=[
+    ]
+)
+c['schedulers'].append(cxx_force_scheduler)
+
 julia_cxx_factory = BuildFactory()
 julia_cxx_factory.useProgress = True
 julia_cxx_factory.addSteps([
