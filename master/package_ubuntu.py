@@ -11,10 +11,16 @@ c['schedulers'].append(ubuntu_package_scheduler)
 ubuntu_package_julia_factory = BuildFactory()
 ubuntu_package_julia_factory.useProgress = True
 ubuntu_package_julia_factory.addSteps([
+    # Fetch first (allowing failure if no existing clone is present) so sha's
+    # that haven't been seen before don't cause rebuilds from scratch
+    ShellCommand(
+        name="git fetch",
+        command=["git", "fetch"],
+        flunkOnFailure=False
+    ),
+
     # Clone julia
     Git(name="Julia checkout", repourl=Property('repository', default='git://github.com/JuliaLang/julia.git'), mode='incremental', method='clean', submodules=True, clobberOnFailure=True, progress=True),
-    # Fetch so that remote branches get updated as well.
-    ShellCommand(command=["git", "fetch"], flunkOnFailure=False),
 
     # Perform pre-tarball steps
     ShellCommand(name="version_git.jl", command=["make", "-C", "base", "version_git.jl.phony"]),

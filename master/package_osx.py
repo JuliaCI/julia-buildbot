@@ -11,6 +11,14 @@ c['schedulers'].append(osx_package_scheduler)
 julia_dmg_factory = BuildFactory()
 julia_dmg_factory.useProgress = True
 julia_dmg_factory.addSteps([
+    # Fetch first (allowing failure if no existing clone is present) so sha's
+    # that haven't been seen before don't cause rebuilds from scratch
+    ShellCommand(
+    	name="git fetch",
+    	command=["git", "fetch"],
+    	flunkOnFailure=False
+    ),
+
     # Clone julia
     Git(
     	name="Julia checkout",
@@ -20,12 +28,6 @@ julia_dmg_factory.addSteps([
     	submodules=True,
     	clobberOnFailure=True,
     	progress=True
-    ),
-    # Fetch so that remote branches get updated as well.
-    ShellCommand(
-    	name="git fetch",
-    	command=["git", "fetch"],
-    	flunkOnFailure=False
     ),
 
     # Unlink brew dependencies

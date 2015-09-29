@@ -11,6 +11,14 @@ c['schedulers'].append(tarball_package_scheduler)
 julia_tarball_factory = BuildFactory()
 julia_tarball_factory.useProgress = True
 julia_tarball_factory.addSteps([
+    # Fetch first (allowing failure if no existing clone is present) so sha's
+    # that haven't been seen before don't cause rebuilds from scratch
+    ShellCommand(
+        name="git fetch",
+        command=["git", "fetch"],
+        flunkOnFailure=False
+    ),
+
     # Clone julia
     Git(
     	name="Julia checkout",
@@ -20,12 +28,6 @@ julia_tarball_factory.addSteps([
     	submodules=True,
     	clobberOnFailure=True,
     	progress=True
-    ),
-    # Fetch so that remote branches get updated as well.
-    ShellCommand(
-    	name="git fetch",
-    	command=["git", "fetch"],
-    	flunkOnFailure=False
     ),
 
     # make clean first
