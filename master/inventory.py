@@ -37,8 +37,10 @@ for name in all_names:
         bits = '32'
         flags += 'JULIA_CPU_TARGET=pentium4 '
 
-    # On windows, add XC_HOST dependent on the architecture
+    # On windows, disable running doc/genstdlib.jl due to julia issue #11727
+    # and add XC_HOST dependent on the architecture
     if name[:3] == 'win':
+        flags += 'JULIA_ENABLE_DOCBUILD=0 '
         if march == 'i686':
             flags += 'XC_HOST=i686-w64-mingw32 '
         else:
