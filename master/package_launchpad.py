@@ -22,7 +22,7 @@ launchpad_package_factory.addSteps([
     ),
     MasterShellCommand(
     	name="Report success",
-    	command=["curl", "-L", "-H", "Content-type: application/json", "-d", Interpolate('{"target": "Launchpad", "version": "%(prop:shortcommit)s"}'), "https://status.julialang.org/put/nightly"]
+        command=["/bin/bash", "-c", Interpolate("~/bin/try_thrice curl -L -H 'Content-type: application/json' -d '{\"target\": \"Launchpad\", \"version\": \"%(prop:shortcommit)s\"}' https://status.julialang.org/put/nightly")],
     )
 ])
 

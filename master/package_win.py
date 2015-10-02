@@ -93,12 +93,12 @@ win_package_factory.addSteps([
     # Upload it to AWS and cleanup the master!
     MasterShellCommand(
         name="Upload to AWS",
-        command=["/bin/bash", "-c", Interpolate("~/bin/aws put --fail --public julianightlies/bin/winnt/%(prop:up_arch)s/%(prop:majmin)s/julia-%(prop:version)s-%(prop:shortcommit)s-win%(prop:bits)s.exe /tmp/julia_package/%(prop:filename)s")],
+        command=["/bin/bash", "-c", Interpolate("~/bin/try_thrice ~/bin/aws put --fail --public julianightlies/bin/winnt/%(prop:up_arch)s/%(prop:majmin)s/julia-%(prop:version)s-%(prop:shortcommit)s-win%(prop:bits)s.exe /tmp/julia_package/%(prop:filename)s")],
         haltOnFailure=True
     ),
     MasterShellCommand(
         name="Upload to AWS",
-        command=["/bin/bash", "-c", Interpolate("~/bin/aws put --fail --public julianightlies/bin/winnt/%(prop:up_arch)s/julia-latest-win%(prop:bits)s.exe /tmp/julia_package/%(prop:filename)s")],
+        command=["/bin/bash", "-c", Interpolate("~/bin/try_thrice ~/bin/aws put --fail --public julianightlies/bin/winnt/%(prop:up_arch)s/julia-latest-win%(prop:bits)s.exe /tmp/julia_package/%(prop:filename)s")],
         doStepIf=is_nightly_build,
         haltOnFailure=True
     ),
@@ -110,7 +110,7 @@ win_package_factory.addSteps([
     # Stupid windows HTTPS problems
     MasterShellCommand(
         name="Report success",
-        command=["curl", "-L", "-H", "Content-type: application/json", "-d", Interpolate('{"target": "win%(prop:bits)s", "url":"https://s3.amazonaws.com/julianightlies/bin/winnt/%(prop:up_arch)s/%(prop:majmin)s/julia-%(prop:version)s-%(prop:shortcommit)s-win%(prop:bits)s.exe", "version": "%(prop:shortcommit)s"}'), "https://status.julialang.org/put/nightly"],
+        command=["/bin/bash", "-c", Interpolate("~/bin/try_thrice curl -L -H 'Content-type: application/json' -d '{\"target\": \"win-%(prop:bits)s\", \"url\": \"https://s3.amazonaws.com/julianightlies/bin/winnt/%(prop:up_arch)s/%(prop:majmin)s/julia-%(prop:version)s-%(prop:shortcommit)s-win%(prop:bits)s.tar.gz\", \"version\": \"%(prop:shortcommit)s\"}' https://status.julialang.org/put/nightly")],
         doStepIf=is_nightly_build
     )
 ])

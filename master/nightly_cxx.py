@@ -90,12 +90,12 @@ julia_cxx_factory.addSteps([
     # Upload it to AWS and cleanup the master!
     MasterShellCommand(
         name="Upload to AWS",
-        command=["/bin/bash", "-c", Interpolate("~/bin/aws put --fail --public julianightlies/bin/linux/%(prop:up_arch)s/%(prop:majmin)s/juliacxx-%(prop:version)s-%(prop:shortcommit)s-linux%(prop:bits)s.tar.gz /tmp/julia_package/juliacxx-%(prop:shortcommit)s-Linux-%(prop:tar_arch)s.tar.gz")],
+        command=["/bin/bash", "-c", Interpolate("~/bin/try_thrice ~/bin/aws put --fail --public julianightlies/bin/linux/%(prop:up_arch)s/%(prop:majmin)s/juliacxx-%(prop:version)s-%(prop:shortcommit)s-linux%(prop:bits)s.tar.gz /tmp/julia_package/juliacxx-%(prop:shortcommit)s-Linux-%(prop:tar_arch)s.tar.gz")],
         haltOnFailure=True
     ),
     MasterShellCommand(
         name="Upload to AWS (latest)",
-        command=["/bin/bash", "-c", Interpolate("~/bin/aws put --fail --public julianightlies/bin/linux/%(prop:up_arch)s/juliacxx-latest-linux%(prop:bits)s.tar.gz /tmp/julia_package/julia-%(prop:shortcommit)s-Linux-%(prop:tar_arch)s.tar.gz")],
+        command=["/bin/bash", "-c", Interpolate("~/bin/try_thrice ~/bin/aws put --fail --public julianightlies/bin/linux/%(prop:up_arch)s/juliacxx-latest-linux%(prop:bits)s.tar.gz /tmp/julia_package/julia-%(prop:shortcommit)s-Linux-%(prop:tar_arch)s.tar.gz")],
         doStepIf=is_nightly_build,
         haltOnFailure=True
     ),
@@ -106,7 +106,7 @@ julia_cxx_factory.addSteps([
 
     MasterShellCommand(
         name="Report success",
-        command=["curl", "-L", "-H", "Content-type: application/json", "-d", Interpolate('{"target": "linux_cxx-%(prop:tar_arch)s", "url":"https://s3.amazonaws.com/julianightlies/bin/linux/%(prop:up_arch)s/%(prop:majmin)s/juliacxx-%(prop:version)s-%(prop:shortcommit)s-linux%(prop:bits)s.tar.gz", "version": "%(prop:shortcommit)s"}'), "https://status.julialang.org/put/nightly"],
+        command=["/bin/bash", "-c", Interpolate("~/bin/try_thrice curl -L -H 'Content-type: application/json' -d '{\"target\": \"linux_cxx-%(prop:tar_arch)s\", \"url\": \"https://s3.amazonaws.com/julianightlies/bin/linux/%(prop:up_arch)s/%(prop:majmin)s/juliacxx-%(prop:version)s-%(prop:shortcommit)s-linux%(prop:bits)s.tar.gz\", \"version\": \"%(prop:shortcommit)s\"}' https://status.julialang.org/put/nightly")],
         doStepIf=is_nightly_build
     ),
 ])

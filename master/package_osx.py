@@ -48,7 +48,7 @@ julia_dmg_factory.addSteps([
     	name="make cleanall",
     	command=["/bin/bash", "-c", Interpolate("make %(prop:flags)s cleanall")]
     ),
-    
+
     # Make!
     ShellCommand(
     	name="make",
@@ -96,12 +96,12 @@ julia_dmg_factory.addSteps([
     ),
     MasterShellCommand(
     	name="Upload to AWS",
-    	command=["/bin/bash", "-c", Interpolate("~/bin/aws put --fail --public julianightlies/bin/osx/x64/%(prop:majmin)s/julia-%(prop:version)s-%(prop:shortcommit)s-osx.dmg /tmp/julia_package/%(prop:filename)s")],
+    	command=["/bin/bash", "-c", Interpolate("~/bin/try_thrice ~/bin/aws put --fail --public julianightlies/bin/osx/x64/%(prop:majmin)s/julia-%(prop:version)s-%(prop:shortcommit)s-osx.dmg /tmp/julia_package/%(prop:filename)s")],
     	haltOnFailure=True
     ),
     MasterShellCommand(
     	name="Upload to AWS (latest)",
-    	command=["/bin/bash", "-c", Interpolate("~/bin/aws put --fail --public julianightlies/bin/osx/x64/julia-latest-osx.dmg /tmp/julia_package/%(prop:filename)s")],
+    	command=["/bin/bash", "-c", Interpolate("~/bin/try_thrice ~/bin/aws put --fail --public julianightlies/bin/osx/x64/julia-latest-osx.dmg /tmp/julia_package/%(prop:filename)s")],
     	doStepIf=is_nightly_build,
     	haltOnFailure=True
     ),
@@ -119,7 +119,7 @@ julia_dmg_factory.addSteps([
     # Report back to the mothership
     MasterShellCommand(
     	name="Report success",
-    	command=["curl", "-L", "-H", "Content-type: application/json", "-d", Interpolate('{"target": "osx10.7+", "url": "https://s3.amazonaws.com/julianightlies/bin/osx/x64/%(prop:majmin)s/julia-%(prop:version)s-%(prop:shortcommit)s-osx.dmg", "version": "%(prop:shortcommit)s"}'), "https://status.julialang.org/put/nightly"],
+    	command=["/bin/bash", "-c", Interpolate("~/bin/try_thrice curl -L -H 'Content-type: application/json' -d '{\"target\": \"osx10.7+\", \"url\": \"https://s3.amazonaws.com/julianightlies/bin/osx/x64/%(prop:majmin)s/julia-%(prop:version)s-%(prop:shortcommit)s-osx.dmg\", \"version\": \"%(prop:shortcommit)s\"}' https://status.julialang.org/put/nightly")],
     	doStepIf=is_nightly_build
     ),
 ])

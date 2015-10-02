@@ -120,7 +120,7 @@ julia_srpm_package_factory.addSteps([
     ),
     MasterShellCommand(
         name="Upload to AWS",
-        command=["/bin/bash", "-c", Interpolate("~/bin/aws put --fail --public julianightlies/bin/srpm/%(prop:filename)s /tmp/julia_package/%(prop:filename)s")],
+        command=["/bin/bash", "-c", Interpolate("~/bin/try_thrice ~/bin/aws put --fail --public julianightlies/bin/srpm/%(prop:filename)s /tmp/julia_package/%(prop:filename)s")],
         haltOnFailure=True
     ),
 
@@ -140,7 +140,7 @@ julia_srpm_package_factory.addSteps([
     ),
     MasterShellCommand(
         name="Report success",
-        command=["curl", "-L", "-H", "Content-type: application/json", "-d", Interpolate('{"target": "Copr", "url": "https://s3.amazonaws.com/julianightlies/bin/srpm/%(prop:filename)s", "version": "%(prop:shortcommit)s"}'), "https://status.julialang.org/put/nightly"]
+        command=["/bin/bash", "-c", Interpolate("~/bin/try_thrice curl -L -H 'Content-type: application/json' -d '{\"target\": \"Copr\", \"url\": \"https://s3.amazonaws.com/julianightlies/bin/srpm/%(prop:filename)s\", \"version\": \"%(prop:shortcommit)s\"}' https://status.julialang.org/put/nightly")],
     )
 ])
 

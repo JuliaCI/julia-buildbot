@@ -32,7 +32,7 @@ sign_juno_factory.addSteps([
     SetPropertyFromCommand(name="Get filename", command=["/bin/bash", "-c", "ls *-signed*"], property="filename"),
     MasterShellCommand(name="mkdir juno_cache", command=["mkdir", "-p", "/tmp/juno_cache"]),
     FileUpload(slavesrc=Interpolate("%(prop:filename)s"), masterdest=Interpolate("/tmp/juno_cache/%(prop:filename)s")),
-    MasterShellCommand(name="Upload to AWS", command=["/bin/bash", "-c", Interpolate("~/bin/aws put --fail --public junolab/latest/signed/%(prop:filename)s /tmp/juno_cache/%(prop:filename)s")], haltOnFailure=True),
+    MasterShellCommand(name="Upload to AWS", command=["/bin/bash", "-c", Interpolate("~/bin/try_thrice ~/bin/aws put --fail --public junolab/latest/signed/%(prop:filename)s /tmp/juno_cache/%(prop:filename)s")], haltOnFailure=True),
 
     # Cleanup!
     MasterShellCommand(name="Cleanup", command=["rm", "-f", Interpolate("/tmp/bottle_cache/%(prop:filename)s")])
