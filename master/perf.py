@@ -22,9 +22,9 @@ c['schedulers'].append(ForceScheduler(
 
 install_perf_cmd = """
 Pkg.update()
-Pkg.clone("https://github.com/johnmyleswhite/Benchmarks.jl")
-Pkg.clone("https://github.com/staticfloat/Perftests.jl")
-Pkg.add("Compat")
+try Pkg.clone("https://github.com/johnmyleswhite/Benchmarks.jl") end
+try Pkg.clone("https://github.com/staticfloat/Perftests.jl") end
+try Pkg.add("Compat") end
 Pkg.resolve()
 Pkg.build()
 """
