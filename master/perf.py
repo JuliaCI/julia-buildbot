@@ -69,7 +69,7 @@ julia_perf_factory.addSteps([
 
 # Add coverage builders
 c['builders'].append(BuilderConfig(
-    name="perf_nanosoldier",
+    name="perf_nanosoldier-x64",
     slavenames=["nanosoldier-x64"],
     category="Performance",
     factory=julia_perf_factory
