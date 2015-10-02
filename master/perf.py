@@ -24,6 +24,9 @@ install_perf_cmd = """
 Pkg.update()
 Pkg.clone("https://github.com/johnmyleswhite/Benchmarks.jl")
 Pkg.clone("https://github.com/staticfloat/Perftests.jl")
+Pkg.add("Compat")
+Pkg.resolve()
+Pkg.build()
 """
 
 run_perf_cmd = """
