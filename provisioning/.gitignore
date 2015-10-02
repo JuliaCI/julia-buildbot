@@ -1,2 +1,0 @@
-# Don't save "hosts" so that we at least aren't broadcasting our ip addresses to the world at large
-hosts

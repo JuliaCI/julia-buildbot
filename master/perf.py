@@ -27,6 +27,7 @@ try Pkg.clone("https://github.com/staticfloat/Perftests.jl") end
 try Pkg.add("Compat") end
 Pkg.resolve()
 Pkg.build()
+run(`rm -rf $(Pkg.dir("Perftests","test","results-*"))`)
 """
 
 run_perf_cmd = """
