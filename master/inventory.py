@@ -18,7 +18,7 @@ all_hail_the_nanosoldier = ["nanosoldier-x64"]
 # he'll get picked up by quickbuild, and we don't want that
 arm_names = ["ubuntu14.04-armv7l"]
 
-all_names = ubuntu_names + osx_names + centos_names + win_names + all_hail_the_nanosoldier + arm_name
+all_names = ubuntu_names + osx_names + centos_names + win_names + all_hail_the_nanosoldier + arm_names
 
 # This is getting sickening, how many attributes we're defining here
 c['slaves'] = []
