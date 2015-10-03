@@ -9,6 +9,9 @@ for version in ["14.04", "12.04"]:
     for arch in ["x64", "x86"]:
         ubuntu_names += ["ubuntu%s-%s"%(version, arch)]
 
+# We've got an ubuntu ARM machine!
+ubuntu_names += ["ubuntu14.04-armv7l"]
+
 osx_names = ["osx10.8-x64", "osx10.9-x64", "osx10.10-x64"]
 centos_names = ["centos5.11-x64", "centos5.11-x86", "centos6.7-x64", "centos7.1-x64"]
 win_names = ["win6.2-x64", "win6.2-x86"]
@@ -18,11 +21,7 @@ all_names = ubuntu_names + osx_names + centos_names + win_names + all_hail_the_n
 # This is getting sickening, how many attributes we're defining here
 c['slaves'] = []
 for name in all_names:
-    deb_arch = 'amd64'
-    tar_arch = 'x86_64'
-    march = 'x86-64'
-    up_arch = 'x64'
-    bits = '64'
+
 
     # Everything should be VERBOSE
     flags = 'VERBOSE=1 '
@@ -38,6 +37,20 @@ for name in all_names:
         bits = '32'
         flags += 'JULIA_CPU_TARGET=pentium4 '
 
+    if name[-3:] == 'x64'
+        deb_arch = 'amd64'
+        tar_arch = 'x86_64'
+        march = 'x86-64'
+        up_arch = 'x64'
+        bits = '64'
+
+    if name[-6:] == 'armv7l'
+        deb_arch = 'armhf'
+        tar_arch = 'armhf'
+        march = 'armv7l'
+        up_arch = 'armv7l'
+        bits = 'armv7l'
+
     # On windows, disable running doc/genstdlib.jl due to julia issue #11727
     # and add XC_HOST dependent on the architecture
     if name[:3] == 'win':
@@ -46,9 +59,6 @@ for name in all_names:
             flags += 'XC_HOST=i686-w64-mingw32 '
         else:
             flags += 'XC_HOST=x86_64-w64-mingw32 '
-    #else:
-        # We're going to try compiling everything with ccache to speed up buildtimes
-        #flags += 'USECCACHE=1 '
 
     # On OSX, core2 is the minimum MARCH we support
     if name[:3] == "osx":
@@ -72,6 +82,3 @@ for name in all_names:
 			'bits':bits
 		}
 	)]
-
-
-
