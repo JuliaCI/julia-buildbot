@@ -16,7 +16,7 @@ all_hail_the_nanosoldier = ["nanosoldier-x64"]
 
 # We've got an ubuntu ARM machine!  But don't add him to ubuntu_names, otherwise
 # he'll get picked up by quickbuild, and we don't want that
-arm_names += ["ubuntu14.04-armv7l"]
+arm_names = ["ubuntu14.04-armv7l"]
 
 all_names = ubuntu_names + osx_names + centos_names + win_names + all_hail_the_nanosoldier + arm_name
 
