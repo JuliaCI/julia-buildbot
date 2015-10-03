@@ -37,14 +37,14 @@ for name in all_names:
         bits = '32'
         flags += 'JULIA_CPU_TARGET=pentium4 '
 
-    if name[-3:] == 'x64'
+    if name[-3:] == 'x64':
         deb_arch = 'amd64'
         tar_arch = 'x86_64'
         march = 'x86-64'
         up_arch = 'x64'
         bits = '64'
 
-    if name[-6:] == 'armv7l'
+    if name[-6:] == 'armv7l':
         deb_arch = 'armhf'
         tar_arch = 'armv7l'
         march = 'armv7l'
