@@ -131,7 +131,16 @@ julia_tarball_factory.addSteps([
         },
         waitForFinish=False,
         doStepIf=should_run_coverage
-    )
+    ),
+
+    # Trigger a download of this file onto another slave for perf testing purposes
+    Trigger(schedulerNames=["Julia Performance Tracking"],
+        set_properties={
+            'url': Interpolate('https://s3.amazonaws.com/julianightlies/bin/linux/%(prop:up_arch)s/%(prop:majmin)s/julia-%(prop:version)s-%(prop:shortcommit)s-linux%(prop:bits)s.tar.gz'),
+        },
+        waitForFinish=False,
+        doStepIf=should_run_coverage
+    ),
 ])
 
 
