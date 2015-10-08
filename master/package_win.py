@@ -110,7 +110,7 @@ win_package_factory.addSteps([
     # Stupid windows HTTPS problems
     MasterShellCommand(
         name="Report success",
-        command=["/bin/bash", "-c", Interpolate("~/bin/try_thrice curl -L -H 'Content-type: application/json' -d '{\"target\": \"win-%(prop:bits)s\", \"url\": \"https://s3.amazonaws.com/julianightlies/bin/winnt/%(prop:up_arch)s/%(prop:majmin)s/julia-%(prop:version)s-%(prop:shortcommit)s-win%(prop:bits)s.tar.gz\", \"version\": \"%(prop:shortcommit)s\"}' https://status.julialang.org/put/nightly")],
+        command=["/bin/bash", "-c", Interpolate("~/bin/try_thrice curl -L -H 'Content-type: application/json' -d '{\"target\": \"win%(prop:bits)s\", \"url\": \"https://s3.amazonaws.com/julianightlies/bin/winnt/%(prop:up_arch)s/%(prop:majmin)s/julia-%(prop:version)s-%(prop:shortcommit)s-win%(prop:bits)s.tar.gz\", \"version\": \"%(prop:shortcommit)s\"}' https://status.julialang.org/put/nightly")],
         doStepIf=is_nightly_build
     )
 ])
