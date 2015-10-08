@@ -31,6 +31,7 @@ run(`rm -rf $(Pkg.dir("Perftests","test","results-*"))`)
 """
 
 run_perf_cmd = """
+versioninfo(true)
 Pkg.test("Perftests")
 """
 
