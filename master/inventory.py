@@ -58,10 +58,10 @@ for name in all_names:
     # and add XC_HOST dependent on the architecture
     if name[:3] == 'win':
         flags += 'JULIA_ENABLE_DOCBUILD=0 '
-        if march == 'i686':
-            flags += 'XC_HOST=i686-w64-mingw32 '
-        else:
+        if march == 'x86-64':
             flags += 'XC_HOST=x86_64-w64-mingw32 '
+        else:
+            flags += 'XC_HOST=i686-w64-mingw32 '
 
     # On OSX, core2 is the minimum MARCH we support
     if name[:3] == "osx":
