@@ -73,8 +73,9 @@ for name in all_names:
         flags += 'DEPS_CXXFLAGS="-DO_CLOEXEC=0" '
         flags += 'CMAKE=cmake28 '
 
-    # Add MARCH to flags
+    # Add MARCH and ARCH to flags
     flags += "MARCH=%s "%(march)
+    flags += "ARCH=%s "%(tar_arch)
     c['slaves'] += [BuildSlave(name, 'julialang42', max_builds=1,
 		properties={
 			'deb_arch':deb_arch,
