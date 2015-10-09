@@ -34,7 +34,7 @@ for name in all_names:
     if name[-3:] == 'x86':
         deb_arch = 'i386'
         tar_arch = 'i686'
-        march = 'pentium4'
+        march = 'i686'
         up_arch = 'x86'
         bits = '32'
         flags += 'JULIA_CPU_TARGET=pentium4 '
@@ -73,9 +73,8 @@ for name in all_names:
         flags += 'DEPS_CXXFLAGS="-DO_CLOEXEC=0" '
         flags += 'CMAKE=cmake28 '
 
-    # Add MARCH and ARCH to flags
+    # Add MARCH to flags
     flags += "MARCH=%s "%(march)
-    flags += "ARCH=%s "%(tar_arch)
     c['slaves'] += [BuildSlave(name, 'julialang42', max_builds=1,
 		properties={
 			'deb_arch':deb_arch,
