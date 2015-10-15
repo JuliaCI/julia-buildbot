@@ -71,8 +71,6 @@ for name in all_names:
     # and old cmake has issues linking openssl in libgit2
     if name[:10] == "centos5.11":
         flags += 'DEPS_CXXFLAGS="-DO_CLOEXEC=0" '
-	if name[-3:] == 'x86':
-            flags += 'DEPS_CFLAGS="-fira-region=one" CFLAGS="-fira-region=one" '
         flags += 'CMAKE=cmake28 '
 
     # Add MARCH to flags
