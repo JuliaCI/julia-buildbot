@@ -41,7 +41,7 @@ julia_cxx_factory.addSteps([
     # Add our particular configuration to flags
     SetPropertyFromCommand(
         name="Add configuration to flags",
-        command=["echo", Interpolate("%(prop:flags)s LLVM_VER=kf/gallium LLVM_GIT_VER_LLDB=kf/gallium LLVM_GIT_VER_CLANG=kf/gallium LLVM_GIT_URL_LLVM=https://github.com/JuliaLang/llvm.git LLVM_GIT_URL_LLDB=https://github.com/JuliaLang/lldb.git LLVM_GIT_URL_CLANG=https://github.com/JuliaLang/clang.git LLVM_ASSERTIONS=1 BUILD_LLVM_CLANG=1 BUILD_LLDB=1 USE_LLVM_SHLIB=1 LLDB_DISABLE_PYTHON=1")],
+        command=["echo", Interpolate("%(prop:flags)s LLVM_VER=svn LLVM_GIT_VER=kf/gallium LLVM_GIT_VER_LLDB=kf/gallium LLVM_GIT_VER_CLANG=kf/gallium LLVM_GIT_URL_LLVM=https://github.com/JuliaLang/llvm.git LLVM_GIT_URL_LLDB=https://github.com/JuliaLang/lldb.git LLVM_GIT_URL_CLANG=https://github.com/JuliaLang/clang.git LLVM_ASSERTIONS=1 BUILD_LLVM_CLANG=1 BUILD_LLDB=1 USE_LLVM_SHLIB=1 LLDB_DISABLE_PYTHON=1")],
         property="flags"
     ),
 
