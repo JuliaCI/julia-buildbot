@@ -20,7 +20,6 @@ Source0:        https://api.github.com/repos/JuliaLang/julia/tarball/master#/jul
 Source1:        https://api.github.com/repos/JuliaLang/libuv/tarball/%{uvcommit}#/libuv-%{uvcommit}.tar.gz
 # Julia currently uses a custom version of Rmath, called Rmath-julia, with a custom RNG system (temporary)
 Source2:        https://api.github.com/repos/JuliaLang/Rmath-julia/tarball/v%{Rmathjuliaversion}#/Rmath-julia-%{Rmathjuliaversion}.tar.gz
-Patch0:         %{name}_juliadoc.patch
 Provides:       bundled(libuv) = %{uvversion}
 Provides:       bundled(Rmath) = %{Rmathversion}
 BuildRequires:  arpack-devel
@@ -49,8 +48,7 @@ BuildRequires:  libgit2-devel >= 1:0.21
 BuildRequires:  libgit2-devel >= 0.21
 %endif
 BuildRequires:  libunwind-devel
-BuildRequires:  llvm-devel
-BuildRequires:  llvm-static
+BuildRequires:  llvm3.3-devel
 %if 0%{?rhel} && 0%{?rhel} <= 6
 BuildRequires:  mpfr3-devel >= 3.0
 %else
@@ -163,10 +161,6 @@ Julia into external programs or debugging Julia itself.
 
 %prep
 %setup -qn %{name}
-%patch0 -p 1
-
-# .gitignore files make rpmlint complain
-find . -name ".git*" -exec rm {} \;
 
 pushd deps
     # Julia downloads tarballs for external dependencies even when the folder is present:
@@ -235,17 +229,22 @@ mkdir -p %{buildroot}%{_datarootdir}/icons/hicolor/24x24/apps/
 mkdir -p %{buildroot}%{_datarootdir}/icons/hicolor/32x32/apps/
 mkdir -p %{buildroot}%{_datarootdir}/icons/hicolor/48x48/apps/
 mkdir -p %{buildroot}%{_datarootdir}/icons/hicolor/256x256/apps/
-cp -p doc/juliadoc/juliadoc/theme/julia/static/julia-logo.svg \
+cp -p doc/_build/html/_static/julia-logo.svg \
     %{buildroot}%{_datarootdir}/icons/hicolor/scalable/apps/%{name}.svg
-convert -scale 16x16 doc/juliadoc/juliadoc/theme/julia/static/julia-logo.svg  \
+convert -scale 16x16 -extent 16x16 -gravity center -background transparent \
+    doc/_build/html/_static/julia-logo.svg \
     %{buildroot}%{_datarootdir}/icons/hicolor/16x16/apps/%{name}.png
-convert -scale 24x24 doc/juliadoc/juliadoc/theme/julia/static/julia-logo.svg  \
+convert -scale 24x24 -extent 24x24 -gravity center -background transparent \
+    doc/_build/html/_static/julia-logo.svg \
     %{buildroot}%{_datarootdir}/icons/hicolor/24x24/apps/%{name}.png
-convert -scale 32x32 doc/juliadoc/juliadoc/theme/julia/static/julia-logo.svg  \
+convert -scale 32x32 -extent 32x32 -gravity center -background transparent \
+    doc/_build/html/_static/julia-logo.svg \
     %{buildroot}%{_datarootdir}/icons/hicolor/32x32/apps/%{name}.png
-convert -scale 48x48 doc/juliadoc/juliadoc/theme/julia/static/julia-logo.svg  \
+convert -scale 48x48 -extent 48x48 -gravity center -background transparent \
+    doc/_build/html/_static/julia-logo.svg \
     %{buildroot}%{_datarootdir}/icons/hicolor/48x48/apps/%{name}.png
-convert -scale 256x256 doc/juliadoc/juliadoc/theme/julia/static/julia-logo.svg  \
+convert -scale 256x256 -extent 256x256 -gravity center -background transparent \
+    doc/_build/html/_static/julia-logo.svg \
     %{buildroot}%{_datarootdir}/icons/hicolor/256x256/apps/%{name}.png
 mkdir -p %{buildroot}%{_datarootdir}/applications
 cat > %{buildroot}%{_datarootdir}/applications/%{name}.desktop << EOF
@@ -286,9 +285,6 @@ desktop-file-validate %{buildroot}%{_datarootdir}/applications/%{name}.desktop
 %dir %{_datarootdir}/julia/
 %{_datarootdir}/julia/*.jl
 %{_datarootdir}/julia/base/
-%exclude %{_datarootdir}/julia/base/build.h
-
-%{_docdir}/julia/helpdb.jl
 
 %dir %{_sysconfdir}/julia/
 %config(noreplace) %{_sysconfdir}/julia/juliarc.jl
@@ -344,6 +340,55 @@ exit 0
 /usr/bin/gtk-update-icon-cache %{_datarootdir}/icons/hicolor &>/dev/null || :
 
 %changelog
+* Fri Oct 9 2015 Milan Bouchet-Valat <nalimilan@club.fr> - 0.4.0-2
+- Use LLVM 3.3 to fix bugs and improve compilation performance.
+- Run all the tests now that they pass.
+- Stop specifying -fsigned-char explicitly, since it is now handled by Julia.
+- Refactor architecture checking logic to prepare support for new arches.
+- Use upstream .desktop file instead of a custom one.
+
+* Fri Oct 9 2015 Milan Bouchet-Valat <nalimilan@club.fr> - 0.4.0-1
+- New upstream release.
+- Drop patches now included upstream.
+- Drop obsolete rm commands.
+
+* Thu Sep 17 2015 Dave Airlie <airlied@redhat.com> 0.4.0-0.4.rc1
+- drag in latest upstream 0.4 branch in hope of fixing i686
+- drop out some tests on i686
+- build against LLVM 3.7
+
+* Fri Sep 11 2015 Milan Bouchet-Valat <nalimilan@club.fr> - 0.4.0-0.3.rc1
+- New upstream release candidate.
+- Drop now useless patch.
+- Remove libccalltest.so file installed under /usr/share/.
+
+* Fri Aug 28 2015 Nils Philippsen <nils@redhat.com> - 0.4.0-0.2.20150823git
+- rebuild against suitesparse-4.4.5, to work around
+  https://github.com/JuliaLang/julia/issues/12841
+
+* Sun Aug 23 2015 Milan Bouchet-Valat <nalimilan@club.fr> - 0.4.0-0.1.20150823git
+- Update to development version 0.4.0 to fix FTBFS.
+- Move to PCRE2, libgit2, utf8proc 1.3, and up-to-date libuv fork.
+- Preliminary support for ARM.
+- patchelf no longer needed when the same paths are passed to 'make' and 'make install'.
+- Building Sphynx documentation no longer needed.
+- Fix icons to be square.
+
+* Wed Jun 17 2015 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 0.3.7-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_23_Mass_Rebuild
+
+* Thu Jun 11 2015 Nils Philippsen <nils@redhat.com> - 0.3.7-4
+- rebuild for suitesparse-4.4.4
+
+* Fri Apr 10 2015 Milan Bouchet-Valat <nalimilan@club.fr> - 0.3.7-3
+- Rebuilt for LLVM 3.6.
+
+* Sat Mar 28 2015 Milan Bouchet-Valat <nalimilan@club.fr> - 0.3.7-2
+- Rebuild for utf8proc ABI break.
+
+* Tue Mar 24 2015 Milan Bouchet-Valat <nalimilan@club.fr> - 0.3.7-1
+- New upstream release.
+
 * Mon Mar 2 2015 Milan Bouchet-Valat <nalimilan@club.fr> - 0.3.6-2
 - Fix loading libcholmod, libfftw3_threads and libumfpack.
 
