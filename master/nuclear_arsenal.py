@@ -36,7 +36,7 @@ clean_factory.useProgress = True
 clean_factory.addSteps([
     ShellCommand(
     	name="clean deps",
-    	command=["/bin/bash", "-c", "for f in ../../{package_,build_}*; do ([[ -d $f/build/deps ]] && cd $f/build/deps && make distclean-arpack distclean-suitesparse distclean-openblas distclean-openlibm distclean-openspecfun); done; echo Done"]
+    	command=["/bin/bash", "-c", "for f in ../../{package_,build_,coverage_,juno_,nightly_,perf_}*; do ([[ -d $f/build/deps ]] && cd $f/build/deps && make distclean-arpack distclean-suitesparse distclean-openblas distclean-openlibm distclean-openspecfun); done; echo Done"]
     )
 ])
 
@@ -45,7 +45,7 @@ nuclear_factory.useProgress = True
 nuclear_factory.addSteps([
     ShellCommand(
     	name="Do your thing, Duke",
-    	command=["/bin/bash", "-c", "if [ `uname` = Darwin ]; then sudo rm -rf ../../{package_,build_}*; else rm -rf ../../{package_,build_}*; fi"]
+    	command=["/bin/bash", "-c", "if [ `uname` = Darwin ]; then sudo rm -rf ../../{package_,build_,coverage_,juno_,nightly_,perf_}*; else rm -rf ../../{package_,build_,coverage_,juno_,nightly_,perf_}*; fi"]
     )
 ])
 
