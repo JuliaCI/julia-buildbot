@@ -3,7 +3,7 @@
 ###############################################################################
 
 julia_threading_builders = ["nightly_threading64"]
-threading_nightly_scheduler = Nightly(name="Julia Threading package", builderNames=julia_threading_builders, hour=[0,12], branch="master", onlyIfChanged=True )
+threading_nightly_scheduler = Nightly(name="Julia Threading package", builderNames=julia_threading_builders, hour=[1,13], branch="master", onlyIfChanged=True )
 c['schedulers'].append(threading_nightly_scheduler)
 
 threading_force_scheduler = ForceScheduler(
