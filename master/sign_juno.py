@@ -22,8 +22,8 @@ c['schedulers'].append(juno_scheduler)
 sign_juno_factory = BuildFactory()
 sign_juno_factory.useProgress = True
 sign_juno_factory.addSteps([
-    # Copy our sign_juno.sh script over to the slave:
-    FileDownload(mastersrc="../commands/sign_juno.sh", slavedest="sign_juno.sh"),
+    # Download our sign_juno.sh script over to the slave: (we don't use FileDownload here because of stupid buildbot problems)
+    ShellCommand(command=["/usr/bin/curl", "-L", "https://raw.githubusercontent.com/staticfloat/julia-buildbot/master/commands/sign_juno.sh", "-o", "sign_juno.sh"]),
 
     # Invoke it
     ShellCommand(command=["/bin/bash", "sign_juno.sh", Property('osx64_url'), Property('win32_url'), Property('win64_url')], haltOnFailure=True),
