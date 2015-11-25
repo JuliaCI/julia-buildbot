@@ -37,7 +37,7 @@ if [[ "$(uname)" == "Darwin" ]]; then
 	echo "Creating ${FILENAME%.*}-signed.dmg..."
 	hdiutil convert $FILENAME -format UDZO -o ${FILENAME%.*}-signed.dmg -shadow -imagekey zlib-level=9
 else
-	if [[ "$(hostname)" == "win81x86" ]]; then
+	if [[ "$(uname -m )" == "i686" ]]; then
 		WIN_URL="$WIN32_URL"
 		FOLDER_NAME="juno-windows32"
 	else
