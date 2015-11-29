@@ -28,17 +28,13 @@ CoverageBase.runtests(CoverageBase.testnames())
 
 analyze_cov_cmd = """
 import CoverageBase
-using Coverage, HDF5, JLD
+using Coverage
 cd(joinpath(CoverageBase.julia_top()))
 results=Coverage.process_folder("base")
-save("coverage.jld", "results", results)
 """
 
-merge_cov_cmd = """
-using Coverage, CoverageBase, HDF5, JLD, Compat
-cd(joinpath(CoverageBase.julia_top()))
-results = CoverageBase.merge_coverage(load("coverage_noninlined.jld", "results"), load("coverage_inlined.jld", "results"))
-
+submit_cov_cmd = """
+using Coverage, CoverageBase, Compat
 # Create git_info for Coveralls
 git_info = @compat Dict(
     "branch" => Base.GIT_VERSION_INFO.branch,
@@ -83,12 +79,6 @@ julia_coverage_factory.addSteps([
         command=["/bin/bash", "-c", Interpolate("curl -L %(prop:url)s | tar zx")],
     ),
 
-    # Ensure HDF5 is installed
-    ShellCommand(
-        name="Install hdf5",
-        command=["sudo", "apt-get", "install", "-y", "hdf5-tools"],
-    ),
-
     # Find Julia directory (so we don't have to know the shortcommit)
     SetPropertyFromCommand(
         name="Find Julia executable",
@@ -119,44 +109,24 @@ julia_coverage_factory.addSteps([
         haltOnFailure=True,
     ),
 
-    # Run Julia, gathering coverage statistics and then analyzing them into a .jld file
+    # Run Julia, gathering coverage statistics
     ShellCommand(
         name="Run inlined tests",
         command=[Interpolate("%(prop:juliadir)s/bin/julia"), "--precompiled=no", "--code-coverage=all", "-e", run_coverage_cmd]
     ),
-    ShellCommand(
-        name="Gather inlined test results",
-        command=[Interpolate("%(prop:juliadir)s/bin/julia"), "-e", analyze_cov_cmd]
-    ),
-
-    # Clear out all .cov files, so that we can run the non-inlined tests without fear of interference
-    ShellCommand(
-        name="Clean out all .cov files",
-        command=["/bin/bash", "-c", "find . -name *.cov | xargs rm -f"]
-    ),
-    ShellCommand(
-        name="Move coverage.jld -> coverage_inlined.jld",
-        command=["mv", Interpolate("%(prop:juliadir)s/share/julia/coverage.jld"), Interpolate("%(prop:juliadir)s/share/julia/coverage_inlined.jld")]
-    ),
-
-    # Do the coverage stats for non-inlined tests now
     ShellCommand(
         name="Run non-inlined tests",
         command=[Interpolate("%(prop:juliadir)s/bin/julia"), "--precompiled=no", "--code-coverage=all", "--inline=no", "-e", run_coverage_cmd],
         timeout=3600,
     ),
     ShellCommand(
-        name="Gather non-inlined test results",
+        name="Gather test results",
         command=[Interpolate("%(prop:juliadir)s/bin/julia"), "-e", analyze_cov_cmd]
     ),
+    #submit the results!
     ShellCommand(
-        name="Move coverage.jld -> coverage_noninlined.jld",
-        command=["mv", Interpolate("%(prop:juliadir)s/share/julia/coverage.jld"), Interpolate("%(prop:juliadir)s/share/julia/coverage_noninlined.jld")]
-    ),
-    # Merge final results and submit!
-    ShellCommand(
-        name="Merge and submit",
-        command=[Interpolate("%(prop:juliadir)s/bin/julia"), "-e", Interpolate(merge_cov_cmd)],
+        name="Submit",
+        command=[Interpolate("%(prop:juliadir)s/bin/julia"), "-e", Interpolate(submit_cov_cmd)],
         env={'COVERALLS_REPO_TOKEN':COVERALLS_REPO_TOKEN, 'CODECOV_REPO_TOKEN':CODECOV_REPO_TOKEN},
         logEnviron=False,
     ),
