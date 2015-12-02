@@ -26,15 +26,11 @@ using Base.Test
 CoverageBase.runtests(CoverageBase.testnames())
 """
 
-analyze_cov_cmd = """
-import CoverageBase
-using Coverage
+analyse_and_submit_cov_cmd = """
+using Coverage, CoverageBase, Compat
+
 cd(joinpath(CoverageBase.julia_top()))
 results=Coverage.process_folder("base")
-"""
-
-submit_cov_cmd = """
-using Coverage, CoverageBase, Compat
 # Create git_info for Coveralls
 git_info = @compat Dict(
     "branch" => Base.GIT_VERSION_INFO.branch,
@@ -119,14 +115,10 @@ julia_coverage_factory.addSteps([
         command=[Interpolate("%(prop:juliadir)s/bin/julia"), "--precompiled=no", "--code-coverage=all", "--inline=no", "-e", run_coverage_cmd],
         timeout=3600,
     ),
-    ShellCommand(
-        name="Gather test results",
-        command=[Interpolate("%(prop:juliadir)s/bin/julia"), "-e", analyze_cov_cmd]
-    ),
     #submit the results!
     ShellCommand(
-        name="Submit",
-        command=[Interpolate("%(prop:juliadir)s/bin/julia"), "-e", Interpolate(submit_cov_cmd)],
+        name="Gather test results and Submit",
+        command=[Interpolate("%(prop:juliadir)s/bin/julia"), "-e", Interpolate(analyse_and_submit_cov_cmd)],
         env={'COVERALLS_REPO_TOKEN':COVERALLS_REPO_TOKEN, 'CODECOV_REPO_TOKEN':CODECOV_REPO_TOKEN},
         logEnviron=False,
     ),
