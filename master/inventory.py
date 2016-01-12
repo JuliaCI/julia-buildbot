@@ -52,7 +52,6 @@ for name in all_names:
         march = 'armv7l'
         up_arch = 'armv7l'
         bits = 'armv7l'
-        flags += 'LLVM_VER=svn'
 
     # On windows, disable running doc/genstdlib.jl due to julia issue #11727
     # and add XC_HOST dependent on the architecture
