@@ -16,7 +16,7 @@ all_hail_the_nanosoldier = ["nanosoldier-x64"]
 
 # We've got an ubuntu ARM machine!  But don't add him to ubuntu_names, otherwise
 # he'll get picked up by quickbuild, and we don't want that
-arm_names = ["ubuntu14.04-armv7l"]
+arm_names = ["ubuntu14.04-armv7"]
 
 all_names = ubuntu_names + osx_names + centos_names + win_names + all_hail_the_nanosoldier + arm_names
 
@@ -46,12 +46,12 @@ for name in all_names:
         up_arch = 'x64'
         bits = '64'
 
-    if name[-6:] == 'armv7l':
+    if name[-6:] == 'armv7':
         deb_arch = 'armhf'
-        tar_arch = 'armv7l'
-        march = 'armv7l'
-        up_arch = 'armv7l'
-        bits = 'armv7l'
+        tar_arch = 'armv7'
+        march = 'armv7'
+        up_arch = 'armv7'
+        bits = 'armv7'
 
     # On windows, disable running doc/genstdlib.jl due to julia issue #11727
     # and add XC_HOST dependent on the architecture
