@@ -46,7 +46,7 @@ for name in all_names:
         up_arch = 'x64'
         bits = '64'
 
-    if name[-6:] == 'armv7':
+    if name[-5:] == 'armv7':
         deb_arch = 'armhf'
         tar_arch = 'armv7'
         march = 'armv7'
