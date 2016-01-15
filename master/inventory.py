@@ -52,7 +52,7 @@ for name in all_names:
         march = 'armv7-a'
         up_arch = 'arm'
         bits = 'arm'
-	flags += 'JULIA_CPU_TARGET=generic '
+        flags += 'JULIA_CPU_TARGET=generic '
 
     # On windows, disable running doc/genstdlib.jl due to julia issue #11727
     # and add XC_HOST dependent on the architecture
