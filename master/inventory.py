@@ -5,7 +5,8 @@
 from buildbot.buildslave import BuildSlave
 
 ubuntu_names = []
-for version in ["14.04", "12.04"]:
+# Removed 12.04 from this list
+for version in ["14.04"]:
     for arch in ["x64", "x86"]:
         ubuntu_names += ["ubuntu%s-%s"%(version, arch)]
 
