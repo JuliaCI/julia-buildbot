@@ -61,7 +61,7 @@ julia_threading_factory.addSteps([
     ShellCommand(
     	name="make testall",
     	command=["/bin/bash", "-c", Interpolate("make %(prop:flags)s testall")]
-    )
+    ),
 
     SetPropertyFromCommand(
         name="Get major/minor version",
