@@ -5,6 +5,17 @@
 gc_debug_nightly_scheduler = Nightly(name="Julia GC Debug Build", builderNames=["nightly_gc_debug-x86", "nightly_gc_debug-x64"], hour=[3], branch="master", onlyIfChanged=True)
 c['schedulers'].append(gc_debug_nightly_scheduler)
 
+for arch in ["x86", "x64"]:
+    force_scheduler = ForceScheduler(
+        name="Julia GC debug building",
+        builderNames=["nightly_gc_debug-%s" % arch],
+        reason=FixedParameter(name="reason", default=""),
+        branch=FixedParameter(name="branch", default=""),
+        repository=FixedParameter(name="repository", default=""),
+        project=FixedParameter(name="project", default="Juno"),
+        properties=[])
+    c['schedulers'].append(force_scheduler)
+
 julia_gc_debug_factory = BuildFactory()
 julia_gc_debug_factory.useProgress = True
 julia_gc_debug_factory.addSteps([

@@ -1,22 +1,21 @@
 ###############################################################################
-# Define everything needed to build nightly Julia builds against LLVM SVN for .jl
+# Define everything needed to build nightly Julia with threading enabled
 ###############################################################################
 
-julia_threading_builders = ["nightly_threading64"]
+julia_threading_builders = ["nightly_threading-x86", "nightly_threading-x64"]
 threading_nightly_scheduler = Nightly(name="Julia Threading package", builderNames=julia_threading_builders, hour=[1,13], branch="master", onlyIfChanged=True )
 c['schedulers'].append(threading_nightly_scheduler)
 
-threading_force_scheduler = ForceScheduler(
-    name="Julia Threading building",
-    builderNames=["nightly_threading64"],
-    reason=FixedParameter(name="reason", default=""),
-    branch=FixedParameter(name="branch", default=""),
-    repository=FixedParameter(name="repository", default=""),
-    project=FixedParameter(name="project", default="Juno"),
-    properties=[
-    ]
-)
-c['schedulers'].append(threading_force_scheduler)
+for arch in ["x86", "x64"]:
+    force_scheduler = ForceScheduler(
+        name="Julia Threading building",
+        builderNames=["nightly_threading-%s" % arch],
+        reason=FixedParameter(name="reason", default=""),
+        branch=FixedParameter(name="branch", default=""),
+        repository=FixedParameter(name="repository", default=""),
+        project=FixedParameter(name="project", default="Juno"),
+        properties=[])
+    c['schedulers'].append(force_scheduler)
 
 julia_threading_factory = BuildFactory()
 julia_threading_factory.useProgress = True
@@ -57,6 +56,13 @@ julia_threading_factory.addSteps([
         command=["/bin/bash", "-c", Interpolate("make %(prop:flags)s binary-dist")],
         haltOnFailure = True
     ),
+
+    # Test!
+    ShellCommand(
+    	name="make testall",
+    	command=["/bin/bash", "-c", Interpolate("make %(prop:flags)s testall")]
+    )
+
     SetPropertyFromCommand(
         name="Get major/minor version",
         command=["./julia", "-e", "println(\"$(VERSION.major).$(VERSION.minor)\")"],
@@ -108,17 +114,10 @@ julia_threading_factory.addSteps([
 ])
 
 
-# Add linux tarball builders
-#c['builders'].append(BuilderConfig(
-#    name="nightly_threading32",
-#    slavenames=["ubuntu12.04-x86"],
-#    category="Packaging",
-#    factory=julia_threading_factory
-#))
-
-c['builders'].append(BuilderConfig(
-    name="nightly_threading64",
-    slavenames=["centos6.7-x64"],
-    category="Nightlies",
-    factory=julia_threading_factory
-))
+for arch in ["x86", "x64"]:
+    c['builders'].append(BuilderConfig(
+        name="nightly_threading-%s"%(arch),
+        slavenames=["ubuntu14.04-%s"%(arch)],
+        category="Nightlies",
+        factory=julia_threading_factory
+    ))
