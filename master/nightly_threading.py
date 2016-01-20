@@ -8,7 +8,7 @@ c['schedulers'].append(threading_nightly_scheduler)
 
 for arch in ["x86", "x64"]:
     force_scheduler = ForceScheduler(
-        name="Julia Threading building",
+        name="Julia %s Threading building"%(arch),
         builderNames=["nightly_threading-%s" % arch],
         reason=FixedParameter(name="reason", default=""),
         branch=FixedParameter(name="branch", default=""),

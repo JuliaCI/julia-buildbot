@@ -7,7 +7,7 @@ c['schedulers'].append(gc_debug_nightly_scheduler)
 
 for arch in ["x86", "x64"]:
     force_scheduler = ForceScheduler(
-        name="Julia GC debug building",
+        name="Julia %s GC debug building"%(arch),
         builderNames=["nightly_gc_debug-%s" % arch],
         reason=FixedParameter(name="reason", default=""),
         branch=FixedParameter(name="branch", default=""),
