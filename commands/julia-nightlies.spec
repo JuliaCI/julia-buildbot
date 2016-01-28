@@ -4,6 +4,9 @@
 %global Rmathjuliaversion 0.1
 %global Rmathversion 3.0.1
 
+%global llvm_version 3.7
+%global llvmversion 37
+
 Name:           julia
 Version:        %{juliaversion}
 Release:        0.%{datecommit}%{?dist}
@@ -30,11 +33,9 @@ BuildRequires:  devtoolset-2-build
 BuildRequires:  devtoolset-2-gcc
 BuildRequires:  devtoolset-2-gcc-c++
 %endif
-BuildRequires:  double-conversion-devel >= 1.1.1
 BuildRequires:  dSFMT-devel
 BuildRequires:  fftw-devel >= 3.3.2
-BuildRequires:  gcc-gfortran
-# Needed to test package management until the switch  to libgit2
+# Needed to test package management until the switch to libgit2
 BuildRequires:  git
 %if 0%{?rhel} && 0%{?rhel} <= 6
 BuildRequires:  gmp5-devel >= 5.0
@@ -48,19 +49,16 @@ BuildRequires:  libgit2-devel >= 1:0.21
 BuildRequires:  libgit2-devel >= 0.21
 %endif
 BuildRequires:  libunwind-devel
-BuildRequires:  llvm3.3-devel
+BuildRequires:  llvm%{llvmversion}-devel
 %if 0%{?rhel} && 0%{?rhel} <= 6
 BuildRequires:  mpfr3-devel >= 3.0
 %else
 BuildRequires:  mpfr-devel >= 3.0
 %endif
-%ifarch %{arm}
-BuildRequires:  blas-devel
-BuildRequires:  lapack-devel
-%else
-BuildRequires:  openblas-devel
-%endif
+BuildRequires:  openblas-threads
+%ifarch %{ix86} x86_64
 BuildRequires:  openlibm-devel >= 0.4
+%endif
 BuildRequires:  openspecfun-devel >= 0.4
 BuildRequires:  pcre2-devel
 BuildRequires:  perl
@@ -90,16 +88,12 @@ Requires:       mpfr3 >= 3.0
 %else
 Requires:       mpfr >= 3.0
 %endif
-%ifarch %{arm}
-Requires:       blas
-Requires:       lapack
-%else
 Requires:       openblas-threads
-%endif
+%ifarch %{ix86} x86_64
 Requires:       openlibm >= 0.4
+%endif
 Requires:       openspecfun >= 0.4
 Requires:       pcre2
-BuildRequires:  utf8proc >= 1.3
 # Currently, Julia does not work properly architectures other than x86
 # https://bugzilla.redhat.com/show_bug.cgi?id=1158024
 # https://bugzilla.redhat.com/show_bug.cgi?id=1158026
@@ -162,7 +156,9 @@ Julia into external programs or debugging Julia itself.
 %prep
 %setup -qn %{name}
 
-pushd deps
+mkdir -p deps/srccache
+
+pushd deps/srccache
     # Julia downloads tarballs for external dependencies even when the folder is present:
     # we need to copy the tarball and let the build process unpack it
     # https://github.com/JuliaLang/julia/pull/10280
@@ -174,47 +170,53 @@ popd
 # (i386 does not work yet: https://github.com/JuliaLang/julia/issues/7185)
 # Without specifying MARCH, the Julia system image would only work on native CPU
 %ifarch %{ix86}
-%global march MARCH=pentium4
+%global march pentium4
 %endif
 %ifarch x86_64
-%global march MARCH=x86-64
+%global march x86-64
 %endif
 %ifarch %{arm}
 # gcc and LLVM do not support the same targets
-%global march MARCH=$(echo %optflags | grep -Po 'march=\\K[^ ]*') JULIA_CPU_TARGET=generic
+%global march $(echo %optflags | grep -Po 'march=\\K[^ ]*')
 %endif
 %ifarch armv7hl
-%global march MARCH=$(echo %optflags | grep -Po 'march=\\K[^ ]*') JULIA_CPU_TARGET=cortex-a8
+%global march $(echo %optflags | grep -Po 'march=\\K[^ ]*')
+%endif
+%ifarch aarch64
+%global march armv8-a
 %endif
 
-# OpenBLAS is not available on ARM, and need to pass -fsigned-char there
-%ifarch %{arm}
-%global archspecific LIBBLAS=-lblas LIBBLASNAME=liblblas.so.3 LIBLAPACK=-llapack LIBLAPACKNAME=liblapack.so.3 JCFLAGS="-fsigned-char -std=gnu99 -pipe -fPIC -fno-strict-aliasing -D_FILE_OFFSET_BITS=64" %{march}
+%global blas USE_BLAS64=0 LIBBLAS=-lopenblasp LIBBLASNAME=libopenblasp.so.0 LIBLAPACK=-lopenblasp LIBLAPACKNAME=libopenblasp.so.0
+
+%ifarch %{ix86} x86_64
+%global libm USE_SYSTEM_LIBM=0 USE_SYSTEM_OPENLIBM=1
 %else
-%global archspecific LIBBLAS=-lopenblasp LIBBLASNAME=libopenblasp.so.0 LIBLAPACK=-lopenblasp LIBLAPACKNAME=libopenblasp.so.0 %{march}
+%global libm USE_SYSTEM_LIBM=1
 %endif
 
-# USE_BLAS64=0 means that BLAS was built with 32-bit integers, even if the library is 64 bits
 # About build, build_libdir and build_bindir, see https://github.com/JuliaLang/julia/issues/5063#issuecomment-32628111
 %global julia_builddir %{_builddir}/%{name}/build
-%global commonopts USE_SYSTEM_LLVM=1 USE_SYSTEM_LIBUNWIND=1 USE_SYSTEM_READLINE=1 USE_SYSTEM_PCRE=1 USE_SYSTEM_OPENSPECFUN=1  USE_SYSTEM_OPENLIBM=1 USE_SYSTEM_BLAS=1 USE_SYSTEM_LAPACK=1 USE_SYSTEM_FFTW=1 USE_SYSTEM_GMP=1 USE_SYSTEM_MPFR=1 USE_SYSTEM_ARPACK=1 USE_SYSTEM_SUITESPARSE=1 USE_SYSTEM_ZLIB=1 USE_SYSTEM_GRISU=1 USE_SYSTEM_DSFMT=1 USE_SYSTEM_LIBUV=0 USE_SYSTEM_RMATH=0 USE_LLVM_SHLIB=1 USE_SYSTEM_UTF8PROC=1 USE_SYSTEM_LIBGIT2=1 USE_SYSTEM_PATCHELF=1 VERBOSE=1 USE_BLAS64=0 %{archspecific} prefix=%{_prefix} bindir=%{_bindir} libdir=%{_libdir} libexecdir=%{_libexecdir} datarootdir=%{_datarootdir} includedir=%{_includedir} sysconfdir=%{_sysconfdir} build_prefix=%{julia_builddir} build_bindir=%{julia_builddir}%{_bindir} build_libdir=%{julia_builddir}%{_libdir} build_private_libdir=%{julia_builddir}%{_libdir}/julia build_libexecdir=%{julia_builddir}%{_libexecdir} build_datarootdir=%{julia_builddir}%{_datarootdir} build_includedir=%{julia_builddir}%{_includedir} build_sysconfdir=%{julia_builddir}%{_sysconfdir}
+%global commonopts USE_SYSTEM_LLVM=1 USE_LLVM_SHLIB=1 LLVM_CONFIG=llvm-config-%{__isa_bits}-%{llvm_version} USE_SYSTEM_LIBUNWIND=1 USE_SYSTEM_READLINE=1 USE_SYSTEM_PCRE=1 USE_SYSTEM_OPENSPECFUN=1 USE_SYSTEM_BLAS=1 USE_SYSTEM_LAPACK=1 USE_SYSTEM_FFTW=1 USE_SYSTEM_GMP=1 USE_SYSTEM_MPFR=1 USE_SYSTEM_ARPACK=1 USE_SYSTEM_SUITESPARSE=1 USE_SYSTEM_ZLIB=1 USE_SYSTEM_GRISU=1 USE_SYSTEM_DSFMT=1 USE_SYSTEM_LIBUV=0 USE_SYSTEM_RMATH=0 USE_SYSTEM_UTF8PROC=1 USE_SYSTEM_LIBGIT2=1 USE_SYSTEM_PATCHELF=1 VERBOSE=1 MARCH=%{march} %{blas} %{libm} prefix=%{_prefix} bindir=%{_bindir} libdir=%{_libdir} libexecdir=%{_libexecdir} datarootdir=%{_datarootdir} includedir=%{_includedir} sysconfdir=%{_sysconfdir} build_prefix=%{julia_builddir} build_bindir=%{julia_builddir}%{_bindir} build_libdir=%{julia_builddir}%{_libdir} build_private_libdir=%{julia_builddir}%{_libdir}/julia build_libexecdir=%{julia_builddir}%{_libexecdir} build_datarootdir=%{julia_builddir}%{_datarootdir} build_includedir=%{julia_builddir}%{_includedir} build_sysconfdir=%{julia_builddir}%{_sysconfdir} JULIA_CPU_CORES=$(echo %{?_smp_mflags} | sed s/-j//)
 
 %build
 %if 0%{?rhel} && 0%{?rhel} <= 6
 . /opt/rh/devtoolset-2/enable
 %endif
 
-make %{?_smp_mflags} CFLAGS="%{optflags}" CXXFLAGS="%{optflags}" FFLAGS="%{optflags}" %commonopts release
+# Need to repeat -march here to override i686 from optflags
+%global buildflags CFLAGS="%{optflags} -march=%{march}" CXXFLAGS="%{optflags} -march=%{march}"
+
+make %{?_smp_mflags} %{buildflags} %{commonopts} release
 # If debug is not built here, it is built during make install
 # And both targets cannot be on the same call currently:
 # https://github.com/JuliaLang/julia/issues/10088
-make %{?_smp_mflags} CFLAGS="%{optflags}" CXXFLAGS="%{optflags}" FFLAGS="%{optflags}" %commonopts debug
+make %{?_smp_mflags} %{buildflags} %{commonopts} debug
 
 %check
-make %commonopts test
+make %{commonopts} test
 
 %install
-make %commonopts DESTDIR=%{buildroot} install
+make %{commonopts} DESTDIR=%{buildroot} install
 
 cp -p CONTRIBUTING.md LICENSE.md NEWS.md README.md %{buildroot}%{_docdir}/julia/
 
@@ -246,20 +248,6 @@ convert -scale 48x48 -extent 48x48 -gravity center -background transparent \
 convert -scale 256x256 -extent 256x256 -gravity center -background transparent \
     doc/_build/html/_static/julia-logo.svg \
     %{buildroot}%{_datarootdir}/icons/hicolor/256x256/apps/%{name}.png
-mkdir -p %{buildroot}%{_datarootdir}/applications
-cat > %{buildroot}%{_datarootdir}/applications/%{name}.desktop << EOF
-[Desktop Entry]
-Name=Julia
-Comment=High-level, high-performance dynamic language for technical computing
-Exec=julia
-Icon=%{name}
-Terminal=true
-Type=Application
-Categories=Science;Math;
-%if 0%{?rhel} && 0%{?rhel} <= 5
-Encoding=UTF-8
-%endif
-EOF
 desktop-file-validate %{buildroot}%{_datarootdir}/applications/%{name}.desktop
 
 %files
@@ -304,10 +292,11 @@ desktop-file-validate %{buildroot}%{_datarootdir}/applications/%{name}.desktop
 # Julia currently needs the unversioned .so files:
 # https://github.com/JuliaLang/julia/issues/6742
 ln -sf %{_libdir}/libarpack.so.2 %{_libdir}/julia/libarpack.so
-ln -sf %{_libdir}/libcholmod.so.2 %{_libdir}/julia/libcholmod.so
+ln -sf %{_libdir}/libcholmod.so.3 %{_libdir}/julia/libcholmod.so
 ln -sf %{_libdir}/libdSFMT.so.2 %{_libdir}/julia/libdSFMT.so
-ln -sf %{_libdir}/libgit2.so.0 %{_libdir}/julia/libgit2.so
-ln -sf %{_libdir}/libfftw3_threads.so.2 %{_libdir}/julia/libfftw3_threads.so
+# TODO: do something to handle different libgit2 SONAMES
+ln -sf %{_libdir}/libgit2.so.23 %{_libdir}/julia/libgit2.so
+ln -sf %{_libdir}/libfftw3_threads.so.3 %{_libdir}/julia/libfftw3_threads.so
 ln -sf %{_libdir}/libgmp.so.10 %{_libdir}/julia/libgmp.so
 ln -sf %{_libdir}/libmpfr.so.4 %{_libdir}/julia/libmpfr.so
 ln -sf %{_libdir}/libopenlibm.so.1 %{_libdir}/julia/libopenlibm.so
@@ -340,6 +329,22 @@ exit 0
 /usr/bin/gtk-update-icon-cache %{_datarootdir}/icons/hicolor &>/dev/null || :
 
 %changelog
+* Tue Jan 5 2016 Orion Poplawski <orion@cora.nwra.com> - 0.4.2-3
+- Use proper conditional for __isa_bits tests
+
+* Thu Dec 24 2015 Milan Bouchet-Valat <nalimilan@club.fr> - 0.4.2-2
+- Use new ILP64 OpenBLAS, suffixed with 64_ (ARPACK and SuiteSparse still use
+  the LP64 Atlas).
+
+* Wed Dec 9 2015 Milan Bouchet-Valat <nalimilan@club.fr> - 0.4.2-1
+- New upstream release.
+- Update bundled libuv to latest Julia fork.
+
+* Mon Nov 9 2015 Milan Bouchet-Valat <nalimilan@club.fr> - 0.4.1-1
+- New upstream release.
+- Pass explicitly -march to override default -march=i686 with pentium4.
+- Get rid of useless build dependencies.
+
 * Fri Oct 9 2015 Milan Bouchet-Valat <nalimilan@club.fr> - 0.4.0-2
 - Use LLVM 3.3 to fix bugs and improve compilation performance.
 - Run all the tests now that they pass.
@@ -392,8 +397,30 @@ exit 0
 * Mon Mar 2 2015 Milan Bouchet-Valat <nalimilan@club.fr> - 0.3.6-2
 - Fix loading libcholmod, libfftw3_threads and libumfpack.
 
-* Sun Oct 12 2014 Milan Bouchet-Valat <nalimilan@club.fr> - 0.3.1-3+copr
-- Add support for EPEL5 and 6.
+* Tue Feb 17 2015 Milan Bouchet-Valat <nalimilan@club.fr> - 0.3.6-1
+- New upstream release.
+
+* Fri Jan 9 2015 Milan Bouchet-Valat <nalimilan@club.fr> - 0.3.5-1
+- New upstream release.
+
+* Fri Dec 26 2014 Milan Bouchet-Valat <nalimilan@club.fr> - 0.3.4-1
+- New upstream release.
+
+* Fri Dec 12 2014 Adam Jackson <ajax@redhat.com> 0.3.3-2
+- Rebuild for F21 LLVM 3.5 rebase
+
+* Sun Nov 23 2014 Milan Bouchet-Valat <nalimilan@club.fr> - 0.3.3-1
+- New upstream release.
+- Bump libuv to follow upstream.
+
+* Wed Nov 05 2014 Adam Jackson <ajax@redhat.com> 0.3.2-4
+- Don't BuildRequire: llvm-static
+
+* Tue Oct 28 2014 Milan Bouchet-Valat <nalimilan@club.fr> - 0.3.2-3
+- Trigger rebuild to use LLVM 3.5.
+
+* Thu Oct 23 2014 Milan Bouchet-Valat <nalimilan@club.fr> - 0.3.2-2
+- New upstream release.
 
 * Sun Oct 12 2014 Milan Bouchet-Valat <nalimilan@club.fr> - 0.3.1-3
 - Fix missing symlinks to libarpack, libpcre, libgmp and libmpfr, which could
