@@ -40,7 +40,8 @@ julia_tarball_factory.addSteps([
     ShellCommand(
         name="make binary-dist",
         command=["/bin/bash", "-c", Interpolate("make %(prop:flags)s binary-dist")],
-        haltOnFailure = True
+        haltOnFailure = True,
+        timeout=2400
     ),
 
     # Set a bunch of properties that everyone will need
