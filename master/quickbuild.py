@@ -31,10 +31,10 @@ quickbuild_factory.addSteps([
     ShellCommand(command=["/bin/bash", "-c", Interpolate("make %(prop:flags)s cleanall")]),
 
     # Make!
-    ShellCommand(command=["/bin/bash", "-c", Interpolate("make %(prop:flags)s")], haltOnFailure = True),
+    ShellCommand(command=["/bin/bash", "-c", Interpolate("make %(prop:flags)s")], haltOnFailure = True, timeout=3600),
 
     # Test!
-    ShellCommand(command=["/bin/bash", "-c", Interpolate("make %(prop:flags)s testall")])
+    ShellCommand(command=["/bin/bash", "-c", Interpolate("make %(prop:flags)s testall")], timeout=3600)
 ])
 
 # Add builders that link to the factory above

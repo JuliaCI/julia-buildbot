@@ -53,7 +53,8 @@ julia_dmg_factory.addSteps([
     ShellCommand(
     	name="make",
     	command=["/bin/bash", "-c", Interpolate("make %(prop:flags)s")],
-    	haltOnFailure=True
+    	haltOnFailure=True,
+    	timeout=3600
     ),
 
     # Set a bunch of properties that everyone will need
