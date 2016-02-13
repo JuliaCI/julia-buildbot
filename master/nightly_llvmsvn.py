@@ -49,6 +49,12 @@ julia_llvmsvn_factory.addSteps([
     	haltOnFailure = True
     ),
 
+    # Print versioninfo. This is particularly useful for llvm-svn build
+    # since it includes the llvm version number.
+    ShellCommand(
+    	name="versioninfo()",
+    	command=["usr/bin/julia", "-f", "-e", "versioninfo()"]
+    ),
     # Test!
     ShellCommand(
     	name="make testall",
