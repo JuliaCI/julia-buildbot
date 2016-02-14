@@ -68,9 +68,9 @@ for name in all_names:
     if name[:3] == "osx":
         march = "core2"
 
-	# Just so that we can pass tests on our memory-limited OSX builder,
-	# we will set JULIA_CPU_CORES=1, which is sad but apparently necessary.
-	flags += 'JULIA_CPU_CORES=1 '
+        # Just so that we can pass tests on our memory-limited OSX builder,
+        # we will set JULIA_CPU_CORES=1, which is sad but apparently necessary.
+        flags += 'JULIA_CPU_CORES=1 '
 
     # On ancient CentOS systems, O_CLOEXEC makes LLVM sad
     # and old cmake has issues linking openssl in libgit2
