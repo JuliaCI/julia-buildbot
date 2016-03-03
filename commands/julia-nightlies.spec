@@ -35,6 +35,7 @@ BuildRequires:  devtoolset-2-gcc-c++
 %endif
 BuildRequires:  dSFMT-devel
 BuildRequires:  fftw-devel >= 3.3.2
+BuildRequires:  gcc-c++
 # Needed to test package management until the switch to libgit2
 BuildRequires:  git
 %if 0%{?rhel} && 0%{?rhel} <= 6
@@ -65,45 +66,15 @@ BuildRequires:  perl
 BuildRequires:  suitesparse-devel
 BuildRequires:  utf8proc-devel >= 1.3
 BuildRequires:  zlib-devel
-# Dependencies loaded at run time by Julia code
-# and thus not detected by find-requires
-Requires:       arpack
-Requires:       dSFMT
-Requires:       fftw >= 3.3.2
 # Needed for package management until the switch  to libgit2
 Requires:       git
-%if 0%{?rhel} && 0%{?rhel} <= 6
-Requires:       gmp5 >= 5.0
-%else
-Requires:       gmp >= 5.0
-%endif
 Requires:       julia-common = %{version}-%{release}
-%if 0%{?rhel} && 0%{?rhel} == 6
-Requires:       libgit2 >= 1:0.21
-%else
-Requires:       libgit2 >= 0.21
-%endif
-%if 0%{?rhel} && 0%{?rhel} <= 6
-Requires:       mpfr3 >= 3.0
-%else
-Requires:       mpfr >= 3.0
-%endif
 Requires:       openblas-threads
-%ifarch %{ix86} x86_64
-Requires:       openlibm >= 0.4
-%endif
-Requires:       openspecfun >= 0.4
-Requires:       pcre2
 # Currently, Julia does not work properly architectures other than x86
 # https://bugzilla.redhat.com/show_bug.cgi?id=1158024
 # https://bugzilla.redhat.com/show_bug.cgi?id=1158026
 # https://bugzilla.redhat.com/show_bug.cgi?id=1158025
 ExclusiveArch:  %{ix86} x86_64
-%if 0%{?rhel} && 0%{?rhel} <= 5
-%global buildroot %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
-%global _datarootdir %{_datadir}
-BuildRoot:      %{buildroot}
-%endif
 
 %description
 Julia is a high-level, high-performance dynamic programming language
@@ -204,7 +175,11 @@ popd
 %endif
 
 # Need to repeat -march here to override i686 from optflags
-%global buildflags CFLAGS="%{optflags} -march=%{march}" CXXFLAGS="%{optflags} -march=%{march}"
+# USE_ORCJIT needs to be set directly since it's disabled by default with USE_SYSTEM_LLVM=1
+%global buildflags CFLAGS="%{optflags} -march=%{march}" CXXFLAGS="%{optflags} -march=%{march} -DUSE_ORCJIT"
+
+# Temporary: https://github.com/JuliaLang/julia/issues/15079
+ulimit -s 100000
 
 make %{?_smp_mflags} %{buildflags} %{commonopts} release
 # If debug is not built here, it is built during make install
@@ -213,10 +188,35 @@ make %{?_smp_mflags} %{buildflags} %{commonopts} release
 make %{?_smp_mflags} %{buildflags} %{commonopts} debug
 
 %check
+%{julia_builddir}%{_bindir}/julia -e '1^(-1)' || :
+%{julia_builddir}%{_bindir}/julia -e 'try 1^(-1) catch for p in catch_backtrace() ccall(:jl_gdblookup, Void, (Ptr{Void},), p) end end' || :
+
 make %{commonopts} test
 
 %install
 make %{commonopts} DESTDIR=%{buildroot} install
+
+# Julia currently needs the unversioned .so files:
+# https://github.com/JuliaLang/julia/issues/6742
+# By creating symlinks to versioned libraries, we hardcode a dependency
+# on the specific SOVERSION so that any breaking update in one of the
+# dependencies can be detected (just as what happens with the C linker).
+# Automatic dependency detection is smart enough to add Requires as needed.
+pushd %{buildroot}%{_libdir}/julia
+    ln -s $(realpath -e %{_libdir}/libarpack.so) libarpack.so
+    ln -s $(realpath -e %{_libdir}/libcholmod.so) libcholmod.so
+    ln -s $(realpath -e %{_libdir}/libdSFMT.so) libdSFMT.so
+    ln -s $(realpath -e %{_libdir}/libgit2.so) libgit2.so
+    ln -s $(realpath -e %{_libdir}/libfftw3.so) libfftw3.so
+    ln -s $(realpath -e %{_libdir}/libgmp.so) libgmp.so
+    ln -s $(realpath -e %{_libdir}/libmpfr.so) libmpfr.so
+%ifarch %{ix86} x86_64
+    ln -s $(realpath -e %{_libdir}/libopenlibm.so) libopenlibm.so
+%endif
+    ln -s $(realpath -e %{_libdir}/libopenspecfun.so) libopenspecfun.so
+    ln -s $(realpath -e %{_libdir}/libpcre2-8.so) libpcre2-8.so
+    ln -s $(realpath -e %{_libdir}/libumfpack.so) libumfpack.so
+popd
 
 cp -p CONTRIBUTING.md LICENSE.md NEWS.md README.md %{buildroot}%{_docdir}/julia/
 
@@ -289,37 +289,12 @@ desktop-file-validate %{buildroot}%{_datarootdir}/applications/%{name}.desktop
 
 %post
 /sbin/ldconfig
-# Julia currently needs the unversioned .so files:
-# https://github.com/JuliaLang/julia/issues/6742
-ln -sf %{_libdir}/libarpack.so.2 %{_libdir}/julia/libarpack.so
-ln -sf %{_libdir}/libcholmod.so.3 %{_libdir}/julia/libcholmod.so
-ln -sf %{_libdir}/libdSFMT.so.2 %{_libdir}/julia/libdSFMT.so
-# TODO: do something to handle different libgit2 SONAMES
-ln -sf %{_libdir}/libgit2.so.23 %{_libdir}/julia/libgit2.so
-ln -sf %{_libdir}/libfftw3_threads.so.3 %{_libdir}/julia/libfftw3_threads.so
-ln -sf %{_libdir}/libgmp.so.10 %{_libdir}/julia/libgmp.so
-ln -sf %{_libdir}/libmpfr.so.4 %{_libdir}/julia/libmpfr.so
-ln -sf %{_libdir}/libopenlibm.so.1 %{_libdir}/julia/libopenlibm.so
-ln -sf %{_libdir}/libopenspecfun.so.1 %{_libdir}/julia/libopenspecfun.so
-ln -sf %{_libdir}/libpcre2-8.so.0 %{_libdir}/julia/libpcre2-8.so
-ln -sf %{_libdir}/libumfpack.so.5 %{_libdir}/julia/libumfpack.so
 /bin/touch --no-create %{_datarootdir}/icons/hicolor &>/dev/null || :
 exit 0
 
 %postun
 /sbin/ldconfig
 if [ $1 -eq 0 ] ; then
-    rm -f %{_libdir}/julia/libarpack.so
-    rm -f %{_libdir}/julia/libcholmod.so
-    rm -f %{_libdir}/julia/libdSFMT.so
-    rm -f %{_libdir}/julia/libgit2.so
-    rm -f %{_libdir}/julia/libfftw3_threads.so
-    rm -f %{_libdir}/julia/libgmp.so
-    rm -f %{_libdir}/julia/libmpfr.so
-    rm -f %{_libdir}/julia/libopenlibm.so
-    rm -f %{_libdir}/julia/libopenspecfun.so
-    rm -f %{_libdir}/julia/libpcre2-8.so
-    rm -f %{_libdir}/julia/libumfpack.so
     /bin/touch --no-create %{_datarootdir}/icons/hicolor &>/dev/null
     /usr/bin/gtk-update-icon-cache %{_datarootdir}/icons/hicolor &>/dev/null || :
 fi
@@ -329,6 +304,29 @@ exit 0
 /usr/bin/gtk-update-icon-cache %{_datarootdir}/icons/hicolor &>/dev/null || :
 
 %changelog
+* Wed Mar 2 2016 Milan Bouchet-Valat <nalimilan@club.fr> - 0.4.3-6
+- Fix missing PCRE2 dependency, use realpath -e to detect this problem.
+
+* Tue Mar 1 2016 Milan Bouchet-Valat <nalimilan@club.fr> - 0.4.3-5
+- Automate generation of library symlinks, and include them in the package instead of
+  in %%post so that dependencies on specific library versions are detected.
+
+* Fri Feb 26 2016 Suvayu Ali <fatkasuvayu+linux@gmail.com> - 0.4.3-4
+- Fix broken symlinks in libdir
+
+* Thu Feb 04 2016 Fedora Release Engineering <releng@fedoraproject.org> - 0.4.3-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_24_Mass_Rebuild
+
+* Thu Jan 28 2016 Milan Bouchet-Valat <nalimilan@club.fr> - 0.4.3-2
+- Fix build with GCC 6.
+
+* Thu Jan 28 2016 Milan Bouchet-Valat <nalimilan@club.fr> - 0.4.3-1
+- New upstream release.
+- Revert to LP64 OpenBLAS until ILP64 works correctly.
+
+* Wed Jan 27 2016 Adam Jackson <ajax@redhat.com> 0.4.2-4
+- Rebuild for llvm 3.7.1 library split
+
 * Tue Jan 5 2016 Orion Poplawski <orion@cora.nwra.com> - 0.4.2-3
 - Use proper conditional for __isa_bits tests
 
