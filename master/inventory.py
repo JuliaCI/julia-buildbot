@@ -71,6 +71,8 @@ for name in all_names:
         # Just so that we can pass tests on our memory-limited OSX builder,
         # we will set JULIA_CPU_CORES=2, which is sad but apparently necessary.
         flags += 'JULIA_CPU_CORES=2 '
+    else:
+    	flags += 'JULIA_CPU_CORES=4 '
 
     # tests are hitting memory issues, so restart workers when memory consumption gets too high
     flags += 'JULIA_TEST_MAXRSS_MB=600 '
