@@ -72,6 +72,9 @@ for name in all_names:
         # we will set JULIA_CPU_CORES=1, which is sad but apparently necessary.
         flags += 'JULIA_CPU_CORES=1 '
 
+    # tests are hitting memory issues, so restart workers when memory consumption gets too high
+    flags += 'JULIA_TEST_MAXRSS_MB=600 '
+
     # On ancient CentOS systems, O_CLOEXEC makes LLVM sad
     # and old cmake has issues linking openssl in libgit2
     if name[:10] == "centos5.11":
