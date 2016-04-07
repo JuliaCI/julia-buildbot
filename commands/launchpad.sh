@@ -12,7 +12,6 @@ JULIA_GIT_URL="https://github.com/JuliaLang/julia.git"
 DEBIAN_GIT_URL="https://github.com/staticfloat/julia-debian.git"
 JULIA_GIT_BRANCH=master
 DEBIAN_GIT_BRANCH=master
-BZR_BRANCH=trunk
 BUILD_DIR=/tmp/julia-packaging/ubuntu
 
 cd $(dirname $0)
@@ -36,11 +35,8 @@ cd $BUILD_DIR
 # Get the git branch
 if test ! -d julia-${JULIA_GIT_BRANCH}; then
     git clone ${JULIA_GIT_URL} julia-${JULIA_GIT_BRANCH}
-fi
-
-# Get the bzr branch
-if test ! -d ${BZR_BRANCH}; then
-    bzr branch http://bazaar.launchpad.net/${TEAM}/${PROJECT}/${BZR_BRANCH}/
+    # Setup remote for launchpad
+    git remote add launchpad git+ssh://staticfloat@git.launchpad.net/~staticfloat/julianightlies
 fi
 
 # Get the debian directory
@@ -57,6 +53,7 @@ cd julia-${JULIA_GIT_BRANCH}
 git checkout ${JULIA_GIT_BRANCH}
 git fetch
 git reset --hard origin/${JULIA_GIT_BRANCH}
+make cleanall
 
 # Checkout the commit we've been given
 git checkout -B ${JULIA_GIT_BRANCH} ${COMMIT}
@@ -80,30 +77,24 @@ make -C deps get-Rmath-julia
 # Work around our lack of git on buildd servers
 make -C base version_git.jl.phony
 
+# Run this again in an attempt to get the timestamps correct
+make doc/_build/html
+
 # Make it blaringly obvious to everyone that this is a git build when they start up Julia-
 JULIA_VERSION=$(cat ./VERSION)
 DATECOMMIT=$(git log --pretty=format:'%cd' --date=short -n 1 | tr -d '-')
 echo "Syncing commit ${JULIA_VERSION}+$DATECOMMIT."
-cd ..
 
-# Now go into the bzr branch and copy everything over
-cd ${BZR_BRANCH}
-bzr pull http://bazaar.launchpad.net/${TEAM}/${PROJECT}/${BZR_BRANCH}/
-rm -rf *
-cp -r ../julia-${JULIA_GIT_BRANCH}/* .
-
-# Throw the debian directory into here as well, instead of relying on launchpad
+# Throw the debian directory into here
+rm -rf debian
 cp -r ../debian-${DEBIAN_GIT_BRANCH}/debian .
-
-# Run this again in an attempt to get the timestamps correct
-make doc/_build/html
 
 # Also, increment the current debian changelog, so we get git version tagged binaries
 dch -v "${JULIA_VERSION}+$DATECOMMIT" "nightly git build"
 
-bzr add
-bzr ci -m "Manual import commit ${DATECOMMIT} from ${JULIA_GIT_URL}" || true
-bzr push lp:${TEAM}/${PROJECT}/${BZR_BRANCH}
-cd ..
+# Force-push this up to launchpad
+git add -f *
+git commit -m "Manual import commit ${DATECOMMIT} from ${JULIA_GIT_URL}"
+git push -f launchpad
 
 exit 0
