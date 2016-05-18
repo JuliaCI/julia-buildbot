@@ -39,7 +39,7 @@ julia_llvmsvn_factory.addSteps([
     ),
     ShellCommand(
     	name="make distclean-llvm",
-    	command=["/bin/bash", "-c", Interpolate("make %(prop:flags)s cleanall -C deps distclean-llvm")]
+    	command=["/bin/bash", "-c", Interpolate("make %(prop:flags)s -C deps distclean-llvm")]
     ),
 
     # Make!
