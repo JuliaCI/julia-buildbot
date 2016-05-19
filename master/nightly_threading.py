@@ -38,9 +38,10 @@ julia_threading_factory.addSteps([
     ),
 
     # Add our particular configuration to flags
+    # Enable 4 threads by default
     SetPropertyFromCommand(
         name="Add configuration to flags",
-        command=["echo", Interpolate("%(prop:flags)s JULIA_THREADS=1")],
+        command=["echo", Interpolate("%(prop:flags)s JULIA_THREADS=4")],
         property="flags"
     ),
 
