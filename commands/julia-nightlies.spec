@@ -4,6 +4,8 @@
 %global Rmathjuliaversion 0.1
 %global Rmathversion 3.0.1
 
+%global unwindversion 1.1-julia2
+
 %global llvm_version 3.7
 %global llvmversion 37
 
@@ -23,8 +25,11 @@ Source0:        https://api.github.com/repos/JuliaLang/julia/tarball/master#/jul
 Source1:        https://api.github.com/repos/JuliaLang/libuv/tarball/%{uvcommit}#/libuv-%{uvcommit}.tar.gz
 # Julia currently uses a custom version of Rmath, called Rmath-julia, with a custom RNG system (temporary)
 Source2:        https://api.github.com/repos/JuliaLang/Rmath-julia/tarball/v%{Rmathjuliaversion}#/Rmath-julia-%{Rmathjuliaversion}.tar.gz
+#Source3:        http://download.savannah.gnu.org/releases/libunwind/libunwind-%{unwindversion}.tar.gz
+Source3:        https://s3.amazonaws.com/julialang/src/libunwind-%{unwindversion}.tar.gz
 Provides:       bundled(libuv) = %{uvversion}
 Provides:       bundled(Rmath) = %{Rmathversion}
+Provides:       bundled(libunwind) = %{unwindversion}
 BuildRequires:  arpack-devel
 BuildRequires:  desktop-file-utils
 %if 0%{?rhel} && 0%{?rhel} <= 6
@@ -57,9 +62,7 @@ BuildRequires:  mpfr3-devel >= 3.0
 BuildRequires:  mpfr-devel >= 3.0
 %endif
 BuildRequires:  openblas-threads
-%ifarch %{ix86} x86_64
 BuildRequires:  openlibm-devel >= 0.4
-%endif
 BuildRequires:  openspecfun-devel >= 0.4
 BuildRequires:  pcre2-devel
 BuildRequires:  perl
@@ -135,6 +138,7 @@ pushd deps/srccache
     # https://github.com/JuliaLang/julia/pull/10280
     cp -p %SOURCE1 .
     cp -p %SOURCE2 .
+    cp -p %SOURCE3 .
 popd
 
 # Required so that the image is not optimized for the build CPU
@@ -159,15 +163,9 @@ popd
 
 %global blas USE_BLAS64=0 LIBBLAS=-lopenblasp LIBBLASNAME=libopenblasp.so.0 LIBLAPACK=-lopenblasp LIBLAPACKNAME=libopenblasp.so.0
 
-%ifarch %{ix86} x86_64
-%global libm USE_SYSTEM_LIBM=0 USE_SYSTEM_OPENLIBM=1
-%else
-%global libm USE_SYSTEM_LIBM=1
-%endif
-
 # About build, build_libdir and build_bindir, see https://github.com/JuliaLang/julia/issues/5063#issuecomment-32628111
 %global julia_builddir %{_builddir}/%{name}/build
-%global commonopts USE_SYSTEM_LLVM=1 USE_LLVM_SHLIB=1 LLVM_CONFIG=llvm-config-%{__isa_bits}-%{llvm_version} USE_SYSTEM_LIBUNWIND=1 USE_SYSTEM_READLINE=1 USE_SYSTEM_PCRE=1 USE_SYSTEM_OPENSPECFUN=1 USE_SYSTEM_BLAS=1 USE_SYSTEM_LAPACK=1 USE_SYSTEM_FFTW=1 USE_SYSTEM_GMP=1 USE_SYSTEM_MPFR=1 USE_SYSTEM_ARPACK=1 USE_SYSTEM_SUITESPARSE=1 USE_SYSTEM_ZLIB=1 USE_SYSTEM_GRISU=1 USE_SYSTEM_DSFMT=1 USE_SYSTEM_LIBUV=0 USE_SYSTEM_RMATH=0 USE_SYSTEM_UTF8PROC=1 USE_SYSTEM_LIBGIT2=1 USE_SYSTEM_PATCHELF=1 VERBOSE=1 MARCH=%{march} %{blas} %{libm} prefix=%{_prefix} bindir=%{_bindir} libdir=%{_libdir} libexecdir=%{_libexecdir} datarootdir=%{_datarootdir} includedir=%{_includedir} sysconfdir=%{_sysconfdir} build_prefix=%{julia_builddir} build_bindir=%{julia_builddir}%{_bindir} build_libdir=%{julia_builddir}%{_libdir} build_private_libdir=%{julia_builddir}%{_libdir}/julia build_libexecdir=%{julia_builddir}%{_libexecdir} build_datarootdir=%{julia_builddir}%{_datarootdir} build_includedir=%{julia_builddir}%{_includedir} build_sysconfdir=%{julia_builddir}%{_sysconfdir} JULIA_CPU_CORES=$(echo %{?_smp_mflags} | sed s/-j//)
+%global commonopts USE_SYSTEM_LLVM=1 USE_LLVM_SHLIB=1 LLVM_CONFIG=llvm-config-%{__isa_bits}-%{llvm_version} USE_SYSTEM_LIBUNWIND=0 USE_SYSTEM_READLINE=1 USE_SYSTEM_PCRE=1 USE_SYSTEM_OPENSPECFUN=1 USE_SYSTEM_BLAS=1 USE_SYSTEM_LAPACK=1 USE_SYSTEM_FFTW=1 USE_SYSTEM_GMP=1 USE_SYSTEM_MPFR=1 USE_SYSTEM_ARPACK=1 USE_SYSTEM_SUITESPARSE=1 USE_SYSTEM_ZLIB=1 USE_SYSTEM_GRISU=1 USE_SYSTEM_DSFMT=1 USE_SYSTEM_LIBUV=0 USE_SYSTEM_RMATH=0 USE_SYSTEM_UTF8PROC=1 USE_SYSTEM_LIBGIT2=1 USE_SYSTEM_PATCHELF=1 USE_SYSTEM_LIBM=0 USE_SYSTEM_OPENLIBM=1 VERBOSE=1 MARCH=%{march} %{blas} prefix=%{_prefix} bindir=%{_bindir} libdir=%{_libdir} libexecdir=%{_libexecdir} datarootdir=%{_datarootdir} includedir=%{_includedir} sysconfdir=%{_sysconfdir} build_prefix=%{julia_builddir} build_bindir=%{julia_builddir}%{_bindir} build_libdir=%{julia_builddir}%{_libdir} build_private_libdir=%{julia_builddir}%{_libdir}/julia build_libexecdir=%{julia_builddir}%{_libexecdir} build_datarootdir=%{julia_builddir}%{_datarootdir} build_includedir=%{julia_builddir}%{_includedir} build_sysconfdir=%{julia_builddir}%{_sysconfdir} JULIA_CPU_CORES=$(echo %{?_smp_mflags} | sed s/-j//)
 
 %build
 %if 0%{?rhel} && 0%{?rhel} <= 6
@@ -178,9 +176,7 @@ popd
 # USE_ORCJIT needs to be set directly since it's disabled by default with USE_SYSTEM_LLVM=1
 %global buildflags CFLAGS="%{optflags} -march=%{march}" CXXFLAGS="%{optflags} -march=%{march} -DUSE_ORCJIT"
 
-# Temporary: https://github.com/JuliaLang/julia/issues/15079
-ulimit -s 100000
-
+echo "MAKEOVERRIDES =" >> deps/Makefile
 make %{?_smp_mflags} %{buildflags} %{commonopts} release
 # If debug is not built here, it is built during make install
 # And both targets cannot be on the same call currently:
@@ -188,9 +184,6 @@ make %{?_smp_mflags} %{buildflags} %{commonopts} release
 make %{?_smp_mflags} %{buildflags} %{commonopts} debug
 
 %check
-%{julia_builddir}%{_bindir}/julia -e '1^(-1)' || :
-%{julia_builddir}%{_bindir}/julia -e 'try 1^(-1) catch for p in catch_backtrace() ccall(:jl_gdblookup, Void, (Ptr{Void},), p) end end' || :
-
 make %{commonopts} test
 
 %install
@@ -203,19 +196,19 @@ make %{commonopts} DESTDIR=%{buildroot} install
 # dependencies can be detected (just as what happens with the C linker).
 # Automatic dependency detection is smart enough to add Requires as needed.
 pushd %{buildroot}%{_libdir}/julia
-    ln -s $(realpath -e %{_libdir}/libarpack.so) libarpack.so
-    ln -s $(realpath -e %{_libdir}/libcholmod.so) libcholmod.so
-    ln -s $(realpath -e %{_libdir}/libdSFMT.so) libdSFMT.so
-    ln -s $(realpath -e %{_libdir}/libgit2.so) libgit2.so
-    ln -s $(realpath -e %{_libdir}/libfftw3.so) libfftw3.so
-    ln -s $(realpath -e %{_libdir}/libgmp.so) libgmp.so
-    ln -s $(realpath -e %{_libdir}/libmpfr.so) libmpfr.so
+    for LIB in arpack cholmod dSFMT git2 fftw3 gmp mpfr openspecfun pcre2-8 umfpack
+    do
+        ln -s %{_libdir}/$(readelf -d %{_libdir}/lib$LIB.so | sed -n '/SONAME/s/.*\(lib[^ ]*\.so\.[0-9]*\).*/\1/p') lib$LIB.so
+        # Raise an error in case of failure
+        realpath -e lib$LIB.so
+    done
+
 %ifarch %{ix86} x86_64
-    ln -s $(realpath -e %{_libdir}/libopenlibm.so) libopenlibm.so
+    # Note the "libopen" trick because of greedy matching
+    ln -s %{_libdir}/libopen$(readelf -d %{_libdir}/libopenlibm.so | sed -n '/SONAME/s/.*\(lib[^ ]*\.so\.[0-9]*\).*/\1/p') libopenlibm.so
+    # Raise an error in case of failure
+    realpath -e libopenlibm.so
 %endif
-    ln -s $(realpath -e %{_libdir}/libopenspecfun.so) libopenspecfun.so
-    ln -s $(realpath -e %{_libdir}/libpcre2-8.so) libpcre2-8.so
-    ln -s $(realpath -e %{_libdir}/libumfpack.so) libumfpack.so
 popd
 
 cp -p CONTRIBUTING.md LICENSE.md NEWS.md README.md %{buildroot}%{_docdir}/julia/
@@ -258,7 +251,9 @@ desktop-file-validate %{buildroot}%{_datarootdir}/applications/%{name}.desktop
 %doc %{_docdir}/julia/README.md
 %{_bindir}/julia
 %{_libdir}/julia/
-%exclude %{_libdir}/julia/libjulia-debug.so
+%{_libdir}/libjulia.so.*
+%exclude %{_libdir}/libjulia.so
+%exclude %{_libdir}/libjulia-debug.so*
 %{_mandir}/man1/julia.1*
 %{_datarootdir}/appdata/julia.appdata.xml
 %{_datarootdir}/applications/%{name}.desktop
@@ -282,7 +277,8 @@ desktop-file-validate %{buildroot}%{_datarootdir}/applications/%{name}.desktop
 
 %files devel
 %{_bindir}/julia-debug
-%{_libdir}/julia/libjulia-debug.so
+%{_libdir}/libjulia.so
+%{_libdir}/libjulia-debug.so*
 %{_includedir}/julia/
 %{_datarootdir}/julia/test/
 %{_mandir}/man1/julia-debug.1*
