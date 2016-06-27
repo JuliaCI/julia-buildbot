@@ -108,12 +108,13 @@ julia_coverage_factory.addSteps([
     # Run Julia, gathering coverage statistics
     ShellCommand(
         name="Run inlined tests",
-        command=[Interpolate("%(prop:juliadir)s/bin/julia"), "--precompiled=no", "--code-coverage=all", "-e", run_coverage_cmd]
+        command=[Interpolate("%(prop:juliadir)s/bin/julia"), "--precompiled=no", "--code-coverage=all", "-e", run_coverage_cmd],
+        timeout=3600,
     ),
     ShellCommand(
         name="Run non-inlined tests",
         command=[Interpolate("%(prop:juliadir)s/bin/julia"), "--precompiled=no", "--code-coverage=all", "--inline=no", "-e", run_coverage_cmd],
-        timeout=3600,
+        timeout=7200,
     ),
     #submit the results!
     ShellCommand(
