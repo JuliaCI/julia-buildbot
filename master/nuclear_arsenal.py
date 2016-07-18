@@ -17,6 +17,21 @@ clean_scheduler = ForceScheduler(
 )
 c['schedulers'].append(clean_scheduler)
 
+# Add a manual scheduler for clearing out package_ and build_ mbedtls, libssh2, libgit2 deps
+pkgclean_names = ubuntu_names + ["osx10.9-x64"] + centos_names + win_names + arm_names
+pkgclean_scheduler = ForceScheduler(
+    name="clean mbedtls, libssh2, and libgit2",
+    builderNames=["pkgclean_" + x for x in clean_names],
+    reason=FixedParameter(name="reason", default=""),
+    branch=FixedParameter(name="branch", default=""),
+    revision=FixedParameter(name="revision", default=""),
+    repository=FixedParameter(name="repository", default=""),
+    project=FixedParameter(name="project", default="Cleaning"),
+    properties =[
+    ]
+)
+c['schedulers'].append(pkgclean_scheduler)
+
 # Add a manual scheduler for clearing out EVERYTHING
 nuclear_scheduler = ForceScheduler(
     name="Nuke all build/package directories",
