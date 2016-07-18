@@ -55,6 +55,15 @@ clean_factory.addSteps([
     )
 ])
 
+pkgclean_factory = BuildFactory()
+pkgclean_factory.useProgress = True
+pkgclean_factory.addSteps([
+    ShellCommand(
+    	name="clean pkg deps",
+    	command=["/bin/bash", "-c", "for f in ../../{package_,build_,coverage_,juno_,nightly_,perf_}*; do ([[ -d $f/build/deps ]] && cd $f/build/deps && make distclean-mbedtls distclean-libssh2 distclean-libgit2); done; echo Done"]
+    )
+])
+
 nuclear_factory = BuildFactory()
 nuclear_factory.useProgress = True
 nuclear_factory.addSteps([
