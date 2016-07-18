@@ -82,6 +82,8 @@ for name in all_names:
     if name[:10] == "centos5.11":
         flags += 'DEPS_CXXFLAGS="-DO_CLOEXEC=0" '
         flags += 'CMAKE=cmake28 '
+        # use old c++ abi https://github.com/JuliaLang/julia/issues/17446
+        flags += 'CXXFLAGS=-D_GLIBCXX_USE_CXX11_ABI=0 '
 
     # Add MARCH to flags
     flags += "MARCH=%s "%(march)
