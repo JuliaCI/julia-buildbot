@@ -18,9 +18,9 @@ clean_scheduler = ForceScheduler(
 c['schedulers'].append(clean_scheduler)
 
 # Add a manual scheduler for clearing out package_ and build_ mbedtls, libssh2, libgit2 deps
-pkgclean_scheduler = ForceScheduler(
+cleanpkg_scheduler = ForceScheduler(
     name="clean mbedtls, libssh2, and libgit2",
-    builderNames=["pkgclean_" + x for x in clean_names],
+    builderNames=["cleanpkg_" + x for x in clean_names],
     reason=FixedParameter(name="reason", default=""),
     branch=FixedParameter(name="branch", default=""),
     revision=FixedParameter(name="revision", default=""),
@@ -29,7 +29,7 @@ pkgclean_scheduler = ForceScheduler(
     properties =[
     ]
 )
-c['schedulers'].append(pkgclean_scheduler)
+c['schedulers'].append(cleanpkg_scheduler)
 
 # Add a manual scheduler for clearing out EVERYTHING
 nuclear_scheduler = ForceScheduler(
@@ -54,9 +54,9 @@ clean_factory.addSteps([
     )
 ])
 
-pkgclean_factory = BuildFactory()
-pkgclean_factory.useProgress = True
-pkgclean_factory.addSteps([
+cleanpkg_factory = BuildFactory()
+cleanpkg_factory.useProgress = True
+cleanpkg_factory.addSteps([
     ShellCommand(
     	name="clean pkg deps",
     	command=["/bin/bash", "-c", "for f in ../../{package_,build_,coverage_,juno_,nightly_,perf_}*; do ([[ -d $f/build/deps ]] && cd $f/build/deps && make distclean-mbedtls distclean-libssh2 distclean-libgit2); done; echo Done"]
@@ -84,10 +84,10 @@ for name in clean_names:
 # Add pkg deps cleaners
 for name in clean_names:
     c['builders'].append(BuilderConfig(
-        name="pkgclean_%s"%(name),
+        name="cleanpkg_%s"%(name),
         slavenames=[name],
         category="Cleaning",
-        factory=pkgclean_factory,
+        factory=cleanpkg_factory,
     ))
 
 # Add nuclear cleaners
