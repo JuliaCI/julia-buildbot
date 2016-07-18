@@ -17,6 +17,20 @@ clean_scheduler = ForceScheduler(
 )
 c['schedulers'].append(clean_scheduler)
 
+# Add a manual scheduler for clearing out package_ and build_ mbedtls, libssh2, libgit2 deps
+pkgclean_scheduler = ForceScheduler(
+    name="clean mbedtls, libssh2, and libgit2",
+    builderNames=["pkgclean_" + x for x in clean_names],
+    reason=FixedParameter(name="reason", default=""),
+    branch=FixedParameter(name="branch", default=""),
+    revision=FixedParameter(name="revision", default=""),
+    repository=FixedParameter(name="repository", default=""),
+    project=FixedParameter(name="project", default="Cleaning"),
+    properties =[
+    ]
+)
+c['schedulers'].append(pkgclean_scheduler)
+
 # Add a manual scheduler for clearing out EVERYTHING
 nuclear_scheduler = ForceScheduler(
     name="Nuke all build/package directories",
@@ -40,6 +54,15 @@ clean_factory.addSteps([
     )
 ])
 
+pkgclean_factory = BuildFactory()
+pkgclean_factory.useProgress = True
+pkgclean_factory.addSteps([
+    ShellCommand(
+    	name="clean pkg deps",
+    	command=["/bin/bash", "-c", "for f in ../../{package_,build_,coverage_,juno_,nightly_,perf_}*; do ([[ -d $f/build/deps ]] && cd $f/build/deps && make distclean-mbedtls distclean-libssh2 distclean-libgit2); done; echo Done"]
+    )
+])
+
 nuclear_factory = BuildFactory()
 nuclear_factory.useProgress = True
 nuclear_factory.addSteps([
@@ -56,6 +79,15 @@ for name in clean_names:
         slavenames=[name],
         category="Cleaning",
         factory=clean_factory,
+    ))
+
+# Add pkg deps cleaners
+for name in clean_names:
+    c['builders'].append(BuilderConfig(
+        name="pkgclean_%s"%(name),
+        slavenames=[name],
+        category="Cleaning",
+        factory=pkgclean_factory,
     ))
 
 # Add nuclear cleaners
