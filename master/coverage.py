@@ -30,7 +30,8 @@ analyse_and_submit_cov_cmd = """
 using Coverage, CoverageBase, Compat
 
 cd(joinpath(CoverageBase.julia_top()))
-results=Coverage.process_folder("base")
+results = Coverage.process_folder("base")
+
 # Create git_info for Coveralls
 git_info = @compat Dict(
     "branch" => Base.GIT_VERSION_INFO.branch,
@@ -53,10 +54,17 @@ git_info = @compat Dict(
 # Submit to Coveralls
 ENV["REPO_TOKEN"] = ENV["COVERALLS_REPO_TOKEN"]
 Coveralls.submit_token(results, git_info)
+delete!(ENV, "REPO_TOKEN")
+
+# Create git_info for codecov
+git_info = Any[
+    :branch => Base.GIT_VERSION_INFO.branch,
+    :commit => Base.GIT_VERSION_INFO.commit,
+    :token = ENV["CODECOV_REPO_TOKEN"],
+    ]
 
 # Submit to codecov
-ENV["REPO_TOKEN"] = ENV["CODECOV_REPO_TOKEN"]
-Codecov.submit_token(results, Base.GIT_VERSION_INFO.commit, Base.GIT_VERSION_INFO.branch)
+Codecov.submit_generic(results; git_info...)
 """
 
 # Steps to download a linux tarball, extract it, run coverage on it, and upload coverage stats
