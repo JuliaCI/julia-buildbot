@@ -60,7 +60,7 @@ delete!(ENV, "REPO_TOKEN")
 git_info = Any[
     :branch => Base.GIT_VERSION_INFO.branch,
     :commit => Base.GIT_VERSION_INFO.commit,
-    :token = ENV["CODECOV_REPO_TOKEN"],
+    :token => ENV["CODECOV_REPO_TOKEN"],
     ]
 
 # Submit to codecov
