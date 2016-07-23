@@ -50,9 +50,9 @@ BuildRequires:  gmp-devel >= 5.0
 %endif
 BuildRequires:  ImageMagick
 %if 0%{?rhel} && 0%{?rhel} == 6
-BuildRequires:  libgit2-devel >= 1:0.21
+BuildRequires:  libgit2-devel >= 1:0.23
 %else
-BuildRequires:  libgit2-devel >= 0.21
+BuildRequires:  libgit2-devel >= 0.23
 %endif
 BuildRequires:  libunwind-devel
 BuildRequires:  llvm%{llvmversion}-devel
@@ -67,7 +67,7 @@ BuildRequires:  openspecfun-devel >= 0.4
 BuildRequires:  pcre2-devel
 BuildRequires:  perl
 BuildRequires:  suitesparse-devel
-BuildRequires:  utf8proc-devel >= 1.3
+BuildRequires:  utf8proc-devel >= 2
 BuildRequires:  zlib-devel
 # Needed for package management until the switch  to libgit2
 Requires:       git
@@ -165,7 +165,7 @@ popd
 
 # About build, build_libdir and build_bindir, see https://github.com/JuliaLang/julia/issues/5063#issuecomment-32628111
 %global julia_builddir %{_builddir}/%{name}/build
-%global commonopts USE_SYSTEM_LLVM=1 USE_LLVM_SHLIB=1 LLVM_CONFIG=llvm-config-%{__isa_bits}-%{llvm_version} USE_SYSTEM_LIBUNWIND=0 USE_SYSTEM_READLINE=1 USE_SYSTEM_PCRE=1 USE_SYSTEM_OPENSPECFUN=1 USE_SYSTEM_BLAS=1 USE_SYSTEM_LAPACK=1 USE_SYSTEM_FFTW=1 USE_SYSTEM_GMP=1 USE_SYSTEM_MPFR=1 USE_SYSTEM_ARPACK=1 USE_SYSTEM_SUITESPARSE=1 USE_SYSTEM_ZLIB=1 USE_SYSTEM_GRISU=1 USE_SYSTEM_DSFMT=1 USE_SYSTEM_LIBUV=0 USE_SYSTEM_RMATH=0 USE_SYSTEM_UTF8PROC=1 USE_SYSTEM_LIBGIT2=1 USE_SYSTEM_PATCHELF=1 USE_SYSTEM_LIBM=0 USE_SYSTEM_OPENLIBM=1 VERBOSE=1 MARCH=%{march} %{blas} prefix=%{_prefix} bindir=%{_bindir} libdir=%{_libdir} libexecdir=%{_libexecdir} datarootdir=%{_datarootdir} includedir=%{_includedir} sysconfdir=%{_sysconfdir} build_prefix=%{julia_builddir} build_bindir=%{julia_builddir}%{_bindir} build_libdir=%{julia_builddir}%{_libdir} build_private_libdir=%{julia_builddir}%{_libdir}/julia build_libexecdir=%{julia_builddir}%{_libexecdir} build_datarootdir=%{julia_builddir}%{_datarootdir} build_includedir=%{julia_builddir}%{_includedir} build_sysconfdir=%{julia_builddir}%{_sysconfdir} JULIA_CPU_CORES=$(echo %{?_smp_mflags} | sed s/-j//)
+%global commonopts USE_SYSTEM_LLVM=1 USE_LLVM_SHLIB=1 LLVM_CONFIG=llvm-config-%{__isa_bits}-%{llvm_version} USE_SYSTEM_LIBUNWIND=0 USE_SYSTEM_READLINE=1 USE_SYSTEM_PCRE=1 USE_SYSTEM_OPENSPECFUN=1 USE_SYSTEM_BLAS=1 USE_SYSTEM_LAPACK=1 USE_SYSTEM_FFTW=1 USE_SYSTEM_GMP=1 USE_SYSTEM_MPFR=1 USE_SYSTEM_ARPACK=1 USE_SYSTEM_SUITESPARSE=1 USE_SYSTEM_ZLIB=1 USE_SYSTEM_GRISU=1 USE_SYSTEM_DSFMT=1 USE_SYSTEM_LIBUV=0 USE_SYSTEM_RMATH=0 USE_SYSTEM_UTF8PROC=1 USE_SYSTEM_LIBGIT2=1 USE_SYSTEM_LIBSSH2=1 USE_SYSTEM_MBEDTLS=1 USE_SYSTEM_PATCHELF=1 USE_SYSTEM_LIBM=0 USE_SYSTEM_OPENLIBM=1 VERBOSE=1 MARCH=%{march} %{blas} prefix=%{_prefix} bindir=%{_bindir} libdir=%{_libdir} libexecdir=%{_libexecdir} datarootdir=%{_datarootdir} includedir=%{_includedir} sysconfdir=%{_sysconfdir} build_prefix=%{julia_builddir} build_bindir=%{julia_builddir}%{_bindir} build_libdir=%{julia_builddir}%{_libdir} build_private_libdir=%{julia_builddir}%{_libdir}/julia build_libexecdir=%{julia_builddir}%{_libexecdir} build_datarootdir=%{julia_builddir}%{_datarootdir} build_includedir=%{julia_builddir}%{_includedir} build_sysconfdir=%{julia_builddir}%{_sysconfdir} JULIA_CPU_CORES=$(echo %{?_smp_mflags} | sed s/-j//)
 
 %build
 %if 0%{?rhel} && 0%{?rhel} <= 6
