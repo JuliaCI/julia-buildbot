@@ -28,9 +28,6 @@ for name in all_names:
 
     # Everything should be VERBOSE
     flags = 'VERBOSE=1 '
-    
-    # Parallel make
-    flags += '-j4 '
 
     # Add on the banner
     flags += 'TAGGED_RELEASE_BANNER="Official http://julialang.org/ release" '
@@ -42,6 +39,8 @@ for name in all_names:
         up_arch = 'x86'
         bits = '32'
         flags += 'JULIA_CPU_TARGET=pentium4 '
+        # Parallel make
+        flags += '-j3 '
 
     if name[-3:] == 'x64':
         deb_arch = 'amd64'
@@ -49,6 +48,8 @@ for name in all_names:
         march = 'x86-64'
         up_arch = 'x64'
         bits = '64'
+        # Parallel make
+        flags += '-j4 '
 
     if name[-3:] == 'arm':
         deb_arch = 'armhf'
