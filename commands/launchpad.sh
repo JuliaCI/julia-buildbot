@@ -72,7 +72,6 @@ make -C doc latex
 make -C deps get-llvm
 # Force downloading of LLVM 3.6.1 as well, so that ARM builds get happier
 make LLVM_VER=3.6.1 -C deps get-llvm
-make -C deps get-Rmath-julia
 
 # Work around our lack of git on buildd servers
 make -C base version_git.jl.phony
