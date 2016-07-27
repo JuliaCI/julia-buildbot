@@ -40,7 +40,7 @@ for name in all_names:
         bits = '32'
         flags += 'JULIA_CPU_TARGET=pentium4 '
         # Parallel make
-        flags += '-j3 '
+        #flags += '-j3 '
 
     if name[-3:] == 'x64':
         deb_arch = 'amd64'
@@ -48,8 +48,8 @@ for name in all_names:
         march = 'x86-64'
         up_arch = 'x64'
         bits = '64'
-        # Parallel make
-        flags += '-j4 '
+        # Parallel make seems crashy during bootstrap
+        #flags += '-j4 '
 
     if name[-3:] == 'arm':
         deb_arch = 'armhf'
