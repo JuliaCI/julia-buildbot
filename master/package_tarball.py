@@ -38,6 +38,14 @@ julia_tarball_factory.addSteps([
 
     # Make!
     ShellCommand(
+        name="make",
+        command=["/bin/bash", "-c", Interpolate("make -j3 %(prop:flags)s")],
+        haltOnFailure = True,
+        timeout=2400
+    ),
+
+    # Make!
+    ShellCommand(
         name="make binary-dist",
         command=["/bin/bash", "-c", Interpolate("make %(prop:flags)s binary-dist")],
         haltOnFailure = True,

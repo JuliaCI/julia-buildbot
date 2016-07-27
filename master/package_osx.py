@@ -52,7 +52,7 @@ julia_dmg_factory.addSteps([
     # Make!
     ShellCommand(
     	name="make",
-    	command=["/bin/bash", "-c", Interpolate("make %(prop:flags)s")],
+    	command=["/bin/bash", "-c", Interpolate("make -j3 %(prop:flags)s")],
     	haltOnFailure=True,
     	timeout=3600
     ),
