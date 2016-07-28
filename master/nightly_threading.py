@@ -45,7 +45,7 @@ julia_threading_factory.addSteps([
         property="flags"
     ),
 
-    # make clean first, and nuke llvm
+    # make clean first
     ShellCommand(
     	name="make cleanall",
     	command=["/bin/bash", "-c", Interpolate("make %(prop:flags)s cleanall")]
@@ -81,37 +81,37 @@ julia_threading_factory.addSteps([
     ),
 
     # Upload the result!
-    MasterShellCommand(
-        name="mkdir julia_package",
-        command=["mkdir", "-p", "/tmp/julia_package"]
-    ),
-    FileUpload(
-        slavesrc=Interpolate("julia-%(prop:shortcommit)s-Linux-%(prop:tar_arch)s.tar.gz"),
-        masterdest=Interpolate("/tmp/julia_package/juliathreading-%(prop:shortcommit)s-Linux-%(prop:tar_arch)s.tar.gz")
-    ),
+#    MasterShellCommand(
+#        name="mkdir julia_package",
+#        command=["mkdir", "-p", "/tmp/julia_package"]
+#    ),
+#    FileUpload(
+#        slavesrc=Interpolate("julia-%(prop:shortcommit)s-Linux-%(prop:tar_arch)s.tar.gz"),
+#        masterdest=Interpolate("/tmp/julia_package/juliathreading-%(prop:shortcommit)s-Linux-%(prop:tar_arch)s.tar.gz")
+#    ),
 
     # Upload it to AWS and cleanup the master!
-    MasterShellCommand(
-        name="Upload to AWS",
-        command=["/bin/bash", "-c", Interpolate("~/bin/try_thrice ~/bin/aws put --fail --public julianightlies/bin/linux/%(prop:up_arch)s/%(prop:majmin)s/juliathreading-%(prop:version)s-%(prop:shortcommit)s-linux%(prop:bits)s.tar.gz /tmp/julia_package/juliathreading-%(prop:shortcommit)s-Linux-%(prop:tar_arch)s.tar.gz")],
-        haltOnFailure=True
-    ),
-    MasterShellCommand(
-        name="Upload to AWS (latest)",
-        command=["/bin/bash", "-c", Interpolate("~/bin/try_thrice ~/bin/aws put --fail --public julianightlies/bin/linux/%(prop:up_arch)s/juliathreading-latest-linux%(prop:bits)s.tar.gz /tmp/julia_package/julia-%(prop:shortcommit)s-Linux-%(prop:tar_arch)s.tar.gz")],
-        doStepIf=is_nightly_build,
-        haltOnFailure=True
-    ),
+#    MasterShellCommand(
+#        name="Upload to AWS",
+#        command=["/bin/bash", "-c", Interpolate("~/bin/try_thrice ~/bin/aws put --fail --public julianightlies/bin/linux/%(prop:up_arch)s/%(prop:majmin)s/juliathreading-%(prop:version)s-%(prop:shortcommit)s-linux%(prop:bits)s.tar.gz /tmp/julia_package/juliathreading-%(prop:shortcommit)s-Linux-%(prop:tar_arch)s.tar.gz")],
+#        haltOnFailure=True
+#    ),
+#    MasterShellCommand(
+#        name="Upload to AWS (latest)",
+#        command=["/bin/bash", "-c", Interpolate("~/bin/try_thrice ~/bin/aws put --fail --public julianightlies/bin/linux/%(prop:up_arch)s/juliathreading-latest-linux%(prop:bits)s.tar.gz /tmp/julia_package/julia-%(prop:shortcommit)s-Linux-%(prop:tar_arch)s.tar.gz")],
+#        doStepIf=is_nightly_build,
+#        haltOnFailure=True
+#    ),
     MasterShellCommand(
         name="Cleanup Master",
         command=["rm", "-f", Interpolate("/tmp/julia_package/juliathreading-%(prop:shortcommit)s-Linux-%(prop:tar_arch)s.tar.gz")]
     ),
 
-    MasterShellCommand(
-        name="Report success",
-        command=["/bin/bash", "-c", Interpolate("~/bin/try_thrice curl -L -H 'Content-type: application/json' -d '{\"target\": \"linux_threading-%(prop:tar_arch)s\", \"url\": \"https://s3.amazonaws.com/julianightlies/bin/linux/%(prop:up_arch)s/%(prop:majmin)s/juliathreading-%(prop:version)s-%(prop:shortcommit)s-linux%(prop:bits)s.tar.gz\", \"version\": \"%(prop:shortcommit)s\"}' https://status.julialang.org/put/nightly")],
-        doStepIf=is_nightly_build
-    ),
+#    MasterShellCommand(
+#        name="Report success",
+#        command=["/bin/bash", "-c", Interpolate("~/bin/try_thrice curl -L -H 'Content-type: application/json' -d '{\"target\": \"linux_threading-%(prop:tar_arch)s\", \"url\": \"https://s3.amazonaws.com/julianightlies/bin/linux/%(prop:up_arch)s/%(prop:majmin)s/juliathreading-%(prop:version)s-%(prop:shortcommit)s-linux%(prop:bits)s.tar.gz\", \"version\": \"%(prop:shortcommit)s\"}' https://status.julialang.org/put/nightly")],
+#        doStepIf=is_nightly_build
+#    ),
 ])
 
 
