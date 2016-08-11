@@ -36,8 +36,9 @@ cd $BUILD_DIR
 if test ! -d julia-${JULIA_GIT_BRANCH}; then
     git clone ${JULIA_GIT_URL} julia-${JULIA_GIT_BRANCH}
     # Setup remote for launchpad
-    git remote add launchpad git+ssh://staticfloat@git.launchpad.net/~staticfloat/julianightlies
 fi
+
+
 
 # Get the debian directory
 if test ! -d debian-${DEBIAN_GIT_BRANCH}; then
@@ -90,6 +91,11 @@ cp -r ../debian-${DEBIAN_GIT_BRANCH}/debian .
 
 # Also, increment the current debian changelog, so we get git version tagged binaries
 dch -v "${JULIA_VERSION}+$DATECOMMIT" "nightly git build"
+
+# Add the launchpad remote, if we need to
+if [[ -z "$(git remote show -n | grep launchpad)" ]]; then
+    git remote add launchpad git+ssh://staticfloat@git.launchpad.net/~staticfloat/julianightlies
+fi
 
 # Force-push this up to launchpad
 git add -f *
