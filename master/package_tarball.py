@@ -3,7 +3,7 @@
 ###############################################################################
 
 # Add a dependent scheduler for generic linux tarball builds
-julia_tarball_packagers = ["package_tarball32", "package_tarball64", "package_tarballarm"]
+julia_tarball_packagers = ["package_tarball32", "package_tarball64", "package_tarballarm", "package_tarballppc64le"]
 tarball_package_scheduler = Dependent(name="Julia Tarball package", builderNames=julia_tarball_packagers, upstream=quickbuild_scheduler)
 c['schedulers'].append(tarball_package_scheduler)
 
@@ -177,3 +177,11 @@ c['builders'].append(BuilderConfig(
     category="Packaging",
     factory=julia_tarball_factory
 ))
+
+c['builders'].append(BuilderConfig(
+    name="package_tarballppc64le",
+    slavenames=["centos7.2-ppc64le"],
+    category="Packaging",
+    factory=julia_tarball_factory
+))
+
