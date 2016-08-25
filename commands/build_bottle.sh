@@ -6,6 +6,8 @@ if [[ -z "$FORMULA" ]]; then
     exit -1
 fi
 
+# Don't let Homebrew have its way with our precious precious formulae
+export HOMEBREW_NO_AUTO_UPDATE=1
 echo "Building $FORMULA at" $(date)
 
 # I guess we'll keep doing things in /usr/local for now
