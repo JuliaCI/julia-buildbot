@@ -61,7 +61,7 @@ for name in all_names:
 
     if name[-7:] == 'ppc64le':
         deb_arch = 'ppc64el'
-        tar_arch = 'ppc64le'
+        tar_arch = 'powerpc64le'
         march = 'power8'
         up_arch = 'ppc64le'
         bits = 'ppc64'
