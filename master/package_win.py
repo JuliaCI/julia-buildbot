@@ -40,7 +40,9 @@ win_package_factory.addSteps([
     ShellCommand(
         name="make",
         command=["/bin/bash", "-c", Interpolate("make -j3 %(prop:flags)s")],
-        haltOnFailure = True
+        haltOnFailure = True,
+        timeout=2400,
+        env={'CFLAGS':None, 'CPPFLAGS':None},
     ),
     ShellCommand(
         name="make win-extras",

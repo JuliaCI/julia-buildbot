@@ -54,7 +54,8 @@ julia_dmg_factory.addSteps([
     	name="make",
     	command=["/bin/bash", "-c", Interpolate("make -j3 %(prop:flags)s")],
     	haltOnFailure=True,
-    	timeout=3600
+    	timeout=3600,
+        env={'CFLAGS':None, 'CPPFLAGS':None},
     ),
 
     # Set a bunch of properties that everyone will need

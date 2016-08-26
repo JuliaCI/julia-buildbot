@@ -41,7 +41,8 @@ julia_tarball_factory.addSteps([
         name="make",
         command=["/bin/bash", "-c", Interpolate("make -j3 %(prop:flags)s")],
         haltOnFailure = True,
-        timeout=2400
+        timeout=2400,
+        env={'CFLAGS':None, 'CPPFLAGS':None},
     ),
 
     # Make!
