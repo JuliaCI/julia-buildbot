@@ -50,7 +50,8 @@ julia_tarball_factory.addSteps([
         name="make binary-dist",
         command=["/bin/bash", "-c", Interpolate("make %(prop:flags)s binary-dist")],
         haltOnFailure = True,
-        timeout=2400
+        timeout=2400,
+        env={'CFLAGS':None, 'CPPFLAGS':None},
     ),
 
     # Set a bunch of properties that everyone will need
@@ -185,4 +186,3 @@ c['builders'].append(BuilderConfig(
     category="Packaging",
     factory=julia_tarball_factory
 ))
-

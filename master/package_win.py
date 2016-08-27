@@ -47,12 +47,14 @@ win_package_factory.addSteps([
     ShellCommand(
         name="make win-extras",
         command=["/bin/bash", "-c", Interpolate("make %(prop:flags)s win-extras")],
-        haltOnFailure = True
+        haltOnFailure = True,
+        env={'CFLAGS':None, 'CPPFLAGS':None},
     ),
     ShellCommand(
         name="make binary-dist",
         command=["/bin/bash", "-c", Interpolate("make %(prop:flags)s binary-dist")],
-        haltOnFailure = True
+        haltOnFailure = True,
+        env={'CFLAGS':None, 'CPPFLAGS':None},
     ),
 
     # Set a bunch of properties that everyone will need
