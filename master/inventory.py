@@ -24,8 +24,9 @@ all_names = ubuntu_names + osx_names + centos_names + win_names + all_hail_the_n
 # This is getting sickening, how many attributes we're defining here
 c['slaves'] = []
 for name in all_names:
-
-
+    # Initialize march to none, as some buildbots (power8) don't set it
+    march = None
+   
     # Everything should be VERBOSE
     flags = 'VERBOSE=1 '
 
@@ -62,7 +63,6 @@ for name in all_names:
     if name[-7:] == 'ppc64le':
         deb_arch = 'ppc64el'
         tar_arch = 'powerpc64le'
-        march = 'power8'
         up_arch = 'ppc64le'
         bits = 'ppc64'
         flags += 'JULIA_CPU_TARGET=pwr8 '
@@ -98,7 +98,8 @@ for name in all_names:
         flags += 'CXXFLAGS=-D_GLIBCXX_USE_CXX11_ABI=0 '
 
     # Add MARCH to flags
-    flags += "MARCH=%s "%(march)
+    if march != None:
+        flags += "MARCH=%s "%(march)
     c['slaves'] += [BuildSlave(name, 'julialang42', max_builds=1,
 		properties={
 			'deb_arch':deb_arch,
