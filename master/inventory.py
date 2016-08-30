@@ -65,7 +65,7 @@ for name in all_names:
         march = 'power8'
         up_arch = 'ppc64le'
         bits = 'ppc64'
-        flags += 'JULIA_CPU_TARGET=powerpc64le '
+        flags += 'JULIA_CPU_TARGET=pwr8 '
 
     # On windows, disable running doc/genstdlib.jl due to julia issue #11727
     # and add XC_HOST dependent on the architecture
