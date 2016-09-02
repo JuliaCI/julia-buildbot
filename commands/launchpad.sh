@@ -72,7 +72,7 @@ make -C doc latex
 # We're going to compile LLVM on our own.  :(
 make -C deps get-llvm
 # Force downloading of LLVM 3.6.1 as well, so that ARM builds get happier
-make LLVM_VER=3.6.1 -C deps get-llvm
+make LLVM_VER=3.8.1 -C deps get-llvm
 
 # Work around our lack of git on buildd servers
 make -C base version_git.jl.phony
