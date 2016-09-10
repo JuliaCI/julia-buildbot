@@ -53,6 +53,13 @@ julia_threading_factory.addSteps([
 
     # Make!
     ShellCommand(
+        name="make",
+        command=["/bin/bash", "-c", Interpolate("make -j3 %(prop:flags)s")],
+        haltOnFailure = True
+    ),
+
+    # Make!
+    ShellCommand(
         name="make binary-dist",
         command=["/bin/bash", "-c", Interpolate("make %(prop:flags)s binary-dist")],
         haltOnFailure = True
