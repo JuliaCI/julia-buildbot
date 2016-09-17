@@ -4,29 +4,27 @@
 
 from buildbot.buildslave import BuildSlave
 
-ubuntu_names = []
-# Removed 12.04 from this list
-for version in ["14.04"]:
-    for arch in ["x64", "x86"]:
-        ubuntu_names += ["ubuntu%s-%s"%(version, arch)]
+def build_names(platform, versions, architectures):
+    names = []
+    for version in versions:
+        for arch in architectures:
+            names += ["%s%s-%s"%(platform, version, arch)]
+    return names
 
-osx_names = ["osx10.9-x64", "osx10.10-x64", "osx10.11-x64"]
-centos_names = ["centos5.11-x64", "centos5.11-x86", "centos6.7-x64", "centos7.1-x64", "centos7.2-ppc64le"]
-win_names = ["win6.2-x64", "win6.2-x86"]
-all_hail_the_nanosoldier = ["nanosoldier-x64"]
+win_names    = build_names("win", ["6.2"], ["x64", "x86"])
+ubuntu_names = build_names("ubuntu", ["14.04"], ["x64", "x86", "arm"])
+osx_names    = build_names("osx", ["10.9", "10.10", "10.11"], ["x64"])
+centos_names = build_names("centos", ["5.11"], ["x64", "x86"])
+# Add some special centos names that don't fit in with the rest
+centos_names += ["centos6.7-x64", "centos7.1-x64", "centos7.2-ppc64le"]
+all_names    = ubuntu_names + osx_names + centos_names + win_names
 
-# We've got an ubuntu ARM machine!  But don't add him to ubuntu_names, otherwise
-# he'll get picked up by quickbuild, and we don't want that
-arm_names = ["ubuntu14.04-arm"]
-
-all_names = ubuntu_names + osx_names + centos_names + win_names + all_hail_the_nanosoldier + arm_names
-
-# This is getting sickening, how many attributes we're defining here
+# Define all the attributes we'll use in our buildsteps
 c['slaves'] = []
 for name in all_names:
     # Initialize march to none, as some buildbots (power8) don't set it
     march = None
-   
+
     # Everything should be VERBOSE
     flags = 'VERBOSE=1 '
 
@@ -34,26 +32,19 @@ for name in all_names:
     flags += 'TAGGED_RELEASE_BANNER="Official http://julialang.org/ release" '
 
     if name[-3:] == 'x86':
-        deb_arch = 'i386'
         tar_arch = 'i686'
         march = 'pentium4'
         up_arch = 'x86'
         bits = '32'
         flags += 'JULIA_CPU_TARGET=pentium4 '
-        # Parallel make
-        #flags += '-j3 '
 
     if name[-3:] == 'x64':
-        deb_arch = 'amd64'
         tar_arch = 'x86_64'
         march = 'x86-64'
         up_arch = 'x64'
         bits = '64'
-        # Parallel make seems crashy during bootstrap
-        #flags += '-j4 '
 
     if name[-3:] == 'arm':
-        deb_arch = 'armhf'
         tar_arch = 'arm'
         march = 'armv7-a'
         up_arch = 'arm'
@@ -61,7 +52,6 @@ for name in all_names:
         flags += 'JULIA_CPU_TARGET=generic '
 
     if name[-7:] == 'ppc64le':
-        deb_arch = 'ppc64el'
         tar_arch = 'powerpc64le'
         up_arch = 'ppc64le'
         bits = 'ppc64'
@@ -80,8 +70,7 @@ for name in all_names:
     if name[:3] == "osx":
         march = "core2"
 
-        # Just so that we can pass tests on our memory-limited OSX builder,
-        # we will set JULIA_CPU_CORES=2, which is sad but apparently necessary.
+        # Our OSX builder only devotes 2 cores to each VM
         flags += 'JULIA_CPU_CORES=2 '
     else:
         flags += 'JULIA_CPU_CORES=4 '
@@ -100,9 +89,10 @@ for name in all_names:
     # Add MARCH to flags
     if march != None:
         flags += "MARCH=%s "%(march)
+
+    # Construct the actual BuildSlave object
     c['slaves'] += [BuildSlave(name, 'julialang42', max_builds=1,
 		properties={
-			'deb_arch':deb_arch,
 			'tar_arch':tar_arch,
 			'release':name,
 			'flags':flags,

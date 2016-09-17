@@ -3,7 +3,7 @@
 ###############################################################################
 
 # Add a dependent scheduler for launchpad upload
-launchpad_package_scheduler = Dependent(name="Julia launchpad package", builderNames=["package_launchpad"], upstream=quickbuild_scheduler)
+launchpad_package_scheduler = Dependent(name="Julia launchpad package", builderNames=["package_launchpad"], upstream=packager_scheduler)
 c['schedulers'].append(launchpad_package_scheduler)
 
 # Steps to build the source balls for Launchpad
