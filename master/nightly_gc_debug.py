@@ -6,13 +6,13 @@ gc_debug_nightly_scheduler = Nightly(name="Julia GC Debug Build", builderNames=[
 c['schedulers'].append(gc_debug_nightly_scheduler)
 
 for arch in ["x86", "x64"]:
-    force_scheduler = ForceScheduler(
+    force_scheduler = schedulers.ForceScheduler(
         name="Julia %s GC debug building"%(arch),
         builderNames=["nightly_gc_debug-%s" % arch],
-        reason=FixedParameter(name="reason", default=""),
-        branch=FixedParameter(name="branch", default=""),
-        repository=FixedParameter(name="repository", default=""),
-        project=FixedParameter(name="project", default="Juno"),
+        reason=util.FixedParameter(name="reason", default=""),
+        branch=util.FixedParameter(name="branch", default=""),
+        repository=util.FixedParameter(name="repository", default=""),
+        project=util.FixedParameter(name="project", default="Juno"),
         properties=[])
     c['schedulers'].append(force_scheduler)
 

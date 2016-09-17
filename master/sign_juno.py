@@ -3,18 +3,18 @@
 ###############################################################################
 
 # Add a manual scheduler for signing juno
-juno_scheduler = ForceScheduler(
+juno_scheduler = schedulers.ForceScheduler(
     name="juno signing",
     builderNames=["juno_osx10.9-x64", "juno_win6.2-x86", "juno_win6.2-x64"],
-    reason=FixedParameter(name="reason", default=""),
-    branch=FixedParameter(name="branch", default=""),
-    revision=FixedParameter(name="revision", default=""),
-    repository=FixedParameter(name="repository", default=""),
-    project=FixedParameter(name="project", default="Juno"),
+    reason=util.FixedParameter(name="reason", default=""),
+    branch=util.FixedParameter(name="branch", default=""),
+    revision=util.FixedParameter(name="revision", default=""),
+    repository=util.FixedParameter(name="repository", default=""),
+    project=util.FixedParameter(name="project", default="Juno"),
     properties=[
-        StringParameter(name="osx64_url", label="OSX 64-bit URL", size=30, default="https://junolab.s3.amazonaws.com/latest/juno-mac-x64.dmg"),
-        StringParameter(name="win32_url", label="Windows 32-bit URL", size=30, default="https://junolab.s3.amazonaws.com/latest/juno-windows-x32.zip"),
-        StringParameter(name="win64_url", label="Windows 64-bit URL", size=30, default="https://junolab.s3.amazonaws.com/latest/juno-windows-x64.zip")
+        util.StringParameter(name="osx64_url", label="OSX 64-bit URL", size=30, default="https://junolab.s3.amazonaws.com/latest/juno-mac-x64.dmg"),
+        util.StringParameter(name="win32_url", label="Windows 32-bit URL", size=30, default="https://junolab.s3.amazonaws.com/latest/juno-windows-x32.zip"),
+        util.StringParameter(name="win64_url", label="Windows 64-bit URL", size=30, default="https://junolab.s3.amazonaws.com/latest/juno-windows-x64.zip")
     ]
 )
 c['schedulers'].append(juno_scheduler)

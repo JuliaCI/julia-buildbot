@@ -7,16 +7,14 @@ julia_coverage_builders = ["coverage_ubuntu14.04-x64"]
 julia_coverage_scheduler = Triggerable(name="Julia Coverage Testing", builderNames=julia_coverage_builders)
 c['schedulers'].append(julia_coverage_scheduler)
 
-c['schedulers'].append(ForceScheduler(
+c['schedulers'].append(schedulers.ForceScheduler(
     name="coverage build",
     builderNames=julia_coverage_builders,
-    reason=FixedParameter(name="reason", default=""),
-    revision=FixedParameter(name="revision", default=""),
-    branch=FixedParameter(name="branch", default=""),
-    repository=FixedParameter(name="repository", default=""),
-    project=FixedParameter(name="project", default="Coverage"),
+    reason=util.FixedParameter(name="reason", default=""),
+    revision=util.FixedParameter(name="revision", default=""),
+    branch=util.FixedParameter(name="branch", default=""),
     properties=[
-        StringParameter(name="url", size=60, default="https://status.julialang.org/download/linux-x86_64"),
+        util.StringParameter(name="url", size=60, default="https://status.julialang.org/download/linux-x86_64"),
     ]
 ))
 

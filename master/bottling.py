@@ -3,16 +3,14 @@
 ###############################################################################
 
 # Add a manual scheduler for building bottles, and ONLY a manual scheduler
-c['schedulers'].append(ForceScheduler(
+c['schedulers'].append(schedulers.ForceScheduler(
     name="bottle build",
     builderNames=["bottle_" + z for z in osx_names],
-    reason=FixedParameter(name="reason", default=""),
-    branch=FixedParameter(name="branch", default=""),
-    revision=FixedParameter(name="revision", default=""),
-    repository=FixedParameter(name="repository", default=""),
-    project=FixedParameter(name="project", default="Bottling"),
+    reason=util.FixedParameter(name="reason", default=""),
+    branch=util.FixedParameter(name="branch", default=""),
+    revision=util.FixedParameter(name="revision", default=""),
     properties=[
-        StringParameter(name="formula", label="Formula", size=30, default="staticfloat/juliadeps/")
+        util.StringParameter(name="formula", label="Formula", size=30, default="staticfloat/juliadeps/")
     ]
 ))
 
