@@ -16,12 +16,12 @@ end
 bucket = ARGS[1]
 
 immutable Bottle
-    name::String
-    version::String
-    platform::String
+    name::AbstractString
+    version::AbstractString
+    platform::AbstractString
     bottle_revision::Int64
 
-    Bottle(n,v,p,r) = new(n,v,p, r == nothing ? 0 : int64(r))
+    Bottle(n,v,p,r) = new(n,v,p, r == nothing ? 0 : parse(Int64, r))
 end
 
 function isless(a::Bottle, b::Bottle)
@@ -65,11 +65,11 @@ end
 
 
 # Get list of bottles
-all_bottles = split(readchomp(`aws ls $bucket --simple` |> `cut -f3-`),'\n')
+all_bottles = split(readchomp(pipeline(`aws ls $bucket --simple`, `cut -f3-`)),'\n')
 all_bottles = filter(x -> x != nothing, map(parsebottle, all_bottles))
 
 # Bin them by name:
-binned = Dict{String,Array{Bottle,1}}()
+binned = Dict{AbstractString,Array{Bottle,1}}()
 for b in all_bottles
     if !haskey(binned, b.name)
         binned[b.name] = Bottle[]
@@ -81,7 +81,7 @@ end
 to_delete = Bottle[]
 to_keep = Bottle[]
 for (name, bottles) in binned
-    platforms = Dict{String,Array{Bottle,1}}()
+    platforms = Dict{AbstractString,Array{Bottle,1}}()
     for b in bottles
         if !haskey(platforms, b.platform)
             platforms[b.platform] = Bottle[]
@@ -106,6 +106,7 @@ end
 # Iterate through to_delete and, well, delete them!
 if length(to_delete) > 0
     println("Found $(length(to_delete)) bottles to delete:")
+    to_delete = sort(to_delete, by= (b) -> b.name)
     for b in to_delete
         println("$bucket/$b")
     end
