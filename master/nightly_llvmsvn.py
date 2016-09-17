@@ -2,16 +2,16 @@
 # Define everything needed to build nightly Julia builds against LLVM SVN
 ###############################################################################
 
-llvmsvn_nightly_scheduler = Nightly(name="Julia LLVM SVN Build", builderNames=["nightly_llvmsvn-x86", "nightly_llvmsvn-x64"], hour=[0,12], branch="master", onlyIfChanged=True)
+llvmsvn_nightly_scheduler = schedulers.Nightly(name="Julia LLVM SVN Build", builderNames=["nightly_llvmsvn-x86", "nightly_llvmsvn-x64"], hour=[0,12], branch="master", onlyIfChanged=True)
 c['schedulers'].append(llvmsvn_nightly_scheduler)
 
-julia_llvmsvn_factory = BuildFactory()
+julia_llvmsvn_factory = util.BuildFactory()
 julia_llvmsvn_factory.useProgress = True
 julia_llvmsvn_factory.addSteps([
     # Clone julia
-    Git(
+    steps.Git(
     	name="Julia checkout",
-    	repourl=Property('repository', default='git://github.com/JuliaLang/julia.git'),
+    	repourl=util.Property('repository', default='git://github.com/JuliaLang/julia.git'),
     	mode='incremental',
     	method='clean',
     	submodules=True,
@@ -19,53 +19,53 @@ julia_llvmsvn_factory.addSteps([
     	progress=True
     ),
     # Fetch so that remote branches get updated as well.
-    ShellCommand(
+    steps.ShellCommand(
     	name="git fetch",
     	command=["git", "fetch"],
     	flunkOnFailure=False
     ),
 
     # Add our particular configuration to flags
-    SetPropertyFromCommand(
+    steps.SetPropertyFromCommand(
         name="Add configuration to flags",
-        command=["echo", Interpolate("%(prop:flags)s LLVM_VER=svn")],
+        command=["echo", util.Interpolate("%(prop:flags)s LLVM_VER=svn")],
         property="flags"
     ),
 
     # make clean first, and nuke llvm
-    ShellCommand(
+    steps.ShellCommand(
     	name="make cleanall",
-    	command=["/bin/bash", "-c", Interpolate("make %(prop:flags)s cleanall")]
+    	command=["/bin/bash", "-c", util.Interpolate("make %(prop:flags)s cleanall")]
     ),
-    ShellCommand(
+    steps.ShellCommand(
     	name="make distclean-llvm",
-    	command=["/bin/bash", "-c", Interpolate("make %(prop:flags)s -C deps distclean-llvm")]
+    	command=["/bin/bash", "-c", util.Interpolate("make %(prop:flags)s -C deps distclean-llvm")]
     ),
 
     # Make!
-    ShellCommand(
+    steps.ShellCommand(
     	name="make",
-    	command=["/bin/bash", "-c", Interpolate("make %(prop:flags)s")],
+    	command=["/bin/bash", "-c", util.Interpolate("make %(prop:flags)s")],
     	haltOnFailure = True
     ),
 
     # Print versioninfo. This is particularly useful for llvm-svn build
     # since it includes the llvm version number.
-    ShellCommand(
+    steps.ShellCommand(
     	name="versioninfo()",
     	command=["usr/bin/julia", "-f", "-e", "versioninfo()"]
     ),
     # Test!
-    ShellCommand(
+    steps.ShellCommand(
     	name="make testall",
-    	command=["/bin/bash", "-c", Interpolate("make %(prop:flags)s testall")]
+    	command=["/bin/bash", "-c", util.Interpolate("make %(prop:flags)s testall")]
     )
 ])
 
 for arch in ["x86", "x64"]:
-    c['builders'].append(BuilderConfig(
+    c['builders'].append(util.BuilderConfig(
         name="nightly_llvmsvn-%s"%(arch),
-        slavenames=["ubuntu14.04-%s"%(arch)],
+        slavenames=["ubuntu14_04-%s"%(arch)],
         category="Nightlies",
         factory=julia_llvmsvn_factory
     ))

@@ -1,8 +1,6 @@
 ###############################################################################
-# Define our buildslave inventory, and define attributes for each slave
+# Define our buildworker inventory, and define attributes for each worker
 ###############################################################################
-
-from buildbot.buildslave import BuildSlave
 
 def build_names(platform, versions, architectures):
     names = []
@@ -11,16 +9,16 @@ def build_names(platform, versions, architectures):
             names += ["%s%s-%s"%(platform, version, arch)]
     return names
 
-win_names    = build_names("win", ["6.2"], ["x64", "x86"])
-ubuntu_names = build_names("ubuntu", ["14.04"], ["x64", "x86", "arm"])
-osx_names    = build_names("osx", ["10.9", "10.10", "10.11"], ["x64"])
-centos_names = build_names("centos", ["5.11"], ["x64", "x86"])
+win_names    = build_names("win", ["6_2"], ["x64", "x86"])
+ubuntu_names = build_names("ubuntu", ["14_04"], ["x64", "x86", "arm"])
+osx_names    = build_names("osx", ["10_9", "10_10", "10_11"], ["x64"])
+centos_names = build_names("centos", ["5_11"], ["x64", "x86"])
 # Add some special centos names that don't fit in with the rest
-centos_names += ["centos6.7-x64", "centos7.1-x64", "centos7.2-ppc64le"]
+centos_names += ["centos6_7-x64", "centos7_1-x64", "centos7_2-ppc64le"]
 all_names    = ubuntu_names + osx_names + centos_names + win_names
 
 # Define all the attributes we'll use in our buildsteps
-c['slaves'] = []
+c['workers'] = []
 for name in all_names:
     # Initialize march to none, as some buildbots (power8) don't set it
     march = None
@@ -91,7 +89,7 @@ for name in all_names:
         flags += "MARCH=%s "%(march)
 
     # Construct the actual BuildSlave object
-    c['slaves'] += [BuildSlave(name, 'julialang42', max_builds=1,
+    c['workers'] += [worker.Worker(name, 'julialang42', max_builds=1,
 		properties={
 			'tar_arch':tar_arch,
 			'release':name,

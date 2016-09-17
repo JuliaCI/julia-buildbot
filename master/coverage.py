@@ -3,16 +3,25 @@
 ###############################################################################
 
 # Add a dependent scheduler for running coverage after we build tarballs
-julia_coverage_builders = ["coverage_ubuntu14.04-x64"]
-julia_coverage_scheduler = Triggerable(name="Julia Coverage Testing", builderNames=julia_coverage_builders)
+julia_coverage_builders = ["coverage_ubuntu14_04-x64"]
+julia_coverage_scheduler = schedulers.Triggerable(name="Julia Coverage Testing", builderNames=julia_coverage_builders)
 c['schedulers'].append(julia_coverage_scheduler)
 
 c['schedulers'].append(schedulers.ForceScheduler(
-    name="coverage build",
+    name="force_coverage",
+    label="Force coverage build",
     builderNames=julia_coverage_builders,
     reason=util.FixedParameter(name="reason", default=""),
-    revision=util.FixedParameter(name="revision", default=""),
-    branch=util.FixedParameter(name="branch", default=""),
+    codebases=[
+        util.CodebaseParameter(
+            "",
+            name="",
+            branch=util.FixedParameter(name="branch", default=""),
+            revision=util.FixedParameter(name="revision", default=""),
+            repository=util.FixedParameter(name="repository", default=""),
+            project=util.FixedParameter(name="project", default="Coverage"),
+        )
+    ],
     properties=[
         util.StringParameter(name="url", size=60, default="https://status.julialang.org/download/linux-x86_64"),
     ]
@@ -66,66 +75,66 @@ Codecov.submit_generic(results; git_info...)
 """
 
 # Steps to download a linux tarball, extract it, run coverage on it, and upload coverage stats
-julia_coverage_factory = BuildFactory()
+julia_coverage_factory = util.BuildFactory()
 julia_coverage_factory.useProgress = True
 julia_coverage_factory.addSteps([
     # Clean the place out from previous runs
-    ShellCommand(
+    steps.ShellCommand(
         name="clean it out",
         command=["/bin/bash", "-c", "rm -rf *"]
     ),
 
     # Download the appropriate tarball and extract it
-    ShellCommand(
+    steps.ShellCommand(
         name="download/extract tarball",
-        command=["/bin/bash", "-c", Interpolate("curl -L %(prop:url)s | tar zx")],
+        command=["/bin/bash", "-c", util.Interpolate("curl -L %(prop:url)s | tar zx")],
     ),
 
     # Find Julia directory (so we don't have to know the shortcommit)
-    SetPropertyFromCommand(
+    steps.SetPropertyFromCommand(
         name="Find Julia executable",
         command=["/bin/bash", "-c", "echo julia-*"],
         property="juliadir"
     ),
 
     # Update packages
-    ShellCommand(
+    steps.ShellCommand(
         name="Update packages",
-        command=[Interpolate("%(prop:juliadir)s/bin/julia"), "-e", "Pkg.update(); Pkg.build()"],
+        command=[util.Interpolate("%(prop:juliadir)s/bin/julia"), "-e", "Pkg.update(); Pkg.build()"],
     ),
 
     # Install Coverage, CoverageBase
-    ShellCommand(
+    steps.ShellCommand(
         name="Install Coverage and checkout latest master",
-        command=[Interpolate("%(prop:juliadir)s/bin/julia"), "-e", "Pkg.add(\"Coverage\"); Pkg.checkout(\"Coverage\", \"master\")"],
+        command=[util.Interpolate("%(prop:juliadir)s/bin/julia"), "-e", "Pkg.add(\"Coverage\"); Pkg.checkout(\"Coverage\", \"master\")"],
     ),
-    ShellCommand(
+    steps.ShellCommand(
         name="Install CoverageBase and checkout latest master",
-        command=[Interpolate("%(prop:juliadir)s/bin/julia"), "-e", "Pkg.add(\"CoverageBase\"); Pkg.checkout(\"CoverageBase\", \"master\")"],
+        command=[util.Interpolate("%(prop:juliadir)s/bin/julia"), "-e", "Pkg.add(\"CoverageBase\"); Pkg.checkout(\"CoverageBase\", \"master\")"],
     ),
 
     # Test CoverageBase to make sure everything's on the up-and-up
-    ShellCommand(
+    steps.ShellCommand(
         name="Test CoverageBase.jl",
-        command=[Interpolate("%(prop:juliadir)s/bin/julia"), "-e", "Pkg.test(\"CoverageBase\")"],
+        command=[util.Interpolate("%(prop:juliadir)s/bin/julia"), "-e", "Pkg.test(\"CoverageBase\")"],
         haltOnFailure=True,
     ),
 
     # Run Julia, gathering coverage statistics
-    ShellCommand(
+    steps.ShellCommand(
         name="Run inlined tests",
-        command=[Interpolate("%(prop:juliadir)s/bin/julia"), "--precompiled=no", "--code-coverage=all", "-e", run_coverage_cmd],
+        command=[util.Interpolate("%(prop:juliadir)s/bin/julia"), "--precompiled=no", "--code-coverage=all", "-e", run_coverage_cmd],
         timeout=3600,
     ),
-    ShellCommand(
+    steps.ShellCommand(
         name="Run non-inlined tests",
-        command=[Interpolate("%(prop:juliadir)s/bin/julia"), "--precompiled=no", "--code-coverage=all", "--inline=no", "-e", run_coverage_cmd],
+        command=[util.Interpolate("%(prop:juliadir)s/bin/julia"), "--precompiled=no", "--code-coverage=all", "--inline=no", "-e", run_coverage_cmd],
         timeout=7200,
     ),
     #submit the results!
-    ShellCommand(
+    steps.ShellCommand(
         name="Gather test results and Submit",
-        command=[Interpolate("%(prop:juliadir)s/bin/julia"), "-e", Interpolate(analyse_and_submit_cov_cmd)],
+        command=[util.Interpolate("%(prop:juliadir)s/bin/julia"), "-e", util.Interpolate(analyse_and_submit_cov_cmd)],
         env={'COVERALLS_REPO_TOKEN':COVERALLS_REPO_TOKEN, 'CODECOV_REPO_TOKEN':CODECOV_REPO_TOKEN},
         logEnviron=False,
     ),
@@ -133,9 +142,9 @@ julia_coverage_factory.addSteps([
 
 
 # Add coverage builders
-c['builders'].append(BuilderConfig(
-    name="coverage_ubuntu14.04-x64",
-    slavenames=["ubuntu14.04-x64"],
+c['builders'].append(util.BuilderConfig(
+    name="coverage_ubuntu14_04-x64",
+    slavenames=["ubuntu14_04-x64"],
     category="Coverage",
     factory=julia_coverage_factory
 ))

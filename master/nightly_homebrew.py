@@ -2,49 +2,49 @@
 # Define everything needed to perform nightly homebrew builds
 ###############################################################################
 
-homebrew_nightly_scheduler = Nightly(name="Julia Homebrew Build", builderNames=["nightly_homebrew"], hour=[0,12], branch="master", onlyIfChanged=True )
+homebrew_nightly_scheduler = schedulers.Nightly(name="Julia Homebrew Build", builderNames=["nightly_homebrew"], hour=[0,12], branch="master", onlyIfChanged=True )
 c['schedulers'].append(homebrew_nightly_scheduler)
 
-homebrew_nightly_factory = BuildFactory()
+homebrew_nightly_factory = util.BuildFactory()
 homebrew_nightly_factory.useProgress = True
 homebrew_nightly_factory.addSteps([
-	ShellCommand(
+	steps.ShellCommand(
 		name="Remove Julia and deps",
 		command=["brew", "rm", "-v", "--force", "julia", "openblas-julia", "arpack-julia", "suite-sparse-julia"],
 		flunkOnFailure=False
 	),
-	ShellCommand(
+	steps.ShellCommand(
 		name="Tap tap",
 		command=["brew", "tap", "staticfloat/julia"],
 	),
-	ShellCommand(
+	steps.ShellCommand(
 		name="Update tap",
 		command=["bash", "-c", "cd /usr/local/Library/taps/staticfloat/homebrew-julia && git fetch && git reset --hard origin/master"]
 	),
-	ShellCommand(
+	steps.ShellCommand(
 		name="Update brew",
 		command=["brew", "update"]
 	),
-	ShellCommand(
+	steps.ShellCommand(
 		name="Install Julia",
 		command=["brew", "install", "-v", "--HEAD", "julia"],
 		haltOnFailure=True
 	),
-	SetPropertyFromCommand(
+	steps.SetPropertyFromCommand(
 		name="Get Julia version",
 		command=["/usr/local/bin/julia", "-e", "println(Base.GIT_VERSION_INFO.commit[1:10])"],
 		property="shortcommit"
 	),
-	MasterShellCommand(
+	steps.MasterShellCommand(
 		name="Report success",
-		command=["curl", "-L", "-H", "Content-type: application/json", "-d", Interpolate('{"target": "Homebrew", "version": "%(prop:shortcommit)s"}'), "https://status.julialang.org/put/nightly"]
+		command=["curl", "-L", "-H", "Content-type: application/json", "-d", util.Interpolate('{"target": "Homebrew", "version": "%(prop:shortcommit)s"}'), "https://status.julialang.org/put/nightly"]
 	)
 ])
 
 # Add Homebrew nightly builder
-c['builders'].append(BuilderConfig(
+c['builders'].append(util.BuilderConfig(
 	name="nightly_homebrew",
-	slavenames=["osx10.9-x64"],
+	slavenames=["osx10_9-x64"],
 	category="Nightlies",
 	factory=homebrew_nightly_factory
 ))

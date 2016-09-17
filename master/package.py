@@ -1,11 +1,11 @@
 # Add our packagers on various platforms
-julia_packagers  = ["package_osx10.9-x64"] + ["package_" + z for z in win_names]
-julia_packagers += ["package_tarball%s"%(arch) for arch in ["32", "64", "arm", "ppc64le"]]
+julia_packagers  = ["package_osx64"] + ["package_win32", "package_win64"]
+julia_packagers += ["package_linux%s"%(arch) for arch in ["32", "64", "arm", "ppc64le"]]
 
 # Also add builders for Ubuntu and Centos builders, that won't upload anything at the end
 julia_packagers += ["build_ubuntu32", "build_ubuntu64", "build_centos64"]
 
-packager_scheduler = AnyBranchScheduler(name="Julia packaging", builderNames=julia_packagers, treeStableTimer=1)
+packager_scheduler = schedulers.AnyBranchScheduler(name="Julia packaging", builderNames=julia_packagers, treeStableTimer=1)
 c['schedulers'].append(packager_scheduler)
 
 
@@ -54,20 +54,20 @@ def gen_filename(props):
         return "julia-%s-Darwin-%s.dmg"%(shortcommit, tar_arch)
 
 # Steps to build a `make binary-dist` tarball that should work on just about every linux ever
-julia_package_factory = BuildFactory()
+julia_package_factory = util.BuildFactory()
 julia_package_factory.useProgress = True
 julia_package_factory.addSteps([
     # Fetch first (allowing failure if no existing clone is present)
-    ShellCommand(
+    steps.ShellCommand(
         name="git fetch",
         command=["git", "fetch"],
         flunkOnFailure=False
     ),
 
     # Clone julia
-    Git(
+    steps.Git(
         name="Julia checkout",
-        repourl=Property('repository', default='git://github.com/JuliaLang/julia.git'),
+        repourl=util.Property('repository', default='git://github.com/JuliaLang/julia.git'),
         mode='incremental',
         method='clean',
         submodules=True,
@@ -76,7 +76,7 @@ julia_package_factory.addSteps([
     ),
 
     # Ensure gcc and cmake are installed on OSX
-    ShellCommand(
+    steps.ShellCommand(
         name="Install necessary brew dependencies",
         command=["brew", "install", "gcc", "cmake"],
         doStepIf=is_osx,
@@ -84,56 +84,56 @@ julia_package_factory.addSteps([
     ),
 
     # make clean first
-    ShellCommand(
+    steps.ShellCommand(
         name="make cleanall",
-        command=["/bin/bash", "-c", Interpolate("make %(prop:flags)s cleanall")],
+        command=["/bin/bash", "-c", util.Interpolate("make %(prop:flags)s cleanall")],
         env={'CFLAGS':None, 'CPPFLAGS':None}
     ),
 
     # Make, forcing some degree of parallelism to cut down compile times
-    ShellCommand(
+    steps.ShellCommand(
         name="make",
-        command=["/bin/bash", "-c", Interpolate("make -j3 %(prop:flags)s")],
+        command=["/bin/bash", "-c", util.Interpolate("make -j3 %(prop:flags)s")],
         haltOnFailure = True,
         timeout=3600,
         env={'CFLAGS':None, 'CPPFLAGS':None}
     ),
 
     # Test this build
-    ShellCommand(
+    steps.ShellCommand(
         name="make",
-        command=["/bin/bash", "-c", Interpolate("make %(prop:flags)s testall")],
+        command=["/bin/bash", "-c", util.Interpolate("make %(prop:flags)s testall")],
         haltOnFailure = True,
         timeout=3600,
         env={'CFLAGS':None, 'CPPFLAGS':None}
     ),
 
     # Make win-extras on windows
-    ShellCommand(
+    steps.ShellCommand(
         name="make win-extras",
-        command=["/bin/bash", "-c", Interpolate("make %(prop:flags)s win-extras")],
+        command=["/bin/bash", "-c", util.Interpolate("make %(prop:flags)s win-extras")],
         haltOnFailure = True,
         doStepIf=is_windows,
         env={'CFLAGS':None, 'CPPFLAGS':None},
     ),
 
     # Make binary-dist to package it up
-    ShellCommand(
+    steps.ShellCommand(
         name="make binary-dist",
-        command=["/bin/bash", "-c", Interpolate("make %(prop:flags)s binary-dist")],
+        command=["/bin/bash", "-c", util.Interpolate("make %(prop:flags)s binary-dist")],
         haltOnFailure = True,
         timeout=3600,
         env={'CFLAGS':None, 'CPPFLAGS':None},
     ),
 
     # Set a bunch of properties that are useful down the line
-    SetPropertyFromCommand(
+    steps.SetPropertyFromCommand(
         name="Get julia version/shortcommit",
         command=make_julia_version_command,
         extract_fn=parse_julia_version,
         want_stderr=False
     ),
-    SetPropertyFromCommand(
+    steps.SetPropertyFromCommand(
         name="Get commitmessage",
         command=["git", "log", "-1", "--pretty=format:%s%n%cN%n%cE%n%aN%n%aE"],
         extract_fn=parse_git_log,
@@ -141,78 +141,69 @@ julia_package_factory.addSteps([
     ),
 
     # Transfer the result to the buildmaster for uploading to AWS
-    MasterShellCommand(
+    steps.MasterShellCommand(
         name="mkdir julia_package",
         command=["mkdir", "-p", "/tmp/julia_package"]
     ),
-    FileUpload(
-        slavesrc=Interpolate("julia-%(prop:shortcommit)s-Linux-%(prop:tar_arch)s.tar.gz"),
-        masterdest=Interpolate("/tmp/julia_package/julia-%(prop:shortcommit)s-Linux-%(prop:tar_arch)s.tar.gz")
+    steps.FileUpload(
+        slavesrc=util.Interpolate("julia-%(prop:shortcommit)s-Linux-%(prop:tar_arch)s.tar.gz"),
+        masterdest=util.Interpolate("/tmp/julia_package/julia-%(prop:shortcommit)s-Linux-%(prop:tar_arch)s.tar.gz")
     ),
 
     # Upload it to AWS and cleanup the master!
-    MasterShellCommand(
+    steps.MasterShellCommand(
         name="Upload to AWS",
-        command=["/bin/bash", "-c", Interpolate("~/bin/try_thrice ~/bin/aws put --fail --public julianightlies/bin/linux/%(prop:up_arch)s/%(prop:majmin)s/julia-%(prop:version)s-%(prop:shortcommit)s-linux%(prop:bits)s.tar.gz /tmp/julia_package/julia-%(prop:shortcommit)s-Linux-%(prop:tar_arch)s.tar.gz")],
+        command=["/bin/bash", "-c", util.Interpolate("~/bin/try_thrice ~/bin/aws put --fail --public julianightlies/bin/linux/%(prop:up_arch)s/%(prop:majmin)s/julia-%(prop:version)s-%(prop:shortcommit)s-linux%(prop:bits)s.tar.gz /tmp/julia_package/julia-%(prop:shortcommit)s-Linux-%(prop:tar_arch)s.tar.gz")],
         doStepIf=should_upload,
         haltOnFailure=True
     ),
-    MasterShellCommand(
+    steps.MasterShellCommand(
         name="Upload to AWS (latest)",
-        command=["/bin/bash", "-c", Interpolate("~/bin/try_thrice ~/bin/aws put --fail --public julianightlies/bin/linux/%(prop:up_arch)s/julia-latest-linux%(prop:bits)s.tar.gz /tmp/julia_package/julia-%(prop:shortcommit)s-Linux-%(prop:tar_arch)s.tar.gz")],
+        command=["/bin/bash", "-c", util.Interpolate("~/bin/try_thrice ~/bin/aws put --fail --public julianightlies/bin/linux/%(prop:up_arch)s/julia-latest-linux%(prop:bits)s.tar.gz /tmp/julia_package/julia-%(prop:shortcommit)s-Linux-%(prop:tar_arch)s.tar.gz")],
         doStepIf=should_upload_latest,
         haltOnFailure=True
     ),
 
-    MasterShellCommand(
+    steps.MasterShellCommand(
         name="Cleanup Master",
-        command=["rm", "-f", Interpolate("/tmp/julia_package/julia-%(prop:shortcommit)s-Linux-%(prop:tar_arch)s.tar.gz")],
+        command=["rm", "-f", util.Interpolate("/tmp/julia_package/julia-%(prop:shortcommit)s-Linux-%(prop:tar_arch)s.tar.gz")],
         doStepIf=should_upload
     ),
 
     # Trigger a download of this file onto another slave for coverage purposes
-    Trigger(schedulerNames=["Julia Coverage Testing"],
+    steps.Trigger(schedulerNames=["Julia Coverage Testing"],
         set_properties={
-            'url': Interpolate('https://s3.amazonaws.com/julianightlies/bin/linux/%(prop:up_arch)s/%(prop:majmin)s/julia-%(prop:version)s-%(prop:shortcommit)s-linux%(prop:bits)s.tar.gz'),
-            'commitmessage': Property('commitmessage'),
-            'commitname': Property('commitname'),
-            'commitemail': Property('commitemail'),
-            'authorname': Property('authorname'),
-            'authoremail': Property('authoremail'),
-            'shortcommit': Property('shortcommit'),
+            'url': util.Interpolate('https://s3.amazonaws.com/julianightlies/bin/linux/%(prop:up_arch)s/%(prop:majmin)s/julia-%(prop:version)s-%(prop:shortcommit)s-linux%(prop:bits)s.tar.gz'),
+            'commitmessage': util.Property('commitmessage'),
+            'commitname': util.Property('commitname'),
+            'commitemail': util.Property('commitemail'),
+            'authorname': util.Property('authorname'),
+            'authoremail': util.Property('authoremail'),
+            'shortcommit': util.Property('shortcommit'),
         },
         waitForFinish=False,
         doStepIf=should_run_coverage
-    ),
-
-    # Trigger a download of this file onto another slave for perf testing purposes
-    Trigger(schedulerNames=["Julia Performance Tracking"],
-        set_properties={
-            'url': Interpolate('https://s3.amazonaws.com/julianightlies/bin/linux/%(prop:up_arch)s/%(prop:majmin)s/julia-%(prop:version)s-%(prop:shortcommit)s-linux%(prop:bits)s.tar.gz'),
-        },
-        waitForFinish=False,
-        doStepIf=should_run_coverage
-    ),
+    )
 ])
 
 
 # Map each builder to each packager
 mapping = {
-    "package_osx": "osx10.9-x64",
-    "package_win32": "win6.2-x86",
-    "package_win64": "win6.2-x64",
-    "package_linux32": "centos5.11-x86",
-    "package_linux64": "centos5.11-x64",
-    "package_linuxarm": "ubunt14.04-arm",
-    "package_linuxppc64le": "centos7.2-ppc64le",
+    "package_osx64": "osx10_9-x64",
+    "package_win32": "win6_2-x86",
+    "package_win64": "win6_2-x64",
+    "package_linux32": "centos5_11-x86",
+    "package_linux64": "centos5_11-x64",
+    "package_linuxarm": "ubuntu14_04-arm",
+    "package_linuxppc64le": "centos7_2-ppc64le",
 
     # These builders don't get uploaded
-    "build_ubuntu32": "ubuntu14.04-x86",
-    "build_ubuntu64": "ubuntu14.04-x64",
-    "build_centos64": "centos7.1-x64",
+    "build_ubuntu32": "ubuntu14_04-x86",
+    "build_ubuntu64": "ubuntu14_04-x64",
+    "build_centos64": "centos7_1-x64",
 }
 for packager, slave in mapping.iteritems():
-    c['builders'].append(BuilderConfig(
+    c['builders'].append(util.BuilderConfig(
         name=packager,
         slavenames=[slave],
         category="Packaging",
