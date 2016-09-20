@@ -25,10 +25,10 @@ TAP=$(dirname $(dirname $FORMULA))/homebrew-$(basename $(dirname $FORMULA))
 
 if [[ ! -d $(dirname $(dirname $brew))/Library/Taps/$TAP ]]; then
 	brew tap $(dirname $FORMULA)
-	(cd $(dirname $(dirname $brew))/Library/Taps/$TAP && git remote set-branches --add origin staging)
+	(cd $(dirname $(dirname $brew))/Homebrew/Library/Taps/$TAP && git remote set-branches --add origin staging)
 fi
 
-(cd $(dirname $(dirname $brew))/Library/Taps/$TAP && git reset --hard && git fetch && git checkout $BUILD_BRANCH; git reset --hard origin/$BUILD_BRANCH)
+(cd $(dirname $(dirname $brew))/Homebrew/Library/Taps/$TAP && git reset --hard && git fetch && git checkout $BUILD_BRANCH; git reset --hard origin/$BUILD_BRANCH)
 
 # Remove everything first, so we always start clean
 $brew rm --force $($brew deps $FORMULA) 2>/dev/null
