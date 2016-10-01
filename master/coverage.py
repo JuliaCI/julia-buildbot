@@ -144,7 +144,7 @@ julia_coverage_factory.addSteps([
 # Add coverage builders
 c['builders'].append(util.BuilderConfig(
     name="coverage_ubuntu14_04-x64",
-    slavenames=["ubuntu14_04-x64"],
+    workernames=["ubuntu14_04-x64"],
     category="Coverage",
     factory=julia_coverage_factory
 ))

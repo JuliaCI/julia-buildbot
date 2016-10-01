@@ -97,7 +97,7 @@ nuclear_factory.addSteps([
 for name in clean_names:
     c['builders'].append(util.BuilderConfig(
         name="clean_%s"%(name),
-        slavenames=[name],
+        workernames=[name],
         category="Cleaning",
         factory=clean_factory,
     ))
@@ -106,7 +106,7 @@ for name in clean_names:
 for name in clean_names:
     c['builders'].append(util.BuilderConfig(
         name="cleanpkg_%s"%(name),
-        slavenames=[name],
+        workernames=[name],
         category="Cleaning",
         factory=cleanpkg_factory,
     ))
@@ -115,7 +115,7 @@ for name in clean_names:
 for name in clean_names:
     c['builders'].append(util.BuilderConfig(
         name="nuke_%s"%(name),
-        slavenames=[name],
+        workernames=[name],
         category="Cleaning",
         factory=nuclear_factory,
     ))

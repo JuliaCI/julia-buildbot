@@ -36,7 +36,7 @@ osx_bottle_factory.addSteps([
     # Copy our build_bottle.sh script over to the slave:
     steps.FileDownload(
     	mastersrc="../commands/build_bottle.sh",
-    	slavedest="build_bottle.sh"
+    	workerdest="build_bottle.sh"
     ),
 
     # Next, invoke build_bottle.sh!
@@ -57,7 +57,7 @@ osx_bottle_factory.addSteps([
     	command=["mkdir", "-p", "/tmp/bottle_cache"]
     ),
     steps.FileUpload(
-    	slavesrc=util.Interpolate("%(prop:filename)s"),
+    	workersrc=util.Interpolate("%(prop:filename)s"),
     	masterdest=util.Interpolate("/tmp/bottle_cache/%(prop:filename)s")
     ),
     steps.MasterShellCommand(
@@ -77,7 +77,7 @@ osx_bottle_factory.addSteps([
 for name in osx_names:
     c['builders'].append(util.BuilderConfig(
         name="bottle_%s"%(name),
-        slavenames=[name],
+        workernames=[name],
         category="Bottling",
         factory=osx_bottle_factory
     ))

@@ -146,7 +146,7 @@ julia_package_factory.addSteps([
         command=["mkdir", "-p", "/tmp/julia_package"]
     ),
     steps.FileUpload(
-        slavesrc=util.Interpolate("julia-%(prop:shortcommit)s-Linux-%(prop:tar_arch)s.tar.gz"),
+        workersrc=util.Interpolate("julia-%(prop:shortcommit)s-Linux-%(prop:tar_arch)s.tar.gz"),
         masterdest=util.Interpolate("/tmp/julia_package/julia-%(prop:shortcommit)s-Linux-%(prop:tar_arch)s.tar.gz")
     ),
 
@@ -205,7 +205,7 @@ mapping = {
 for packager, slave in mapping.iteritems():
     c['builders'].append(util.BuilderConfig(
         name=packager,
-        slavenames=[slave],
+        workernames=[slave],
         category="Packaging",
         factory=julia_package_factory
     ))

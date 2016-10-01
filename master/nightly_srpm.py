@@ -71,7 +71,7 @@ julia_srpm_package_factory.addSteps([
     ),
     steps.FileDownload(
         mastersrc="../commands/julia_juliadoc.patch",
-        slavedest="../SOURCES/julia_juliadoc.patch"
+        workerdest="../SOURCES/julia_juliadoc.patch"
     ),
     steps.ShellCommand(
         name="Tarballify julia",
@@ -85,7 +85,7 @@ julia_srpm_package_factory.addSteps([
     ),
     steps.FileDownload(
         mastersrc="../commands/julia-nightlies.spec",
-        slavedest="../SPECS/julia-nightlies.spec"
+        workerdest="../SPECS/julia-nightlies.spec"
     ),
     steps.ShellCommand(
         name="replace datecommit and juliaversion in .spec",
@@ -114,7 +114,7 @@ julia_srpm_package_factory.addSteps([
         property="filename"
     ),
     steps.FileUpload(
-        slavesrc=util.Interpolate("../SRPMS/%(prop:filename)s"),
+        workersrc=util.Interpolate("../SRPMS/%(prop:filename)s"),
         masterdest=util.Interpolate("/tmp/julia_package/%(prop:filename)s"),
         haltOnFailure = True
     ),
@@ -148,7 +148,7 @@ julia_srpm_package_factory.addSteps([
 # Add SRPM packager
 c['builders'].append(util.BuilderConfig(
     name="nightly_srpm",
-    slavenames=["centos7_1-x64"],
+    workernames=["centos7_1-x64"],
     category="Nightlies",
     factory=julia_srpm_package_factory,
 ))

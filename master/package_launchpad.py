@@ -29,7 +29,7 @@ launchpad_package_factory.addSteps([
 # Add launchpad julia packager
 c['builders'].append(util.BuilderConfig(
     name="package_launchpad",
-    slavenames=ubuntu_names,
+    workernames=ubuntu_names,
     category="Packaging",
     factory=launchpad_package_factory
 ))

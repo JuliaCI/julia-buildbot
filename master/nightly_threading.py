@@ -93,7 +93,7 @@ julia_threading_factory.addSteps([
 #        command=["mkdir", "-p", "/tmp/julia_package"]
 #    ),
 #    steps.FileUpload(
-#        slavesrc=util.Interpolate("julia-%(prop:shortcommit)s-Linux-%(prop:tar_arch)s.tar.gz"),
+#        workersrc=util.Interpolate("julia-%(prop:shortcommit)s-Linux-%(prop:tar_arch)s.tar.gz"),
 #        masterdest=util.Interpolate("/tmp/julia_package/juliathreading-%(prop:shortcommit)s-Linux-%(prop:tar_arch)s.tar.gz")
 #    ),
 
@@ -125,7 +125,7 @@ julia_threading_factory.addSteps([
 for arch in ["x86", "x64"]:
     c['builders'].append(util.BuilderConfig(
         name="nightly_threading-%s"%(arch),
-        slavenames=["ubuntu14_04-%s"%(arch)],
+        workernames=["ubuntu14_04-%s"%(arch)],
         category="Nightlies",
         factory=julia_threading_factory
     ))

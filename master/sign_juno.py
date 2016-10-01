@@ -38,7 +38,7 @@ sign_juno_factory.addSteps([
     # Grab the output and transfer it back!
     steps.SetPropertyFromCommand(name="Get filename", command=["/bin/bash", "-c", "ls *-signed*"], property="filename"),
     steps.MasterShellCommand(name="mkdir juno_cache", command=["mkdir", "-p", "/tmp/juno_cache"]),
-    steps.FileUpload(slavesrc=util.Interpolate("%(prop:filename)s"), masterdest=util.Interpolate("/tmp/juno_cache/%(prop:filename)s")),
+    steps.FileUpload(workersrc=util.Interpolate("%(prop:filename)s"), masterdest=util.Interpolate("/tmp/juno_cache/%(prop:filename)s")),
     steps.MasterShellCommand(name="Upload to AWS", command=["/bin/bash", "-c", util.Interpolate("~/bin/try_thrice ~/bin/aws put --fail --public junolab/latest/signed/%(prop:filename)s /tmp/juno_cache/%(prop:filename)s")], haltOnFailure=True),
 
     # Cleanup!
@@ -48,7 +48,7 @@ sign_juno_factory.addSteps([
 for name in ["osx10_9-x64", "win6_2-x86", "win6_2-x64"]:
     c['builders'].append(util.BuilderConfig(
         name="juno_%s"%(name),
-        slavenames=[name],
+        workernames=[name],
         category="Juno",
         factory=sign_juno_factory,
     ))

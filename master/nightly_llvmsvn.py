@@ -65,7 +65,7 @@ julia_llvmsvn_factory.addSteps([
 for arch in ["x86", "x64"]:
     c['builders'].append(util.BuilderConfig(
         name="nightly_llvmsvn-%s"%(arch),
-        slavenames=["ubuntu14_04-%s"%(arch)],
+        workernames=["ubuntu14_04-%s"%(arch)],
         category="Nightlies",
         factory=julia_llvmsvn_factory
     ))
