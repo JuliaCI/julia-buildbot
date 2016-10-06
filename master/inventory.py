@@ -58,7 +58,10 @@ for name in all_names:
         march = 'armv7-a'
         up_arch = 'arm'
         bits = 'arm'
-        flags += 'JULIA_CPU_TARGET=generic '
+        flags += 'JULIA_CPU_TARGET=generic'
+        # Add Link-Time-Optimization to ARM builder to work around this GCC bug:
+        # https://github.com/JuliaLang/julia/issues/14550
+        flags += 'CPPFLAGS=-fLTO LDFLAGS=-fLTO '
 
     if name[-7:] == 'ppc64le':
         deb_arch = 'ppc64el'
