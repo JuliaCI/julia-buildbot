@@ -11,7 +11,7 @@ def build_names(platform, versions, architectures):
 
 win_names    = build_names("win", ["6_2"], ["x64", "x86"])
 ubuntu_names = build_names("ubuntu", ["14_04"], ["x64", "x86", "arm"])
-osx_names    = build_names("osx", ["10_9", "10_10", "10_11"], ["x64"])
+osx_names    = build_names("osx", ["10_10", "10_11", "10_12"], ["x64"])
 centos_names = build_names("centos", ["5_11"], ["x64", "x86"])
 # Add some special centos names that don't fit in with the rest
 centos_names += ["centos6_7-x64", "centos7_1-x64", "centos7_2-ppc64le"]
