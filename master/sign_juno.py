@@ -6,7 +6,7 @@
 juno_scheduler = schedulers.ForceScheduler(
     name="force_juno",
     label="Force juno signing",
-    builderNames=["juno_osx10_9-x64", "juno_win6_2-x86", "juno_win6_2-x64"],
+    builderNames=["juno_osx10_10-x64", "juno_win6_2-x86", "juno_win6_2-x64"],
     reason=util.FixedParameter(name="reason", default=""),
     codebases=[
         util.CodebaseParameter(
@@ -45,7 +45,7 @@ sign_juno_factory.addSteps([
     steps.MasterShellCommand(name="Cleanup", command=["rm", "-f", util.Interpolate("/tmp/bottle_cache/%(prop:filename)s")])
 ])
 
-for name in ["osx10_9-x64", "win6_2-x86", "win6_2-x64"]:
+for name in ["osx10_10-x64", "win6_2-x86", "win6_2-x64"]:
     c['builders'].append(util.BuilderConfig(
         name="juno_%s"%(name),
         workernames=[name],

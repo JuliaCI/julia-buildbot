@@ -189,7 +189,7 @@ julia_package_factory.addSteps([
 
 # Map each builder to each packager
 mapping = {
-    "package_osx64": "osx10_9-x64",
+    "package_osx64": "osx10_10-x64",
     "package_win32": "win6_2-x86",
     "package_win64": "win6_2-x64",
     "package_linux32": "centos5_11-x86",
