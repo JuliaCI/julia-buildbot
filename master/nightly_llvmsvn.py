@@ -66,6 +66,6 @@ for arch in ["x86", "x64"]:
     c['builders'].append(util.BuilderConfig(
         name="nightly_llvmsvn-%s"%(arch),
         workernames=["ubuntu14_04-%s"%(arch)],
-        category="Nightlies",
+        tags=["Nightlies"],
         factory=julia_llvmsvn_factory
     ))

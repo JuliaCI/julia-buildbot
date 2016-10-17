@@ -206,6 +206,6 @@ for packager, slave in mapping.iteritems():
     c['builders'].append(util.BuilderConfig(
         name=packager,
         workernames=[slave],
-        category="Packaging",
+        tags=["Packaging"],
         factory=julia_package_factory
     ))

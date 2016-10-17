@@ -30,6 +30,6 @@ launchpad_package_factory.addSteps([
 c['builders'].append(util.BuilderConfig(
     name="package_launchpad",
     workernames=ubuntu_names,
-    category="Packaging",
+    tags=["Packaging"],
     factory=launchpad_package_factory
 ))

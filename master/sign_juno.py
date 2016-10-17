@@ -49,6 +49,6 @@ for name in ["osx10_9-x64", "win6_2-x86", "win6_2-x64"]:
     c['builders'].append(util.BuilderConfig(
         name="juno_%s"%(name),
         workernames=[name],
-        category="Juno",
+        tags=["Juno"],
         factory=sign_juno_factory,
     ))

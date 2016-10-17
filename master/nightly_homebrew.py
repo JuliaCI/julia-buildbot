@@ -45,6 +45,6 @@ homebrew_nightly_factory.addSteps([
 c['builders'].append(util.BuilderConfig(
 	name="nightly_homebrew",
 	workernames=["osx10_9-x64"],
-	category="Nightlies",
+	tags=["Nightlies"],
 	factory=homebrew_nightly_factory
 ))

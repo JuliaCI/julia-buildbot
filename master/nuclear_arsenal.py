@@ -98,7 +98,7 @@ for name in clean_names:
     c['builders'].append(util.BuilderConfig(
         name="clean_%s"%(name),
         workernames=[name],
-        category="Cleaning",
+        tags=["Cleaning"],
         factory=clean_factory,
     ))
 
@@ -107,7 +107,7 @@ for name in clean_names:
     c['builders'].append(util.BuilderConfig(
         name="cleanpkg_%s"%(name),
         workernames=[name],
-        category="Cleaning",
+        tags=["Cleaning"],
         factory=cleanpkg_factory,
     ))
 
@@ -116,6 +116,6 @@ for name in clean_names:
     c['builders'].append(util.BuilderConfig(
         name="nuke_%s"%(name),
         workernames=[name],
-        category="Cleaning",
+        tags=["Cleaning"],
         factory=nuclear_factory,
     ))

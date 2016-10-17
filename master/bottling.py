@@ -78,6 +78,6 @@ for name in osx_names:
     c['builders'].append(util.BuilderConfig(
         name="bottle_%s"%(name),
         workernames=[name],
-        category="Bottling",
+        tags=["Bottling"],
         factory=osx_bottle_factory
     ))
