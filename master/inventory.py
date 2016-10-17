@@ -14,10 +14,7 @@ osx_names = ["osx10.9-x64", "osx10.10-x64", "osx10.11-x64", "osx10.12-x64"]
 centos_names = ["centos5.11-x64", "centos5.11-x86", "centos6.7-x64", "centos7.1-x64", "centos7.2-ppc64le"]
 win_names = ["win6.2-x64", "win6.2-x86"]
 all_hail_the_nanosoldier = ["nanosoldier-x64"]
-
-# We've got an ubuntu ARM machine!  But don't add him to ubuntu_names, otherwise
-# he'll get picked up by quickbuild, and we don't want that
-arm_names = ["ubuntu14.04-arm"]
+arm_names = ["debian7.11-arm"]
 
 all_names = ubuntu_names + osx_names + centos_names + win_names + all_hail_the_nanosoldier + arm_names
 

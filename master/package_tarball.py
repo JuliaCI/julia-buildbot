@@ -175,7 +175,7 @@ c['builders'].append(BuilderConfig(
 
 c['builders'].append(BuilderConfig(
     name="package_tarballarm",
-    slavenames=["ubuntu14.04-arm"],
+    slavenames=["debian7.11-arm"],
     category="Packaging",
     factory=julia_tarball_factory
 ))
