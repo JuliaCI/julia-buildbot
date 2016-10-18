@@ -51,7 +51,7 @@ for name in all_names:
 
     if name[-3:] == 'arm':
         deb_arch = 'armhf'
-        tar_arch = 'arm'
+        tar_arch = 'armv7l'
         march = 'armv7-a'
         up_arch = 'arm'
         bits = 'arm'
