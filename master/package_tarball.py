@@ -39,7 +39,7 @@ julia_tarball_factory.addSteps([
     # Make!
     ShellCommand(
         name="make",
-        command=["/bin/bash", "-c", Interpolate("make -j3 %(prop:flags)s")],
+        command=["/bin/bash", "-c", Interpolate("make -j3 %(prop:flags)s debug release")],
         haltOnFailure = True,
         timeout=2400,
         env={'CFLAGS':None, 'CPPFLAGS':None},
