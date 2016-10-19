@@ -210,3 +210,23 @@ for packager, slave in mapping.iteritems():
         tags=["Packaging"],
         factory=julia_package_factory
     ))
+
+
+# Add a scheduler for building release candidates/triggering builds manually
+force_build_scheduler = schedulers.ForceScheduler(
+    name="force_julia_package",
+    label="Force Julia build/packaging",
+    builderNames=julia_packagers,
+    reason=util.FixedParameter(name="reason", default=""),
+    codebases=[
+        util.CodebaseParameter(
+            "",
+            name="",
+            branch=util.FixedParameter(name="branch", default=""),
+            repository=util.FixedParameter(name="repository", default=""),
+            project=util.FixedParameter(name="project", default="Packaging"),
+        )
+    ],
+    properties=[]
+)
+c['schedulers'].append(force_build_scheduler)
