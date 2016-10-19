@@ -2,7 +2,7 @@
 rc_scheduler = schedulers.ForceScheduler(
     name="force_rc",
     label="Force rc build",
-    builderNames=["package_osx64", "package_win64", "package_win32", "package_linux64", "package_linux32", "package_linuxarm", "package_linuxppc64le"],
+    builderNames=["package_osx64", "package_win64", "package_win32", "package_linux64", "package_linux32", "package_linuxarmv7l", "package_linuxppc64le"],
     reason=util.FixedParameter(name="reason", default=""),
     codebases=[
         util.CodebaseParameter(

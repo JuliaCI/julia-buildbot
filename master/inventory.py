@@ -10,12 +10,14 @@ def build_names(platform, versions, architectures):
     return names
 
 win_names    = build_names("win", ["6_2"], ["x64", "x86"])
-ubuntu_names = build_names("ubuntu", ["14_04"], ["x64", "x86", "arm"])
+ubuntu_names = build_names("ubuntu", ["14_04"], ["x64", "x86"])
 osx_names    = build_names("osx", ["10_10", "10_11", "10_12"], ["x64"])
 centos_names = build_names("centos", ["5_11"], ["x64", "x86"])
+centos_names+= build_names("centos", ["7_2"], ["ppc64le", "aarch64"])
 # Add some special centos names that don't fit in with the rest
-centos_names += ["centos6_7-x64", "centos7_1-x64", "centos7_2-ppc64le"]
-all_names    = ubuntu_names + osx_names + centos_names + win_names
+centos_names+= ["centos6_7-x64", "centos7_1-x64"]
+debian_names = ["debian7_1-armv7l"]
+all_names    = ubuntu_names + osx_names + centos_names + win_names + debian_names
 
 # Define all the attributes we'll use in our buildsteps
 c['workers'] = []
@@ -42,18 +44,28 @@ for name in all_names:
         up_arch = 'x64'
         bits = '64'
 
-    if name[-3:] == 'arm':
-        tar_arch = 'arm'
+    if name[-6:] == 'armv7l':
+        tar_arch = 'armv7l'
         march = 'armv7-a'
-        up_arch = 'arm'
-        bits = 'arm'
+        up_arch = 'armv7l'
+        bits = 'armv7l'
         flags += 'JULIA_CPU_TARGET=generic '
+        # Add Link-Time-Optimization to ARM builder to work around this GCC bug:
+        # https://github.com/JuliaLang/julia/issues/14550
+        flags += 'LLVM_LTO=1 '
 
     if name[-7:] == 'ppc64le':
         tar_arch = 'powerpc64le'
         up_arch = 'ppc64le'
         bits = 'ppc64'
         flags += 'JULIA_CPU_TARGET=pwr8 '
+
+    if name[-7:] == 'aarch64':
+        tar_arch = 'aarch64'
+        up_arch = 'aarch64'
+        bits = 'aarch64'
+        flags += 'JULIA_CPU_TARGET=generic '
+        flags += 'LLVM_VER=3.9.0 '
 
     # On windows, disable running doc/genstdlib.jl due to julia issue #11727
     # and add XC_HOST dependent on the architecture

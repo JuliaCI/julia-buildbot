@@ -1,6 +1,6 @@
 # Add our packagers on various platforms
 julia_packagers  = ["package_osx64"] + ["package_win32", "package_win64"]
-julia_packagers += ["package_linux%s"%(arch) for arch in ["32", "64", "arm", "ppc64le"]]
+julia_packagers += ["package_linux%s"%(arch) for arch in ["32", "64", "armv7l", "ppc64le", "aarch64"]]
 
 # Also add builders for Ubuntu and Centos builders, that won't upload anything at the end
 julia_packagers += ["build_ubuntu32", "build_ubuntu64", "build_centos64"]
@@ -194,8 +194,9 @@ mapping = {
     "package_win64": "win6_2-x64",
     "package_linux32": "centos5_11-x86",
     "package_linux64": "centos5_11-x64",
-    "package_linuxarm": "ubuntu14_04-arm",
+    "package_linuxarmv7l": "debian7_1-armv7l",
     "package_linuxppc64le": "centos7_2-ppc64le",
+    "package_linuxaarch64": "centos7_2-aarch64",
 
     # These builders don't get uploaded
     "build_ubuntu32": "ubuntu14_04-x86",
