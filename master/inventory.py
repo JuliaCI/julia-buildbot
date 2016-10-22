@@ -64,6 +64,7 @@ for name in all_names:
         tar_arch = 'aarch64'
         up_arch = 'aarch64'
         bits = 'aarch64'
+        march = 'armv8-a'
         flags += 'JULIA_CPU_TARGET=generic '
         flags += 'LLVM_VER=3.9.0 '
 
