@@ -42,7 +42,8 @@ julia_tarball_factory.addSteps([
         command=["/bin/bash", "-c", Interpolate("make -j3 %(prop:flags)s debug release")],
         haltOnFailure = True,
         timeout=2400,
-        env={'CFLAGS':None, 'CPPFLAGS':None},
+        env={'CFLAGS':None, 'CPPFLAGS':None,
+             'LLVM_CMAKE':Property('llvm_cmake', default=None)},
     ),
 
     # Make!
@@ -51,7 +52,8 @@ julia_tarball_factory.addSteps([
         command=["/bin/bash", "-c", Interpolate("make %(prop:flags)s binary-dist")],
         haltOnFailure = True,
         timeout=2400,
-        env={'CFLAGS':None, 'CPPFLAGS':None},
+        env={'CFLAGS':None, 'CPPFLAGS':None,
+             'LLVM_CMAKE':Property('llvm_cmake', default=None)},
     ),
 
     # Set a bunch of properties that everyone will need
