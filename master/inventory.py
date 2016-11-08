@@ -23,7 +23,8 @@ c['slaves'] = []
 for name in all_names:
     # Initialize march to none, as some buildbots (power8) don't set it
     march = None
-   
+    llvm_cmake = None
+
     # Everything should be VERBOSE
     flags = 'VERBOSE=1 '
 
@@ -59,6 +60,10 @@ for name in all_names:
         # Add Link-Time-Optimization to ARM builder to work around this GCC bug:
         # https://github.com/JuliaLang/julia/issues/14550
         flags += 'LLVM_LTO=1 '
+        # Force LLVM cmake build to use the armv7 triple instead of picking
+        # up armv8 from uname
+        # This might not be an actual issue since we are not building clang
+        llvm_cmake = '-DLLVM_HOST_TRIPLE=armv7l-unknown-linux-gnueabihf -DLLVM_DEFAULT_TARGET_TRIPLE=armv7l-unknown-linux-gnueabihf'
 
     if name[-7:] == 'ppc64le':
         deb_arch = 'ppc64el'
@@ -107,6 +112,7 @@ for name in all_names:
 			'release':name,
 			'flags':flags,
 			'up_arch':up_arch,
-			'bits':bits
+			'bits':bits,
+			'llvm_cmake':llvm_cmake
 		}
 	)]
