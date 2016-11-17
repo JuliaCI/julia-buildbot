@@ -101,7 +101,7 @@ julia_package_factory.addSteps([
 
     # Test this build
     steps.ShellCommand(
-        name="make",
+        name="make testall",
         command=["/bin/bash", "-c", util.Interpolate("make %(prop:flags)s testall")],
         haltOnFailure = True,
         timeout=3600,
