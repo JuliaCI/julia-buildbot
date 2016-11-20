@@ -194,7 +194,7 @@ mapping = {
     "package_win64": "win6_2-x64",
     "package_linux32": "centos5_11-x86",
     "package_linux64": "centos5_11-x64",
-    "package_linuxarmv7l": "debian7_1-armv7l",
+    "package_linuxarmv7l": "debian7_11-armv7l",
     "package_linuxppc64le": "centos7_2-ppc64le",
     "package_linuxaarch64": "centos7_2-aarch64",
 

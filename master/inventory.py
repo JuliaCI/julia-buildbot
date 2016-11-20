@@ -16,7 +16,7 @@ centos_names = build_names("centos", ["5_11"], ["x64", "x86"])
 centos_names+= build_names("centos", ["7_2"], ["ppc64le", "aarch64"])
 # Add some special centos names that don't fit in with the rest
 centos_names+= ["centos6_7-x64", "centos7_1-x64"]
-debian_names = ["debian7_1-armv7l"]
+debian_names = ["debian7_11-armv7l"]
 all_names    = ubuntu_names + osx_names + centos_names + win_names + debian_names
 
 # Define all the attributes we'll use in our buildsteps
@@ -98,7 +98,7 @@ for name in all_names:
         flags += 'CXXFLAGS=-D_GLIBCXX_USE_CXX11_ABI=0 '
 
     # Add MARCH to flags
-    if march != None:
+    if not march is None:
         flags += "MARCH=%s "%(march)
 
     # Construct the actual BuildSlave object
