@@ -5,7 +5,7 @@ julia_packagers += ["package_linux%s"%(arch) for arch in ["32", "64", "armv7l", 
 # Also add builders for Ubuntu and Centos builders, that won't upload anything at the end
 julia_packagers += ["build_ubuntu32", "build_ubuntu64", "build_centos64"]
 
-packager_scheduler = schedulers.AnyBranchScheduler(name="Julia packaging", change_filter=util.ChangeFilter(branch='master'), builderNames=julia_packagers, treeStableTimer=1)
+packager_scheduler = schedulers.AnyBranchScheduler(name="Julia packaging", change_filter=util.ChangeFilter(project_re='.*/julia$', branch='master'), builderNames=julia_packagers, treeStableTimer=1)
 c['schedulers'].append(packager_scheduler)
 
 
