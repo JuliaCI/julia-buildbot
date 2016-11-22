@@ -3,7 +3,7 @@
 ###############################################################################
 
 # Add a manual scheduler for clearing out package_ and build_ arpack, openblas, suite-sparse deps
-clean_names = ubuntu_names + ["osx10_10-x64"] + centos_names + win_names
+clean_names = ubuntu_names + ["osx10_10-x64"] + centos_names + debian_names + win_names
 clean_scheduler = schedulers.ForceScheduler(
     name="clean",
     label="clean arpack, openblas, suite-sparse, openlibm and openspecfun",
