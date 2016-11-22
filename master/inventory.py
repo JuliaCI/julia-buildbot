@@ -22,8 +22,11 @@ all_names    = ubuntu_names + osx_names + centos_names + win_names + debian_name
 # Define all the attributes we'll use in our buildsteps
 c['workers'] = []
 for name in all_names:
-    # Initialize march to none, as some buildbots (power8) don't set it
+    # Initialize march to None, as some buildbots (power8) don't set it
     march = None
+
+    # Initialize llvm_cmake to None, as no buildbots need it except armv7l
+    llvm_cmake = None
 
     # Everything should be VERBOSE
     flags = 'VERBOSE=1 '
@@ -53,6 +56,9 @@ for name in all_names:
         # Add Link-Time-Optimization to ARM builder to work around this GCC bug:
         # https://github.com/JuliaLang/julia/issues/14550
         flags += 'LLVM_LTO=1 '
+        # Force LLVM cmake build to use the armv7 triple instead of armv8 from uname
+        # This might not be an actual issue since we are not building clang, but BSTS
+        llvm_cmake = '-DLLVM_HOST_TRIPLE=armv7l-unknown-linux-gnueabihf -DLLVM_DEFAULT_TARGET_TRIPLE=armv7l-unknown-linux-gnueabihf'
 
     if name[-7:] == 'ppc64le':
         tar_arch = 'powerpc64le'
@@ -108,6 +114,7 @@ for name in all_names:
 			'release':name,
 			'flags':flags,
 			'up_arch':up_arch,
-			'bits':bits
+			'bits':bits,
+            'llvm_cmake':llvm_cmake,
 		}
 	)]
