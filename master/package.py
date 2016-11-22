@@ -53,6 +53,12 @@ def gen_filename(props):
     if is_osx(props):
         return "julia-%s-Darwin-%s.dmg"%(shortcommit, tar_arch)
 
+julia_package_env = {
+    'CFLAGS':None,
+    'CPPFLAGS': None,
+    'LLVM_CMAKE': Property('llvm_cmake', default=None),
+}
+
 # Steps to build a `make binary-dist` tarball that should work on just about every linux ever
 julia_package_factory = util.BuildFactory()
 julia_package_factory.useProgress = True
@@ -87,7 +93,7 @@ julia_package_factory.addSteps([
     steps.ShellCommand(
         name="make cleanall",
         command=["/bin/bash", "-c", util.Interpolate("make %(prop:flags)s cleanall")],
-        env={'CFLAGS':None, 'CPPFLAGS':None}
+        env=julia_package_env,
     ),
 
     # Make, forcing some degree of parallelism to cut down compile times
@@ -96,7 +102,7 @@ julia_package_factory.addSteps([
         command=["/bin/bash", "-c", util.Interpolate("make -j3 %(prop:flags)s")],
         haltOnFailure = True,
         timeout=3600,
-        env={'CFLAGS':None, 'CPPFLAGS':None}
+        env=julia_package_env,
     ),
 
     # Test this build
@@ -105,7 +111,7 @@ julia_package_factory.addSteps([
         command=["/bin/bash", "-c", util.Interpolate("make %(prop:flags)s testall")],
         haltOnFailure = True,
         timeout=3600,
-        env={'CFLAGS':None, 'CPPFLAGS':None}
+        env=julia_package_env,
     ),
 
     # Make win-extras on windows
@@ -114,7 +120,7 @@ julia_package_factory.addSteps([
         command=["/bin/bash", "-c", util.Interpolate("make %(prop:flags)s win-extras")],
         haltOnFailure = True,
         doStepIf=is_windows,
-        env={'CFLAGS':None, 'CPPFLAGS':None},
+        env=julia_package_env,
     ),
 
     # Make binary-dist to package it up
@@ -123,7 +129,7 @@ julia_package_factory.addSteps([
         command=["/bin/bash", "-c", util.Interpolate("make %(prop:flags)s binary-dist")],
         haltOnFailure = True,
         timeout=3600,
-        env={'CFLAGS':None, 'CPPFLAGS':None},
+        env=julia_package_env,
     ),
 
     # Set a bunch of properties that are useful down the line
@@ -187,7 +193,7 @@ julia_package_factory.addSteps([
 ])
 
 
-# Map each builder to each packager
+# Map each builder to each worker
 mapping = {
     "package_osx64": "osx10_10-x64",
     "package_win32": "win6_2-x86",
