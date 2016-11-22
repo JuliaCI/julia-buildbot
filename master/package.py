@@ -56,7 +56,7 @@ def gen_filename(props):
 julia_package_env = {
     'CFLAGS':None,
     'CPPFLAGS': None,
-    'LLVM_CMAKE': Property('llvm_cmake', default=None),
+    'LLVM_CMAKE': util.Property('llvm_cmake', default=None),
 }
 
 # Steps to build a `make binary-dist` tarball that should work on just about every linux ever
