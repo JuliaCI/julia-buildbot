@@ -74,7 +74,7 @@ def gen_latest_upload_command(props):
 @util.renderer
 def gen_coverage_properties(props):
     return {
-        'url': 'https://s3.amazonaws.com/'+gen_upload_path(props)),
+        'url': 'https://s3.amazonaws.com/'+gen_upload_path(props),
         'commitmessage': props.getProperty('commitmessage'),
         'commitname': props.getProperty('commitname'),
         'commitemail': props.getProperty('commitemail'),
