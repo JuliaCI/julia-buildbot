@@ -42,6 +42,11 @@ def parse_git_log(return_code, stdout, stderr):
         "authoremail": lines[4],
     }
 
+def parse_artifact_filename(return_code, stdout, stderr):
+    if stdout[:26] == 'JULIA_BINARYDIST_FILENAME=':
+        return stdout[26:]
+    return None
+
 @util.renderer
 def gen_upload_path(props):
     up_arch = props.getProperty("up_arch")
@@ -172,7 +177,7 @@ julia_package_factory.addSteps([
     steps.SetPropertyFromCommand(
         name="Get build artifact filename",
         command=["make", "print-JULIA_BINARYDIST_FILENAME"],
-        property="artifact_filename"
+        extract_fn=parse_artifact_filename
     ),
 
     # Transfer the result to the buildmaster for uploading to AWS
