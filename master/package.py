@@ -210,12 +210,12 @@ julia_package_factory.addSteps([
     steps.Trigger(schedulerNames=["Julia Coverage Testing"],
         set_properties={
             'url': gen_download_url,
-            'commitmessage': props.getProperty('commitmessage'),
-            'commitname': props.getProperty('commitname'),
-            'commitemail': props.getProperty('commitemail'),
-            'authorname': props.getProperty('authorname'),
-            'authoremail': props.getProperty('authoremail'),
-            'shortcommit': props.getProperty('shortcommit'),
+            'commitmessage': util.Property('commitmessage'),
+            'commitname': util.Property('commitname'),
+            'commitemail': util.Property('commitemail'),
+            'authorname': util.Property('authorname'),
+            'authoremail': util.Property('authoremail'),
+            'shortcommit': util.Property('shortcommit'),
         },
         waitForFinish=False,
         doStepIf=should_run_coverage
