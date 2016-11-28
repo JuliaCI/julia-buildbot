@@ -43,15 +43,48 @@ def parse_git_log(return_code, stdout, stderr):
     }
 
 @util.renderer
-def gen_filename(props):
-    shortcommit = props.getProperty("shortcommit")
-    tar_arch = props.getProperty("tar_arch")
-    if is_linux(props):
-        return "julia-%s-Linux-%s.tar.gz"%(shortcommit, tar_arch)
-    if is_win(props):
-        return "julia-%s-WINNT-%s.exe"%(shortcommit, tar_arch)
-    if is_osx(props):
-        return "julia-%s-Darwin-%s.dmg"%(shortcommit, tar_arch)
+def gen_upload_path(props):
+    up_arch = props.getProperty("up_arch")
+    majmin = props.getProperty("majmin")
+    artifact_filename = props.getProperty("artifact_filename")
+    os = get_os_name(props)
+    return "julianightlies/bin/%s/%s/%s/%s"%(os, up_arch, majmin, artifact_filename)
+
+@util.renderer
+def gen_latest_upload_path(props):
+    up_arch = props.getProperty("up_arch")
+    artifact_filename = props.getProperty("artifact_filename")
+    if artifact_filename[:6] == "julia-":
+        artifact_filename = "julia-latest-%s"%(artifact_filename[6:])
+    os = get_os_name(props)
+    return "julianightlies/bin/latest/%s/%s/%s"%(os, up_arch, artifact_filename)
+
+@util.renderer
+def gen_upload_command(props):
+    upload_path = gen_upload_path(props)
+    artifact_filename = props.getProperty("artifact_filename")
+    return ["/bin/bash", "-c", "~/bin/try_thrice ~/bin/aws put --fail --public %s /tmp/julia_package/%s"%(upload_path, artifact_filename)]
+
+@util.renderer
+def gen_latest_upload_command(props):
+    latest_upload_path = gen_latest_upload_path(props)
+    artifact_filename = props.getProperty("artifact_filename")
+    return ["/bin/bash", "-c", "~/bin/try_thrice ~/bin/aws put --fail --public %s /tmp/julia_package/%s"%(latest_upload_path, artifact_filename)]
+
+@util.renderer
+def gen_coverage_properties(props):
+    return {
+        'url': 'https://s3.amazonaws.com/'+gen_upload_path(props)),
+        'commitmessage': props.getProperty('commitmessage'),
+        'commitname': props.getProperty('commitname'),
+        'commitemail': props.getProperty('commitemail'),
+        'authorname': props.getProperty('authorname'),
+        'authoremail': props.getProperty('authoremail'),
+        'shortcommit': props.getProperty('shortcommit'),
+    }
+
+
+
 
 julia_package_env = {
     'CFLAGS':None,
@@ -146,48 +179,46 @@ julia_package_factory.addSteps([
         extract_fn=parse_git_log,
         want_stderr=False
     ),
+    steps.SetPropertyFromCommand(
+        name="Get build artifact filename",
+        command=["make", "print-JULIA_BINARYDIST_FILENAME"],
+        property="artifact_filename",
+    )
 
     # Transfer the result to the buildmaster for uploading to AWS
     steps.MasterShellCommand(
         name="mkdir julia_package",
         command=["mkdir", "-p", "/tmp/julia_package"]
     ),
+
     steps.FileUpload(
-        workersrc=util.Interpolate("julia-%(prop:shortcommit)s-Linux-%(prop:tar_arch)s.tar.gz"),
-        masterdest=util.Interpolate("/tmp/julia_package/julia-%(prop:shortcommit)s-Linux-%(prop:tar_arch)s.tar.gz")
+        workersrc=util.Interpolate("%(prop:artifact_filename)s"),
+        masterdest=util.Interpolate("/tmp/julia_package/%(prop:artifact_filename)s")
     ),
 
     # Upload it to AWS and cleanup the master!
     steps.MasterShellCommand(
         name="Upload to AWS",
-        command=["/bin/bash", "-c", util.Interpolate("~/bin/try_thrice ~/bin/aws put --fail --public julianightlies/bin/linux/%(prop:up_arch)s/%(prop:majmin)s/julia-%(prop:version)s-%(prop:shortcommit)s-linux%(prop:bits)s.tar.gz /tmp/julia_package/julia-%(prop:shortcommit)s-Linux-%(prop:tar_arch)s.tar.gz")],
+        command=gen_upload_command,
         doStepIf=should_upload,
         haltOnFailure=True
     ),
     steps.MasterShellCommand(
         name="Upload to AWS (latest)",
-        command=["/bin/bash", "-c", util.Interpolate("~/bin/try_thrice ~/bin/aws put --fail --public julianightlies/bin/linux/%(prop:up_arch)s/julia-latest-linux%(prop:bits)s.tar.gz /tmp/julia_package/julia-%(prop:shortcommit)s-Linux-%(prop:tar_arch)s.tar.gz")],
+        command=gen_latest_upload_command,
         doStepIf=should_upload_latest,
         haltOnFailure=True
     ),
 
     steps.MasterShellCommand(
         name="Cleanup Master",
-        command=["rm", "-f", util.Interpolate("/tmp/julia_package/julia-%(prop:shortcommit)s-Linux-%(prop:tar_arch)s.tar.gz")],
+        command=["rm", "-f", util.Interpolate("/tmp/julia_package/%(prop:artifact_filename)s")],
         doStepIf=should_upload
     ),
 
     # Trigger a download of this file onto another slave for coverage purposes
     steps.Trigger(schedulerNames=["Julia Coverage Testing"],
-        set_properties={
-            'url': util.Interpolate('https://s3.amazonaws.com/julianightlies/bin/linux/%(prop:up_arch)s/%(prop:majmin)s/julia-%(prop:version)s-%(prop:shortcommit)s-linux%(prop:bits)s.tar.gz'),
-            'commitmessage': util.Property('commitmessage'),
-            'commitname': util.Property('commitname'),
-            'commitemail': util.Property('commitemail'),
-            'authorname': util.Property('authorname'),
-            'authoremail': util.Property('authoremail'),
-            'shortcommit': util.Property('shortcommit'),
-        },
+        set_properties=gen_coverage_properties,
         waitForFinish=False,
         doStepIf=should_run_coverage
     )
