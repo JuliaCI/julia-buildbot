@@ -183,7 +183,7 @@ julia_package_factory.addSteps([
         name="Get build artifact filename",
         command=["make", "print-JULIA_BINARYDIST_FILENAME"],
         property="artifact_filename"
-    )
+    ),
 
     # Transfer the result to the buildmaster for uploading to AWS
     steps.MasterShellCommand(
