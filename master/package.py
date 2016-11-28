@@ -72,18 +72,8 @@ def gen_latest_upload_command(props):
     return ["/bin/bash", "-c", "~/bin/try_thrice ~/bin/aws put --fail --public %s /tmp/julia_package/%s"%(latest_upload_path, artifact_filename)]
 
 @util.renderer
-def gen_coverage_properties(props):
-    return {
-        'url': 'https://s3.amazonaws.com/'+gen_upload_path(props),
-        'commitmessage': props.getProperty('commitmessage'),
-        'commitname': props.getProperty('commitname'),
-        'commitemail': props.getProperty('commitemail'),
-        'authorname': props.getProperty('authorname'),
-        'authoremail': props.getProperty('authoremail'),
-        'shortcommit': props.getProperty('shortcommit'),
-    }
-
-
+def gen_download_url(props):
+    return 'https://s3.amazonaws.com/'+gen_upload_path(props)
 
 
 julia_package_env = {
@@ -218,7 +208,15 @@ julia_package_factory.addSteps([
 
     # Trigger a download of this file onto another slave for coverage purposes
     steps.Trigger(schedulerNames=["Julia Coverage Testing"],
-        set_properties=gen_coverage_properties,
+        set_properties={
+            'url': gen_download_url,
+            'commitmessage': props.getProperty('commitmessage'),
+            'commitname': props.getProperty('commitname'),
+            'commitemail': props.getProperty('commitemail'),
+            'authorname': props.getProperty('authorname'),
+            'authoremail': props.getProperty('authoremail'),
+            'shortcommit': props.getProperty('shortcommit'),
+        },
         waitForFinish=False,
         doStepIf=should_run_coverage
     )
