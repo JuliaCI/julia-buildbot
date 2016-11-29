@@ -44,7 +44,7 @@ def parse_git_log(return_code, stdout, stderr):
 
 def parse_artifact_filename(return_code, stdout, stderr):
     if stdout[:26] == 'JULIA_BINARYDIST_FILENAME=':
-        return stdout[26:]
+        return {'artifact_filename': stdout[26:]}
     return None
 
 @util.renderer
