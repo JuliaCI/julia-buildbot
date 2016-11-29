@@ -51,7 +51,7 @@ def parse_artifact_filename(return_code, stdout, stderr):
             artifact_filename += '.exe'
         elif '-linux' in artifact_filename:
             artifact_filename += '.tar.gz'
-        return {'artifact_filename': }
+        return {'artifact_filename': artifact_filename}
     return None
 
 @util.renderer
