@@ -44,7 +44,7 @@ def parse_git_log(return_code, stdout, stderr):
 
 def parse_artifact_filename(return_code, stdout, stderr):
     if stdout[:26] == 'JULIA_BINARYDIST_FILENAME=':
-        artifact_filename = stdout[26:]
+        artifact_filename = stdout[26:].strip()
         if '-osx' in artifact_filename:
             artifact_filename += '.dmg'
         elif '-winnt' in artifact_filename:
