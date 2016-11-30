@@ -54,7 +54,6 @@ def parse_artifact_filename(return_code, stdout, stderr):
         return {'artifact_filename': artifact_filename}
     return None
 
-@util.renderer
 def gen_upload_path(props):
     up_arch = props.getProperty("up_arch")
     majmin = props.getProperty("majmin")
@@ -62,7 +61,6 @@ def gen_upload_path(props):
     os = get_os_name(props)
     return "julianightlies/bin/%s/%s/%s/%s"%(os, up_arch, majmin, artifact_filename)
 
-@util.renderer
 def gen_latest_upload_path(props):
     up_arch = props.getProperty("up_arch")
     artifact_filename = props.getProperty("artifact_filename")
