@@ -168,7 +168,7 @@ julia_package_factory.addSteps([
 
     steps.ShellCommand(
         name="make .app",
-        command=["/bin/bash", "-c", Interpolate("~/unlock_keychain.sh && make %(prop:flags)s app")],
+        command=["/bin/bash", "-c", util.Interpolate("~/unlock_keychain.sh && make %(prop:flags)s app")],
         haltOnFailure = True,
         doStepIf=is_osx,
         env=julia_package_env,
