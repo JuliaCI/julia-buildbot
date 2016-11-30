@@ -166,6 +166,14 @@ julia_package_factory.addSteps([
         env=julia_package_env,
     ),
 
+    steps.ShellCommand(
+        name="make .app",
+        command=["/bin/bash", "-c", Interpolate("~/unlock_keychain.sh && make %(prop:flags)s app")],
+        haltOnFailure = True,
+        doStepIf=is_osx,
+        env=julia_package_env,
+    ),
+
     # Set a bunch of properties that are useful down the line
     steps.SetPropertyFromCommand(
         name="Get julia version/shortcommit",
