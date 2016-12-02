@@ -33,6 +33,7 @@ fi
 # Remove everything first, so we always start clean
 $brew rm --force $($brew deps $FORMULA) 2>/dev/null
 $brew rm --force $FORMULA 2>/dev/null
+$brew cleanup
 
 # Always remove this guy because he's bad news for bottles
 $brew rm --force libgfortran
