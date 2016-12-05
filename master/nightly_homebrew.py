@@ -2,7 +2,7 @@
 # Define everything needed to perform nightly homebrew builds
 ###############################################################################
 
-homebrew_nightly_scheduler = schedulers.Nightly(name="Julia Homebrew Build", builderNames=["nightly_homebrew"], hour=[0,12], branch="master", onlyIfChanged=True )
+homebrew_nightly_scheduler = schedulers.Nightly(name="Julia Homebrew Build", builderNames=["nightly_homebrew"], hour=[0,12], change_filter=util.ChangeFilter(project=['JuliaLang/julia','staticfloat/julia'], branch='master'), onlyIfChanged=True )
 c['schedulers'].append(homebrew_nightly_scheduler)
 
 homebrew_nightly_factory = util.BuildFactory()

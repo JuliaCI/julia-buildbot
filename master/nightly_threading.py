@@ -3,7 +3,7 @@
 ###############################################################################
 
 julia_threading_builders = ["nightly_threading-x86", "nightly_threading-x64"]
-threading_nightly_scheduler = schedulers.Nightly(name="Julia Threading package", builderNames=julia_threading_builders, hour=[1,13], branch="master", onlyIfChanged=True )
+threading_nightly_scheduler = schedulers.Nightly(name="Julia Threading package", builderNames=julia_threading_builders, hour=[1,13], change_filter=util.ChangeFilter(project=['JuliaLang/julia','staticfloat/julia'], branch='master'), onlyIfChanged=True )
 c['schedulers'].append(threading_nightly_scheduler)
 
 for arch in ["x86", "x64"]:

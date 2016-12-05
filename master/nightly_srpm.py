@@ -4,7 +4,7 @@
 
 # Add a dependent scheduler for SRPM packaging
 julia_srpm_builders  = ["nightly_srpm"]
-srpm_package_scheduler = schedulers.Nightly(name="Julia SRPM package", builderNames=julia_srpm_builders, branch="master", hour=[0], onlyIfChanged=True)
+srpm_package_scheduler = schedulers.Nightly(name="Julia SRPM package", builderNames=julia_srpm_builders, change_filter=util.ChangeFilter(project=['JuliaLang/julia','staticfloat/julia'], branch='master'), hour=[0], onlyIfChanged=True)
 c['schedulers'].append(srpm_package_scheduler)
 
 julia_srpm_package_factory = util.BuildFactory()

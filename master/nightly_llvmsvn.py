@@ -2,7 +2,7 @@
 # Define everything needed to build nightly Julia builds against LLVM SVN
 ###############################################################################
 
-llvmsvn_nightly_scheduler = schedulers.Nightly(name="Julia LLVM SVN Build", builderNames=["nightly_llvmsvn-x86", "nightly_llvmsvn-x64"], hour=[0,12], branch="master", onlyIfChanged=True)
+llvmsvn_nightly_scheduler = schedulers.Nightly(name="Julia LLVM SVN Build", builderNames=["nightly_llvmsvn-x86", "nightly_llvmsvn-x64"], hour=[0,12], change_filter=util.ChangeFilter(project=['JuliaLang/julia','staticfloat/julia'], branch='master'), onlyIfChanged=True)
 c['schedulers'].append(llvmsvn_nightly_scheduler)
 
 julia_llvmsvn_factory = util.BuildFactory()
