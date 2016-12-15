@@ -50,9 +50,10 @@ win_package_factory.addSteps([
         haltOnFailure = True,
         env={'CFLAGS':None, 'CPPFLAGS':None},
     ),
+    # piping to powershell is a workaround for https://github.com/JuliaLang/julia/issues/11727
     ShellCommand(
         name="make binary-dist",
-        command=["/bin/bash", "-c", Interpolate("make %(prop:flags)s binary-dist")],
+        command=["/bin/bash", "-c", Interpolate("powershell -Command \"make %(prop:flags)s binary-dist\" | Write-Host")],
         haltOnFailure = True,
         env={'CFLAGS':None, 'CPPFLAGS':None},
     ),
@@ -84,10 +85,11 @@ win_package_factory.addSteps([
         command=["/bin/bash", "-c", "echo julia-*.exe"],
         property="filename"
     ),
-    ShellCommand(
-        name="Sign exe",
-        command=["/bin/bash", "-c", Interpolate("~/sign.sh %(prop:filename)s")]
-    ),
+    # this hasn't worked in a long time, needs to be done manually on releases
+    #ShellCommand(
+    #    name="Sign exe",
+    #    command=["/bin/bash", "-c", Interpolate("~/sign.sh %(prop:filename)s")]
+    #),
 
     FileUpload(
         slavesrc=Interpolate("%(prop:filename)s"),
