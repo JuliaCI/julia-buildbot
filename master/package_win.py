@@ -53,7 +53,7 @@ win_package_factory.addSteps([
     # piping to powershell is a workaround for https://github.com/JuliaLang/julia/issues/11727
     ShellCommand(
         name="make binary-dist",
-        command=["/bin/bash", "-c", Interpolate("powershell -Command \"make %(prop:flags)s binary-dist\" | Write-Host")],
+        command=["/bin/bash", "-c", Interpolate("powershell -Command \"make %(prop:flags)s binary-dist | Write-Host\"")],
         haltOnFailure = True,
         env={'CFLAGS':None, 'CPPFLAGS':None},
     ),
