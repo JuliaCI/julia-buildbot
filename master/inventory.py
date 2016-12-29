@@ -88,6 +88,8 @@ for name in all_names:
         # Just so that we can pass tests on our memory-limited OSX builder,
         # we will set JULIA_CPU_CORES=2, which is sad but apparently necessary.
         flags += 'JULIA_CPU_CORES=2 '
+	# Try to keep the binaries still usable on osx 10.7?
+	flags += 'MACOSX_VERSION_MIN=10.7 '
     else:
         flags += 'JULIA_CPU_CORES=4 '
 
