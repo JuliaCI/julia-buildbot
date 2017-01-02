@@ -73,7 +73,7 @@ julia_gc_debug_factory.addSteps([
 for arch in ["x86", "x64"]:
     c['builders'].append(util.BuilderConfig(
         name="nightly_gc_debug-%s"%(arch),
-        workernames=["ubuntu14_04-%s"%(arch)],
+        workernames=["ubuntu16_04-%s"%(arch)],
         tags=["Nightlies"],
         factory=julia_gc_debug_factory
     ))

@@ -148,7 +148,7 @@ julia_srpm_package_factory.addSteps([
 # Add SRPM packager
 c['builders'].append(util.BuilderConfig(
     name="nightly_srpm",
-    workernames=["centos7_1-x64"],
+    workernames=["centos7_3-x64"],
     tags=["Nightlies"],
     factory=julia_srpm_package_factory,
 ))

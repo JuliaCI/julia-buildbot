@@ -42,44 +42,66 @@ def parse_git_log(return_code, stdout, stderr):
         "authoremail": lines[4],
     }
 
-def parse_artifact_filename(return_code, stdout, stderr):
-    if stdout[:26] == 'JULIA_BINARYDIST_FILENAME=':
-        artifact_filename = stdout[26:].strip()
-        if '-mac' in artifact_filename:
-            artifact_filename += '.dmg'
-        elif '-winnt' in artifact_filename:
-            artifact_filename += '.exe'
-        elif '-linux' in artifact_filename:
-            artifact_filename += '.tar.gz'
-        return {'artifact_filename': artifact_filename}
-    return None
+# This is a weird buildbot hack where we really want to parse the output of our
+# make command, but we also need access to our properties, which we can't get
+# from within an `extract_fn`.  So we save the output from a previous
+# SetPropertyFromCommand invocation, then invoke a new command through this
+# @util.renderer nonsense.  This function is supposed to return a new command
+# to be executed, but it has full access to all our properties, so we do all our
+# artifact filename parsing/munging here, then return ["/bin/true"] as the step
+# to be executed.
+@util.renderer
+def munge_artifact_filename(props_obj):
+    props = props_obj.getProperties().asDict()
+    props = {k: props[k][0] for k in props}
+    # Get the output of the `make print-JULIA_BINARYDIST_FILENAME` step
+    stdout = "{artifact_filename}".format(**props).strip()
+
+    # First, see if we got a JULIA_BINARYDIST_FILENAME output
+    if stdout[:26] == "JULIA_BINARYDIST_FILENAME=" and len(stdout) > 26:
+        local_filename = stdout[26:] + "{os_pkg_ext}".format(**props)
+    else:
+        # If not, use non-sf/consistent_distnames naming
+        if is_mac(props_obj):
+            local_filename = "contrib/mac/app/Julia-{version}-{shortcommit}.{os_pkg_ext}".format(**props)
+        elif is_windows(props_obj):
+            local_filename = "julia-{version}-{tar_arch}.{os_pkg_ext}".format(**props)
+        else:
+            local_filename = "julia-{shortcommit}-Linux-{tar_arch}.{os_pkg_ext}".format(**props)
+
+    # upload_filename always follows sf/consistent_distname rules
+    upload_filename = "julia-{shortcommit}-{os_name}{bits}.{os_pkg_ext}".format(**props)
+
+    props_obj.setProperty("local_filename", local_filename, "munge_artifact_filename")
+    props_obj.setProperty("upload_filename", upload_filename, "munge_artifact_filename")
+    return ["/bin/true"]
 
 def gen_upload_path(props):
     up_arch = props.getProperty("up_arch")
     majmin = props.getProperty("majmin")
-    artifact_filename = props.getProperty("artifact_filename")
+    upload_fname = props.getProperty("upload_filename")
     os = get_os_name(props)
-    return "julianightlies/bin/%s/%s/%s/%s"%(os, up_arch, majmin, artifact_filename)
+    return "julianightlies/bin/%s/%s/%s/%s"%(os, up_arch, majmin, upload_fname)
 
 def gen_latest_upload_path(props):
     up_arch = props.getProperty("up_arch")
-    artifact_filename = props.getProperty("artifact_filename")
-    if artifact_filename[:6] == "julia-":
-        artifact_filename = "julia-latest-%s"%(artifact_filename[6:])
+    upload_filename = props.getProperty("upload_filename")
+    if upload_filename[:6] == "julia-":
+        upload_filename = "julia-latest-%s"%(upload_filename[6:])
     os = get_os_name(props)
-    return "julianightlies/bin/latest/%s/%s/%s"%(os, up_arch, artifact_filename)
+    return "julianightlies/bin/latest/%s/%s/%s"%(os, up_arch, upload_filename)
 
 @util.renderer
 def gen_upload_command(props):
     upload_path = gen_upload_path(props)
-    artifact_filename = props.getProperty("artifact_filename")
-    return ["/bin/bash", "-c", "~/bin/try_thrice ~/bin/aws put --fail --public %s /tmp/julia_package/%s"%(upload_path, artifact_filename)]
+    upload_filename = props.getProperty("upload_filename")
+    return ["/bin/bash", "-c", "~/bin/try_thrice ~/bin/aws put --fail --public %s /tmp/julia_package/%s"%(upload_path, upload_filename)]
 
 @util.renderer
 def gen_latest_upload_command(props):
     latest_upload_path = gen_latest_upload_path(props)
-    artifact_filename = props.getProperty("artifact_filename")
-    return ["/bin/bash", "-c", "~/bin/try_thrice ~/bin/aws put --fail --public %s /tmp/julia_package/%s"%(latest_upload_path, artifact_filename)]
+    upload_filename = props.getProperty("upload_filename")
+    return ["/bin/bash", "-c", "~/bin/try_thrice ~/bin/aws put --fail --public %s /tmp/julia_package/%s"%(latest_upload_path, upload_filename)]
 
 @util.renderer
 def gen_download_url(props):
@@ -118,7 +140,7 @@ julia_package_factory.addSteps([
     steps.ShellCommand(
         name="Install necessary brew dependencies",
         command=["brew", "install", "gcc", "cmake"],
-        doStepIf=is_osx,
+        doStepIf=is_mac,
         flunkOnFailure=False
     ),
 
@@ -170,17 +192,11 @@ julia_package_factory.addSteps([
         name="make .app",
         command=["/bin/bash", "-c", util.Interpolate("~/unlock_keychain.sh && make %(prop:flags)s app")],
         haltOnFailure = True,
-        doStepIf=is_osx,
+        doStepIf=is_mac,
         env=julia_package_env,
     ),
 
     # Set a bunch of properties that are useful down the line
-    steps.SetPropertyFromCommand(
-        name="Get julia version/shortcommit",
-        command=make_julia_version_command,
-        extract_fn=parse_julia_version,
-        want_stderr=False
-    ),
     steps.SetPropertyFromCommand(
         name="Get commitmessage",
         command=["git", "log", "-1", "--pretty=format:%s%n%cN%n%cE%n%aN%n%aE"],
@@ -188,9 +204,20 @@ julia_package_factory.addSteps([
         want_stderr=False
     ),
     steps.SetPropertyFromCommand(
+        name="Get julia version/shortcommit",
+        command=make_julia_version_command,
+        extract_fn=parse_julia_version,
+        want_stderr=False
+    ),
+    steps.SetPropertyFromCommand(
         name="Get build artifact filename",
         command=["make", "print-JULIA_BINARYDIST_FILENAME"],
-        extract_fn=parse_artifact_filename
+        property="artifact_filename",
+    ),
+    steps.SetPropertyFromCommand(
+        name="Munge artifact filename",
+        command=munge_artifact_filename,
+        property="dummy",
     ),
 
     # Transfer the result to the buildmaster for uploading to AWS
@@ -200,8 +227,8 @@ julia_package_factory.addSteps([
     ),
 
     steps.FileUpload(
-        workersrc=util.Interpolate("%(prop:artifact_filename)s"),
-        masterdest=util.Interpolate("/tmp/julia_package/%(prop:artifact_filename)s")
+        workersrc=util.Interpolate("%(prop:local_filename)s"),
+        masterdest=util.Interpolate("/tmp/julia_package/%(prop:upload_filename)s")
     ),
 
     # Upload it to AWS and cleanup the master!
@@ -220,7 +247,7 @@ julia_package_factory.addSteps([
 
     steps.MasterShellCommand(
         name="Cleanup Master",
-        command=["rm", "-f", util.Interpolate("/tmp/julia_package/%(prop:artifact_filename)s")],
+        command=["rm", "-f", util.Interpolate("/tmp/julia_package/%(prop:upload_filename)s")],
         doStepIf=should_upload
     ),
 
@@ -253,9 +280,9 @@ mapping = {
     "package_linuxaarch64": "centos7_2-aarch64",
 
     # These builders don't get uploaded
-    "build_ubuntu32": "ubuntu14_04-x86",
-    "build_ubuntu64": "ubuntu14_04-x64",
-    "build_centos64": "centos7_1-x64",
+    "build_ubuntu32": "ubuntu16_04-x86",
+    "build_ubuntu64": "ubuntu16_04-x64",
+    "build_centos64": "centos7_3-x64",
 }
 for packager, slave in mapping.iteritems():
     c['builders'].append(util.BuilderConfig(

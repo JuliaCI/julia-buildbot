@@ -10,12 +10,12 @@ def build_names(platform, versions, architectures):
     return names
 
 win_names    = build_names("win", ["6_2"], ["x64", "x86"])
-ubuntu_names = build_names("ubuntu", ["14_04"], ["x64", "x86"])
+ubuntu_names = build_names("ubuntu", ["16_04"], ["x64", "x86"])
 osx_names    = build_names("osx", ["10_10", "10_11", "10_12"], ["x64"])
 centos_names = build_names("centos", ["5_11"], ["x64", "x86"])
 centos_names+= build_names("centos", ["7_2"], ["ppc64le", "aarch64"])
 # Add some special centos names that don't fit in with the rest
-centos_names+= ["centos6_7-x64", "centos7_1-x64"]
+centos_names+= ["centos6_7-x64", "centos7_3-x64"]
 debian_names = ["debian7_11-armv7l"]
 all_names    = ubuntu_names + osx_names + centos_names + win_names + debian_names
 
@@ -31,8 +31,20 @@ for name in all_names:
     # Everything should be VERBOSE
     flags = 'VERBOSE=1 '
 
-    # Add on the banner
+    # Add on the tagged release banner
     flags += 'TAGGED_RELEASE_BANNER="Official http://julialang.org/ release" '
+
+    # First, set OS-dependent stuff
+    if name[:3] == "win":
+        os_name = "winnt"
+        os_pkg_ext = "exe"
+    if name[:3] == "osx":
+        os_name = "mac"
+        os_pkg_ext = "dmg"
+    else:
+        os_name = "linux"
+        os_pkg_ext = "tar.gz"
+
 
     if name[-3:] == 'x86':
         tar_arch = 'i686'
@@ -83,8 +95,9 @@ for name in all_names:
         else:
             flags += 'XC_HOST=i686-w64-mingw32 '
 
-    # On OSX, core2 is the minimum MARCH we support
+
     if name[:3] == "osx":
+        # On OSX, core2 is the minimum MARCH we support
         march = "core2"
 
         # Our OSX builder only devotes 2 cores to each VM
@@ -96,10 +109,8 @@ for name in all_names:
     flags += 'JULIA_TEST_MAXRSS_MB=600 '
 
     # On ancient CentOS systems, O_CLOEXEC makes LLVM sad
-    # and old cmake has issues linking openssl in libgit2
     if name[:10] == "centos5.11":
         flags += 'DEPS_CXXFLAGS="-DO_CLOEXEC=0" '
-        flags += 'CMAKE=cmake28 '
         # use old c++ abi https://github.com/JuliaLang/julia/issues/17446
         flags += 'CXXFLAGS=-D_GLIBCXX_USE_CXX11_ABI=0 '
 
@@ -116,5 +127,7 @@ for name in all_names:
 			'up_arch':up_arch,
 			'bits':bits,
             'llvm_cmake':llvm_cmake,
+            'os_name':os_name,
+            'os_pkg_ext':os_pkg_ext,
 		}
 	)]
