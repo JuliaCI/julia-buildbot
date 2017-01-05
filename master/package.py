@@ -276,7 +276,7 @@ mapping = {
     "package_linux32": "centos5_11-x86",
     "package_linux64": "centos5_11-x64",
     "package_linuxarmv7l": "debian7_11-armv7l",
-    "package_linuxppc64le": "centos7_2-ppc64le",
+    "package_linuxppc64le": "debian8_6-ppc64le",
     "package_linuxaarch64": "centos7_2-aarch64",
 
     # These builders don't get uploaded

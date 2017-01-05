@@ -13,10 +13,10 @@ win_names    = build_names("win", ["6_2"], ["x64", "x86"])
 ubuntu_names = build_names("ubuntu", ["16_04"], ["x64", "x86"])
 osx_names    = build_names("osx", ["10_10", "10_11", "10_12"], ["x64"])
 centos_names = build_names("centos", ["5_11"], ["x64", "x86"])
-centos_names+= build_names("centos", ["7_2"], ["ppc64le", "aarch64"])
+centos_names+= build_names("centos", ["7_2"], ["aarch64"])
 # Add some special centos names that don't fit in with the rest.  Yet.
 centos_names+= ["centos7_3-x64"]
-debian_names = ["debian7_11-armv7l"]
+debian_names = ["debian7_11-armv7l", "debian8_6-ppc64le"]
 all_names    = ubuntu_names + osx_names + centos_names + win_names + debian_names
 
 # Define all the attributes we'll use in our buildsteps
