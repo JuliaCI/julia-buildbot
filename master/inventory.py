@@ -38,7 +38,7 @@ for name in all_names:
     if name[:3] == "win":
         os_name = "winnt"
         os_pkg_ext = "exe"
-    if name[:3] == "osx":
+    elif name[:3] == "osx":
         os_name = "mac"
         os_pkg_ext = "dmg"
     else:
