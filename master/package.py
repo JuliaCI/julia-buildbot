@@ -277,7 +277,7 @@ mapping = {
     "package_linux64": "centos5_11-x64",
     "package_linuxarmv7l": "debian7_11-armv7l",
     "package_linuxppc64le": "debian8_6-ppc64le",
-    "package_linuxaarch64": "centos7_2-aarch64",
+    "package_linuxaarch64": "debian8_6-aarch64",
 
     # These builders don't get uploaded
     "build_ubuntu32": "ubuntu16_04-x86",
