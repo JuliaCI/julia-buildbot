@@ -53,7 +53,7 @@ julia_llvmsvn_factory.addSteps([
     # since it includes the llvm version number.
     ShellCommand(
     	name="versioninfo()",
-    	command=["usr/bin/julia", "-f", "-e", "versioninfo()"]
+    	command=["usr/bin/julia", "--startup-file=no", "-e", "versioninfo()"]
     ),
     # Test!
     ShellCommand(
