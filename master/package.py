@@ -87,7 +87,7 @@ def gen_upload_path(props):
     majmin = props.getProperty("majmin")
     upload_fname = props.getProperty("upload_filename")
     os = get_os_name(props)
-    return "julianightlies_test/bin/%s/%s/%s/%s"%(os, up_arch, majmin, upload_fname)
+    return "julianightlies/test/bin/%s/%s/%s/%s"%(os, up_arch, majmin, upload_fname)
 
 def gen_latest_upload_path(props):
     up_arch = props.getProperty("up_arch")
@@ -95,7 +95,7 @@ def gen_latest_upload_path(props):
     if upload_filename[:6] == "julia-":
         upload_filename = "julia-latest-%s"%(upload_filename[6:])
     os = get_os_name(props)
-    return "julianightlies_test/bin/latest/%s/%s/%s"%(os, up_arch, upload_filename)
+    return "julianightlies/test/bin/latest/%s/%s/%s"%(os, up_arch, upload_filename)
 
 @util.renderer
 def gen_upload_command(props):
