@@ -20,7 +20,6 @@ code_scheduler = schedulers.ForceScheduler(
     ],
     properties=[
         util.StringParameter(name="shortcommit", label="shortcommit (e.g. 1a2b3c4d)", size=15, default=""),
-        util.StringParameter(name="bits", label="bits (e.g. 32)", size=2, default=""),
         util.StringParameter(name="majmin", label="majmin version (e.g. 0.5)", size=2, default=""),
         util.TextParameter(name="code_block", label="Code to run", default="", cols=80, rows=5),
     ]
