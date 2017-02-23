@@ -46,7 +46,7 @@ def download_julia(props_obj):
         # TODO: Figure out how to actually do this.  :P
         cmd = "curl -L '%s' -o Julia.exe;"%(download_url)
     else:
-        cmd = "curl -L '%s' | tar zxf --strip-components=1"%(download_url)
+        cmd = "curl -L '%s' | tar --strip-components=1 -zx"%(download_url)
     return ["/bin/bash", "-c", cmd]
 
 
