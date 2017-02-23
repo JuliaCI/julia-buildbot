@@ -34,7 +34,7 @@ def download_julia(props_obj):
     upload_filename = gen_upload_filename(props_obj)
     props_obj.setProperty("upload_filename", upload_filename, "download_julia")
     download_url = gen_download_url(props_obj)
-    props_obj.setProperty('download_url', download_url)
+    props_obj.setProperty('download_url', download_url, "download_julia")
 
     # Build commands to download/install julia
     if is_mac(props_obj):
