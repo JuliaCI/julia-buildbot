@@ -21,7 +21,7 @@ code_scheduler = schedulers.ForceScheduler(
     properties=[
         util.StringParameter(name="shortcommit", label="shortcommit (e.g. 1a2b3c4d)", size=15, default=""),
         util.StringParameter(name="bits", label="bits (e.g. 32)", size=2, default=""),
-        util.StringParameter(name="majmin", label="Major.Minor version (e.g. 0.5)", size=2, default=""),
+        util.StringParameter(name="majmin", label="majmin version (e.g. 0.5)", size=2, default=""),
         util.TextParameter(name="code_block", label="Code to run", default="", cols=80, rows=5),
     ]
 )
@@ -30,10 +30,9 @@ c['schedulers'].append(code_scheduler)
 
 @util.renderer
 def download_julia(props_obj):
-    # Use munge_artifact_filename() to calculate upload_filename for us
-    munge_artifact_filename(props_obj)
-
-    # Use upload_filename to get our download_url
+    # Calculate upload_filename, add to properties, then get download url
+    upload_filename = gen_upload_filename(props_obj)
+    props_obj.setProperty("upload_filename", upload_filename, "download_julia")
     download_url = gen_download_url(props_obj)
 
     # Build commands to download/install julia

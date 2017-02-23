@@ -48,6 +48,52 @@ def parse_git_log(return_code, stdout, stderr):
         "authoremail": lines[4],
     }
 
+def gen_local_filename(props_obj):
+    props = props_obj.getProperties().asDict()
+    props = {k: props[k][0] for k in props}
+    # Get the output of the `make print-JULIA_BINARYDIST_FILENAME` step
+    artifact = "{artifact_filename}".format(**props).strip()
+
+    # First, see if we got a JULIA_BINARYDIST_FILENAME output
+    if artifact[:26] == "JULIA_BINARYDIST_FILENAME=" and len(artifact) > 26:
+        return artifact[26:] + "{os_pkg_ext}".format(**props)
+    else:
+        # If not, use non-sf/consistent_distnames naming
+        if is_mac(props_obj):
+            return "contrib/mac/app/Julia-{version}-{shortcommit}.{os_pkg_ext}".format(**props)
+        elif is_windows(props_obj):
+            return "julia-{version}-{tar_arch}.{os_pkg_ext}".format(**props)
+        else:
+            return "julia-{shortcommit}-Linux-{tar_arch}.{os_pkg_ext}".format(**props)
+
+
+def gen_upload_filename(props_obj):
+    props = props_obj.getProperties().asDict()
+    props = {k: props[k][0] for k in props}
+    return "julia-{shortcommit}-{os_name}{bits}.{os_pkg_ext}".format(**props)
+
+
+def gen_upload_path(props_obj):
+    up_arch = props_obj.getProperty("up_arch")
+    majmin = props_obj.getProperty("majmin")
+    upload_fname = props_obj.getProperty("upload_filename")
+    os = get_os_name(props_obj)
+    return "%s/%s/%s/%s"%(os, up_arch, majmin, upload_fname)
+
+def gen_latest_upload_path(props_obj):
+    up_arch = props_obj.getProperty("up_arch")
+    upload_filename = props_obj.getProperty("upload_filename")
+    if upload_filename[:6] == "julia-":
+        upload_filename = "julia-latest-%s"%(upload_filename[6:])
+    os = get_os_name(props_obj)
+    return "%s/%s/%s"%(os, up_arch, upload_filename)
+
+def gen_download_url(props_obj):
+    base = 'https://s3.amazonaws.com/julianightlies/test/bin'
+    return '%s/%s'%(base, gen_upload_path(props))
+
+
+
 # This is a weird buildbot hack where we really want to parse the output of our
 # make command, but we also need access to our properties, which we can't get
 # from within an `extract_fn`.  So we save the output from a previous
@@ -58,61 +104,29 @@ def parse_git_log(return_code, stdout, stderr):
 # to be executed.
 @util.renderer
 def munge_artifact_filename(props_obj):
-    props = props_obj.getProperties().asDict()
-    props = {k: props[k][0] for k in props}
-    # Get the output of the `make print-JULIA_BINARYDIST_FILENAME` step
-    artifact = "{artifact_filename}".format(**props).strip()
-
-    # First, see if we got a JULIA_BINARYDIST_FILENAME output
-    if artifact[:26] == "JULIA_BINARYDIST_FILENAME=" and len(artifact) > 26:
-        local_filename = artifact[26:] + "{os_pkg_ext}".format(**props)
-    else:
-        # If not, use non-sf/consistent_distnames naming
-        if is_mac(props_obj):
-            local_filename = "contrib/mac/app/Julia-{version}-{shortcommit}.{os_pkg_ext}".format(**props)
-        elif is_windows(props_obj):
-            local_filename = "julia-{version}-{tar_arch}.{os_pkg_ext}".format(**props)
-        else:
-            local_filename = "julia-{shortcommit}-Linux-{tar_arch}.{os_pkg_ext}".format(**props)
-
-    # upload_filename always follows sf/consistent_distname rules
-    upload_filename = "julia-{shortcommit}-{os_name}{bits}.{os_pkg_ext}".format(**props)
+    # Generate our local and upload filenames
+    local_filename = gen_local_filename(props_obj)
+    upload_filename = gen_upload_filename(props_obj)
 
     props_obj.setProperty("local_filename", local_filename, "munge_artifact_filename")
     props_obj.setProperty("upload_filename", upload_filename, "munge_artifact_filename")
     return ["/bin/true"]
 
-def gen_upload_path(props):
-    up_arch = props.getProperty("up_arch")
-    majmin = props.getProperty("majmin")
-    upload_fname = props.getProperty("upload_filename")
-    os = get_os_name(props)
-    return "%s/%s/%s/%s"%(os, up_arch, majmin, upload_fname)
-
-def gen_latest_upload_path(props):
-    up_arch = props.getProperty("up_arch")
-    upload_filename = props.getProperty("upload_filename")
-    if upload_filename[:6] == "julia-":
-        upload_filename = "julia-latest-%s"%(upload_filename[6:])
-    os = get_os_name(props)
-    return "%s/%s/%s"%(os, up_arch, upload_filename)
-
 @util.renderer
-def gen_upload_command(props):
+def render_upload_command(props):
     upload_path = gen_upload_path(props)
     upload_filename = props.getProperty("upload_filename")
     return ["/bin/bash", "-c", "~/bin/try_thrice ~/bin/aws put --fail --public %s /tmp/julia_package/%s"%(upload_path, upload_filename)]
 
 @util.renderer
-def gen_latest_upload_command(props):
+def render_latest_upload_command(props):
     latest_upload_path = gen_latest_upload_path(props)
     upload_filename = props.getProperty("upload_filename")
     return ["/bin/bash", "-c", "~/bin/try_thrice ~/bin/aws put --fail --public %s /tmp/julia_package/%s"%(latest_upload_path, upload_filename)]
 
 @util.renderer
-def gen_download_url(props):
-    base = 'https://s3.amazonaws.com/julianightlies/test/bin'
-    return '%s/%s'%(base, gen_upload_path(props))
+def render_download_url(props_obj):
+    return gen_download_url(props_obj)
 
 julia_package_env = {
     'CFLAGS':None,
@@ -241,13 +255,13 @@ julia_package_factory.addSteps([
     # Upload it to AWS and cleanup the master!
     steps.MasterShellCommand(
         name="Upload to AWS",
-        command=gen_upload_command,
+        command=render_upload_command,
         doStepIf=should_upload,
         haltOnFailure=True
     ),
     steps.MasterShellCommand(
         name="Upload to AWS (latest)",
-        command=gen_latest_upload_command,
+        command=render_latest_upload_command,
         doStepIf=should_upload_latest,
         haltOnFailure=True
     ),
@@ -261,7 +275,7 @@ julia_package_factory.addSteps([
     # Trigger a download of this file onto another slave for coverage purposes
     steps.Trigger(schedulerNames=["Julia Coverage Testing"],
         set_properties={
-            'url': gen_download_url,
+            'url': render_download_url,
             'commitmessage': util.Property('commitmessage'),
             'commitname': util.Property('commitname'),
             'commitemail': util.Property('commitemail'),
