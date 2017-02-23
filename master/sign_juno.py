@@ -42,7 +42,7 @@ sign_juno_factory.addSteps([
     steps.MasterShellCommand(name="Upload to AWS", command=["/bin/bash", "-c", util.Interpolate("~/bin/try_thrice ~/bin/aws put --fail --public junolab/latest/signed/%(prop:filename)s /tmp/juno_cache/%(prop:filename)s")], haltOnFailure=True),
 
     # Cleanup!
-    steps.MasterShellCommand(name="Cleanup", command=["rm", "-f", util.Interpolate("/tmp/bottle_cache/%(prop:filename)s")])
+    steps.MasterShellCommand(name="Cleanup", command=["rm", "-f", util.Interpolate("/tmp/juno_cache/%(prop:filename)s")])
 ])
 
 for name in ["osx10_10-x64", "win6_2-x86", "win6_2-x64"]:
