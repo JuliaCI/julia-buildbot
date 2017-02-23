@@ -37,15 +37,15 @@ def download_julia(props_obj):
 
     # Build commands to download/install julia
     if is_mac(props_obj):
-        cmd  = "curl -L '%s' -o Julia.dmg && "
+        cmd  = "curl -L '%s' -o Julia.dmg && "%(download_url)
         cmd += "hdiutil mount Julia.dmg && "
         cmd += "cp -Ra /Volumes/Julia/*.app/Contents/Resources/julia . && "
         cmd += "hdiutil unmount Julia.dmg"
     elif is_windows(props_obj):
         # TODO: Figure out how to actually do this.  :P
-        cmd = "curl -L '%s' -o Julia.exe;"
+        cmd = "curl -L '%s' -o Julia.exe;"%(download_url)
     else:
-        cmd = "curl -L '%s' | tar zxf --strip-components=1"
+        cmd = "curl -L '%s' | tar zxf --strip-components=1"%(download_url)
     return ["/bin/bash", "-c", cmd]
 
 
