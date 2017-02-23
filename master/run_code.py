@@ -72,7 +72,7 @@ run_code_factory.addSteps([
     steps.StringDownload(
         util.getProperty('code_block'),
         name="Create command.jl",
-        workerdest="command.jl,
+        workerdest="command.jl",
     ),
     steps.SetPropertyFromCommand(
         name="Run code block",
