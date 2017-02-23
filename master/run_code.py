@@ -70,8 +70,8 @@ run_code_factory.addSteps([
 
     # Invoke julia on the provided code block
     steps.StringDownload(
-        name="Create command.jl"
         util.getProperty('code_block'),
+        name="Create command.jl",
         workerdest="command.jl,
     ),
     steps.SetPropertyFromCommand(
