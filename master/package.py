@@ -78,7 +78,7 @@ def gen_upload_path(props_obj):
     majmin = props_obj.getProperty("majmin")
     upload_fname = props_obj.getProperty("upload_filename")
     os = get_os_name(props_obj)
-    return "%s/%s/%s/%s"%(os, up_arch, majmin, upload_fname)
+    return "julianightlies/test/bin/%s/%s/%s/%s"%(os, up_arch, majmin, upload_fname)
 
 def gen_latest_upload_path(props_obj):
     up_arch = props_obj.getProperty("up_arch")
@@ -86,10 +86,11 @@ def gen_latest_upload_path(props_obj):
     if upload_filename[:6] == "julia-":
         upload_filename = "julia-latest-%s"%(upload_filename[6:])
     os = get_os_name(props_obj)
-    return "%s/%s/%s"%(os, up_arch, upload_filename)
+    return "julianightlies/test/bin/%s/%s/%s"%(os, up_arch, upload_filename)
+
 
 def gen_download_url(props_obj):
-    base = 'https://s3.amazonaws.com/julianightlies/test/bin'
+    base = 'https://s3.amazonaws.com'
     return '%s/%s'%(base, gen_upload_path(props_obj))
 
 
