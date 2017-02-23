@@ -1,4 +1,4 @@
-P# Add our runners on various platforms
+# Add our runners on various platforms
 code_runners  = ["runcode_osx64", "runcode_win32", "runcode_win64"]
 code_runners += ["runcode_linux%s"%(arch) for arch in ["32", "64", "armv7l", "ppc64le", "aarch64"]]
 
