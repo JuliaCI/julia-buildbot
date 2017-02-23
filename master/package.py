@@ -25,7 +25,7 @@ def make_julia_version_command(props):
         "println(\"$(VERSION.major).$(VERSION.minor).$(VERSION.patch)\\n$(Base.GIT_VERSION_INFO.commit[1:10])\")"
     ]
 
-    if 'win' in props.getProperty('slavename'):
+    if is_windows(props):
         command[0] += '.exe'
     return command
 
@@ -61,11 +61,11 @@ def munge_artifact_filename(props_obj):
     props = props_obj.getProperties().asDict()
     props = {k: props[k][0] for k in props}
     # Get the output of the `make print-JULIA_BINARYDIST_FILENAME` step
-    stdout = "{artifact_filename}".format(**props).strip()
+    artifact = "{artifact_filename}".format(**props).strip()
 
     # First, see if we got a JULIA_BINARYDIST_FILENAME output
-    if stdout[:26] == "JULIA_BINARYDIST_FILENAME=" and len(stdout) > 26:
-        local_filename = stdout[26:] + "{os_pkg_ext}".format(**props)
+    if artifact[:26] == "JULIA_BINARYDIST_FILENAME=" and len(artifact) > 26:
+        local_filename = artifact[26:] + "{os_pkg_ext}".format(**props)
     else:
         # If not, use non-sf/consistent_distnames naming
         if is_mac(props_obj):
@@ -87,7 +87,7 @@ def gen_upload_path(props):
     majmin = props.getProperty("majmin")
     upload_fname = props.getProperty("upload_filename")
     os = get_os_name(props)
-    return "julianightlies/test/bin/%s/%s/%s/%s"%(os, up_arch, majmin, upload_fname)
+    return "%s/%s/%s/%s"%(os, up_arch, majmin, upload_fname)
 
 def gen_latest_upload_path(props):
     up_arch = props.getProperty("up_arch")
@@ -95,7 +95,7 @@ def gen_latest_upload_path(props):
     if upload_filename[:6] == "julia-":
         upload_filename = "julia-latest-%s"%(upload_filename[6:])
     os = get_os_name(props)
-    return "julianightlies/test/bin/%s/%s/%s"%(os, up_arch, upload_filename)
+    return "%s/%s/%s"%(os, up_arch, upload_filename)
 
 @util.renderer
 def gen_upload_command(props):
@@ -111,8 +111,8 @@ def gen_latest_upload_command(props):
 
 @util.renderer
 def gen_download_url(props):
-    return 'https://s3.amazonaws.com/'+gen_upload_path(props)
-
+    base = 'https://s3.amazonaws.com/julianightlies/test/bin'
+    return '%s/%s'%(base, gen_upload_path(props))
 
 julia_package_env = {
     'CFLAGS':None,
