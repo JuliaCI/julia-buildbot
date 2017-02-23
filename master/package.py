@@ -18,14 +18,14 @@ c['schedulers'].append(packager_scheduler)
 # Helper function to generate the necessary julia invocation to get metadata
 # about this build such as major/minor versions
 @util.renderer
-def make_julia_version_command(props):
+def make_julia_version_command(props_obj):
     command = [
         "usr/bin/julia",
         "-e",
         "println(\"$(VERSION.major).$(VERSION.minor).$(VERSION.patch)\\n$(Base.GIT_VERSION_INFO.commit[1:10])\")"
     ]
 
-    if is_windows(props):
+    if is_windows(props_obj):
         command[0] += '.exe'
     return command
 
@@ -90,7 +90,7 @@ def gen_latest_upload_path(props_obj):
 
 def gen_download_url(props_obj):
     base = 'https://s3.amazonaws.com/julianightlies/test/bin'
-    return '%s/%s'%(base, gen_upload_path(props))
+    return '%s/%s'%(base, gen_upload_path(props_obj))
 
 
 
@@ -113,15 +113,15 @@ def munge_artifact_filename(props_obj):
     return ["/bin/true"]
 
 @util.renderer
-def render_upload_command(props):
-    upload_path = gen_upload_path(props)
-    upload_filename = props.getProperty("upload_filename")
+def render_upload_command(props_obj):
+    upload_path = gen_upload_path(props_obj)
+    upload_filename = props_obj.getProperty("upload_filename")
     return ["/bin/bash", "-c", "~/bin/try_thrice ~/bin/aws put --fail --public %s /tmp/julia_package/%s"%(upload_path, upload_filename)]
 
 @util.renderer
-def render_latest_upload_command(props):
-    latest_upload_path = gen_latest_upload_path(props)
-    upload_filename = props.getProperty("upload_filename")
+def render_latest_upload_command(props_obj):
+    latest_upload_path = gen_latest_upload_path(props_obj)
+    upload_filename = props_obj.getProperty("upload_filename")
     return ["/bin/bash", "-c", "~/bin/try_thrice ~/bin/aws put --fail --public %s /tmp/julia_package/%s"%(latest_upload_path, upload_filename)]
 
 @util.renderer
