@@ -22,6 +22,7 @@ code_scheduler = schedulers.ForceScheduler(
         util.StringParameter(name="shortcommit", label="shortcommit (e.g. 1a2b3c4d)", size=15, default=""),
         util.StringParameter(name="bits", label="bits (e.g. 32)", size=2, default=""),
         util.StringParameter(name="majmin", label="Major.Minor version (e.g. 0.5)", size=2, default=""),
+        util.TextParameter(name="code_block", label="Code to run", default="", cols=80, rows=5),
     ]
 )
 c['schedulers'].append(code_scheduler)
