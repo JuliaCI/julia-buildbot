@@ -133,7 +133,7 @@ def render_make_app(props_obj):
     props = props_obj_to_dict(props_obj)
 
     new_way = "make {flags} app".format(**props)
-    old_way = "make {flags} -C contrib/mac/app && mv contrib/mac/app/{local_filename} .".format(**props)
+    old_way = "make {flags} -C contrib/mac/app && mv contrib/mac/app/*.dmg .".format(**props)
 
     # We emit a bash command that attempts to run `make app` (which is the nice
     # `sf/consistent_distnames` shortcut), and if that fails, it runs the steps
