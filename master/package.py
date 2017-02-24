@@ -49,8 +49,8 @@ def parse_git_log(return_code, stdout, stderr):
     }
 
 def gen_local_filename(props_obj):
-    props = props_obj.getProperties().asDict()
-    props = {k: props[k][0] for k in props}
+    props = props_obj_to_dict(props_obj)
+
     # Get the output of the `make print-JULIA_BINARYDIST_FILENAME` step
     artifact = "{artifact_filename}".format(**props).strip()
 
@@ -68,8 +68,7 @@ def gen_local_filename(props_obj):
 
 
 def gen_upload_filename(props_obj):
-    props = props_obj.getProperties().asDict()
-    props = {k: props[k][0] for k in props}
+    props = props_obj_to_dict(props_obj)
     return "julia-{shortcommit}-{os_name}{bits}.{os_pkg_ext}".format(**props)
 
 
@@ -131,8 +130,7 @@ def render_download_url(props_obj):
 
 @util.renderer
 def render_make_app(props_obj):
-    props = props_obj.getProperties().asDict()
-    props = {k: props[k][0] for k in props}
+    props = props_obj_to_dict(props_obj)
 
     new_way = "make {flags} app".format(**props)
     old_way = "make {flags} -C contrib/mac/app && mv contrib/mac/app/{local_filename} .".format(**props)
