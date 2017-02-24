@@ -129,6 +129,24 @@ def render_latest_upload_command(props_obj):
 def render_download_url(props_obj):
     return gen_download_url(props_obj)
 
+@util.renderer
+def render_make_app(props_obj):
+    props = props_obj.getProperties().asDict()
+    props = {k: props[k][0] for k in props}
+
+    new_way = "make {flags} app".format(**props)
+    old_way = "make {flags} -C contrib/mac/app && mv contrib/mac/app/{local_filename} .".format(**props)
+
+    # We emit a bash command that attempts to run `make app` (which is the nice
+    # `sf/consistent_distnames` shortcut), and if that fails, it runs the steps
+    # manually, which boil down to `make -C contrib/mac/app` and moving the
+    # result to the top-level, where we can find it.
+    return [
+        "/bin/bash",
+        "-c",
+        "~/unlock_keychain.sh && (%s || (%s))"%(new_way, old_way)
+    ]
+
 julia_package_env = {
     'CFLAGS':None,
     'CPPFLAGS': None,
@@ -210,9 +228,10 @@ julia_package_factory.addSteps([
         env=julia_package_env,
     ),
 
+    # On OSX, deal with non-sf/consistent_distnames makefile nonsense
     steps.ShellCommand(
         name="make .app",
-        command=["/bin/bash", "-c", util.Interpolate("~/unlock_keychain.sh && make %(prop:flags)s app")],
+        command=render_make_app,
         haltOnFailure = True,
         doStepIf=is_mac,
         env=julia_package_env,
