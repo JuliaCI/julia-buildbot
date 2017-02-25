@@ -340,7 +340,7 @@ for packager, worker in packager_mapping.iteritems():
 force_build_scheduler = schedulers.ForceScheduler(
     name="force_julia_package",
     label="Force Julia build/packaging",
-    builderNames=julia_packagers,
+    builderNames=packager_mapping.keys(),
     reason=util.FixedParameter(name="reason", default=""),
     codebases=[
         util.CodebaseParameter(
