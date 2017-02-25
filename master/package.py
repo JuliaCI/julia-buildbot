@@ -100,7 +100,7 @@ def gen_download_url(props_obj):
 # SetPropertyFromCommand invocation, then invoke a new command through this
 # @util.renderer nonsense.  This function is supposed to return a new command
 # to be executed, but it has full access to all our properties, so we do all our
-# artifact filename parsing/munging here, then return ["/bin/true"] as the step
+# artifact filename parsing/munging here, then return ["true"] as the step
 # to be executed.
 @util.renderer
 def munge_artifact_filename(props_obj):
@@ -110,7 +110,7 @@ def munge_artifact_filename(props_obj):
 
     props_obj.setProperty("local_filename", local_filename, "munge_artifact_filename")
     props_obj.setProperty("upload_filename", upload_filename, "munge_artifact_filename")
-    return ["/bin/true"]
+    return ["true"]
 
 @util.renderer
 def render_upload_command(props_obj):
