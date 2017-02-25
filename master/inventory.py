@@ -128,3 +128,17 @@ for name in all_names:
             'os_pkg_ext':os_pkg_ext,
 		}
 	)]
+
+
+# Build a nicer mapping for us.  This is how we know things like "package_linux64"
+# runs on "centos5_11-x64"
+builder_mapping = {
+    "osx64": "osx10_10-x64",
+    "win32": "win6_2-x86",
+    "win64": "win6_2-x64",
+    "linux32": "centos5_11-x86",
+    "linux64": "centos5_11-x64",
+    "linuxarmv7l": "debian7_11-armv7l",
+    "linuxppc64le": "debian8_6-ppc64le",
+    "linuxaarch64": "debian8_6-aarch64",
+}

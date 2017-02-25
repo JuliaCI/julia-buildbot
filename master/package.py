@@ -302,7 +302,7 @@ julia_package_factory.addSteps([
         doStepIf=should_upload
     ),
 
-    # Trigger a download of this file onto another slave for coverage purposes
+    # Trigger a download of this file onto another worker for coverage purposes
     steps.Trigger(schedulerNames=["Julia Coverage Testing"],
         set_properties={
             'url': render_download_url,
@@ -318,27 +318,18 @@ julia_package_factory.addSteps([
     )
 ])
 
+# Build a builder-worker mapping based off of the parent mapping in inventory.py
+packager_mapping = {("package_" + k): v for k, v in mapping}
 
-# Map each builder to each worker
-mapping = {
-    "package_osx64": "osx10_10-x64",
-    "package_win32": "win6_2-x86",
-    "package_win64": "win6_2-x64",
-    "package_linux32": "centos5_11-x86",
-    "package_linux64": "centos5_11-x64",
-    "package_linuxarmv7l": "debian7_11-armv7l",
-    "package_linuxppc64le": "debian8_6-ppc64le",
-    "package_linuxaarch64": "debian8_6-aarch64",
+# Add a few builders that don't exist in the typical mapping
+packager_mapping["build_ubuntu32"] = "ubuntu16_04-x86"
+packager_mapping["build_ubuntu64"] = "ubuntu16_04-x64"
+packager_mapping["build_centos64"] = "centos7_3-x64"
 
-    # These builders don't get uploaded
-    "build_ubuntu32": "ubuntu16_04-x86",
-    "build_ubuntu64": "ubuntu16_04-x64",
-    "build_centos64": "centos7_3-x64",
-}
-for packager, slave in mapping.iteritems():
+for packager, worker in packager_mapping.iteritems():
     c['builders'].append(util.BuilderConfig(
         name=packager,
-        workernames=[slave],
+        workernames=[worker],
         tags=["Packaging"],
         factory=julia_package_factory
     ))

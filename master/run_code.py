@@ -87,22 +87,10 @@ run_code_factory.addSteps([
     ),
 ])
 
-
-# Map each builder to each worker
-mapping = {
-    "runcode_osx64": "osx10_10-x64",
-    "runcode_win32": "win6_2-x86",
-    "runcode_win64": "win6_2-x64",
-    "runcode_linux32": "centos5_11-x86",
-    "runcode_linux64": "centos5_11-x64",
-    "runcode_linuxarmv7l": "debian7_11-armv7l",
-    "runcode_linuxppc64le": "debian8_6-ppc64le",
-    "runcode_linuxaarch64": "debian8_6-aarch64",
-}
-for packager, slave in mapping.iteritems():
+for packager, worker in builder_mapping.iteritems():
     c['builders'].append(util.BuilderConfig(
-        name=packager,
-        workernames=[slave],
+        name="runcode_" + packager,
+        workernames=[worker],
         tags=["Coderun"],
         factory=run_code_factory
     ))
