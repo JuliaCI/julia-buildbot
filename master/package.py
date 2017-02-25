@@ -308,7 +308,7 @@ julia_package_factory.addSteps([
 ])
 
 # Build a builder-worker mapping based off of the parent mapping in inventory.py
-packager_mapping = {("package_" + k): v for k, v in builder_mapping}
+packager_mapping = {("package_" + k): v for k, v in builder_mapping.iteritems()}
 
 # Add a few builders that don't exist in the typical mapping
 packager_mapping["build_ubuntu32"] = "ubuntu16_04-x86"
