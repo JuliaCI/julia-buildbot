@@ -2,27 +2,6 @@
 # Define everything needed to build nightly Julia for gc debugging
 ###############################################################################
 
-gc_debug_nightly_scheduler = schedulers.Nightly(name="Julia GC Debug Build", builderNames=["nightly_gc_debug-x86", "nightly_gc_debug-x64"], hour=[3], change_filter=util.ChangeFilter(project=['JuliaLang/julia','staticfloat/julia'], branch='master'), onlyIfChanged=True)
-c['schedulers'].append(gc_debug_nightly_scheduler)
-
-for arch in ["x86", "x64"]:
-    force_scheduler = schedulers.ForceScheduler(
-        name="force_gc_%s"%(arch),
-        label="Force Julia %s GC debug building"%(arch),
-        builderNames=["nightly_gc_debug-%s" % arch],
-        reason=util.FixedParameter(name="reason", default=""),
-        codebases=[
-            util.CodebaseParameter(
-                "",
-                name="",
-                branch=util.FixedParameter(name="branch", default=""),
-                repository=util.FixedParameter(name="repository", default=""),
-                project=util.FixedParameter(name="project", default=""),
-            )
-        ],
-        properties=[])
-    c['schedulers'].append(force_scheduler)
-
 julia_gc_debug_factory = util.BuildFactory()
 julia_gc_debug_factory.useProgress = True
 julia_gc_debug_factory.addSteps([
@@ -69,6 +48,27 @@ julia_gc_debug_factory.addSteps([
     	command=["/bin/bash", "-c", util.Interpolate("make %(prop:flags)s testall")]
     )
 ])
+
+gc_debug_nightly_scheduler = schedulers.Nightly(name="Julia GC Debug Build", builderNames=["nightly_gc_debug-x86", "nightly_gc_debug-x64"], hour=[3], change_filter=util.ChangeFilter(project=['JuliaLang/julia','staticfloat/julia'], branch='master'), onlyIfChanged=True)
+c['schedulers'].append(gc_debug_nightly_scheduler)
+
+for arch in ["x86", "x64"]:
+    force_scheduler = schedulers.ForceScheduler(
+        name="force_gc_%s"%(arch),
+        label="Force Julia %s GC debug building"%(arch),
+        builderNames=["nightly_gc_debug-%s" % arch],
+        reason=util.FixedParameter(name="reason", default=""),
+        codebases=[
+            util.CodebaseParameter(
+                "",
+                name="",
+                branch=util.FixedParameter(name="branch", default=""),
+                repository=util.FixedParameter(name="repository", default=""),
+                project=util.FixedParameter(name="project", default=""),
+            )
+        ],
+        properties=[])
+    c['schedulers'].append(force_scheduler)
 
 for arch in ["x86", "x64"]:
     c['builders'].append(util.BuilderConfig(

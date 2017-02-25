@@ -2,31 +2,6 @@
 # Define everything needed to do per-commit coverage testing on Linux
 ###############################################################################
 
-# Add a dependent scheduler for running coverage after we build tarballs
-julia_coverage_builders = ["coverage_ubuntu16_04-x64"]
-julia_coverage_scheduler = schedulers.Triggerable(name="Julia Coverage Testing", builderNames=julia_coverage_builders)
-c['schedulers'].append(julia_coverage_scheduler)
-
-c['schedulers'].append(schedulers.ForceScheduler(
-    name="force_coverage",
-    label="Force coverage build",
-    builderNames=julia_coverage_builders,
-    reason=util.FixedParameter(name="reason", default=""),
-    codebases=[
-        util.CodebaseParameter(
-            "",
-            name="",
-            branch=util.FixedParameter(name="branch", default=""),
-            revision=util.FixedParameter(name="revision", default=""),
-            repository=util.FixedParameter(name="repository", default=""),
-            project=util.FixedParameter(name="project", default="Coverage"),
-        )
-    ],
-    properties=[
-        util.StringParameter(name="url", size=60, default="https://status.julialang.org/download/linux-x86_64"),
-    ]
-))
-
 run_coverage_cmd = """
 import CoverageBase
 using Base.Test
@@ -140,6 +115,31 @@ julia_coverage_factory.addSteps([
     ),
 ])
 
+
+# Add a dependent scheduler for running coverage after we build tarballs
+julia_coverage_builders = ["coverage_ubuntu16_04-x64"]
+julia_coverage_scheduler = schedulers.Triggerable(name="Julia Coverage Testing", builderNames=julia_coverage_builders)
+c['schedulers'].append(julia_coverage_scheduler)
+
+c['schedulers'].append(schedulers.ForceScheduler(
+    name="force_coverage",
+    label="Force coverage build",
+    builderNames=julia_coverage_builders,
+    reason=util.FixedParameter(name="reason", default=""),
+    codebases=[
+        util.CodebaseParameter(
+            "",
+            name="",
+            branch=util.FixedParameter(name="branch", default=""),
+            revision=util.FixedParameter(name="revision", default=""),
+            repository=util.FixedParameter(name="repository", default=""),
+            project=util.FixedParameter(name="project", default="Coverage"),
+        )
+    ],
+    properties=[
+        util.StringParameter(name="url", size=60, default="https://status.julialang.org/download/linux-x86_64"),
+    ]
+))
 
 # Add coverage builders
 c['builders'].append(util.BuilderConfig(

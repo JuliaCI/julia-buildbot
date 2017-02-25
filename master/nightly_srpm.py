@@ -2,11 +2,6 @@
 # Define everything needed to create SRPMs for copr (Fedora build farm)
 ###############################################################################
 
-# Add a dependent scheduler for SRPM packaging
-julia_srpm_builders  = ["nightly_srpm"]
-srpm_package_scheduler = schedulers.Nightly(name="Julia SRPM package", builderNames=julia_srpm_builders, change_filter=util.ChangeFilter(project=['JuliaLang/julia','staticfloat/julia'], branch='master'), hour=[0], onlyIfChanged=True)
-c['schedulers'].append(srpm_package_scheduler)
-
 julia_srpm_package_factory = util.BuildFactory()
 julia_srpm_package_factory.useProgress = True
 julia_srpm_package_factory.addSteps([
@@ -143,6 +138,21 @@ julia_srpm_package_factory.addSteps([
         command=["/bin/bash", "-c", util.Interpolate("~/bin/try_thrice curl -L -H 'Content-type: application/json' -d '{\"target\": \"Copr\", \"url\": \"https://s3.amazonaws.com/julianightlies/bin/srpm/%(prop:filename)s\", \"version\": \"%(prop:shortcommit)s\"}' https://status.julialang.org/put/nightly")],
     )
 ])
+
+# Add a dependent scheduler for SRPM packaging
+julia_srpm_builders = ["nightly_srpm"]
+srpm_package_scheduler = schedulers.Nightly(
+    name="Julia SRPM package",
+    builderNames=julia_srpm_builders,
+    change_filter=util.ChangeFilter(
+        project=['JuliaLang/julia','staticfloat/julia'],
+        branch='master'
+    ),
+    hour=[0],
+    onlyIfChanged=True
+)
+c['schedulers'].append(srpm_package_scheduler)
+
 
 
 # Add SRPM packager

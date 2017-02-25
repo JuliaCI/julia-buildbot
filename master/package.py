@@ -8,23 +8,12 @@
 # we can safely remove anything that talks about non-`sf/consistent_distnames`
 # compatibility/workarounds.
 
-
-# Add our packagers on various platforms
-julia_packagers  = ["package_osx64"] + ["package_win32", "package_win64"]
-julia_packagers += ["package_linux%s"%(arch) for arch in ["32", "64", "armv7l", "ppc64le", "aarch64"]]
-
-# Also add builders for Ubuntu and Centos builders, that won't upload anything at the end
-julia_packagers += ["build_ubuntu32", "build_ubuntu64", "build_centos64"]
-
 def should_build_branch(branch):
     if branch in ["master", "sf/buildbot_testing"]:
         return True
     if branch.startswith("release-"):
         return True
     return False
-packager_scheduler = schedulers.AnyBranchScheduler(name="Julia binary packaging", change_filter=util.ChangeFilter(project=['JuliaLang/julia','staticfloat/julia'], branch_fn=should_build_branch), builderNames=julia_packagers, treeStableTimer=1)
-c['schedulers'].append(packager_scheduler)
-
 
 # Helper function to generate the necessary julia invocation to get metadata
 # about this build such as major/minor versions
@@ -319,12 +308,24 @@ julia_package_factory.addSteps([
 ])
 
 # Build a builder-worker mapping based off of the parent mapping in inventory.py
-packager_mapping = {("package_" + k): v for k, v in mapping}
+packager_mapping = {("package_" + k): v for k, v in builder_mapping}
 
 # Add a few builders that don't exist in the typical mapping
 packager_mapping["build_ubuntu32"] = "ubuntu16_04-x86"
 packager_mapping["build_ubuntu64"] = "ubuntu16_04-x64"
 packager_mapping["build_centos64"] = "centos7_3-x64"
+
+
+packager_scheduler = schedulers.AnyBranchScheduler(
+    name="Julia binary packaging",
+    change_filter=util.ChangeFilter(
+        project=['JuliaLang/julia','staticfloat/julia'],
+        branch_fn=should_build_branch
+    ),
+    builderNames=packager_mapping.keys(),
+    treeStableTimer=1
+)
+c['schedulers'].append(packager_scheduler)
 
 for packager, worker in packager_mapping.iteritems():
     c['builders'].append(util.BuilderConfig(

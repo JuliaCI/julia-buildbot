@@ -6,7 +6,6 @@
 nuclear_arsenal = {}
     "clean": {
         "label": "clean arpack, openblas, suite-sparse, openlibm and openspecfun",
-        "builder_names": ["clean_" + x for x in builder_mapping],
         "command": [
             "/bin/bash",
             "-c",
@@ -21,7 +20,6 @@ nuclear_arsenal = {}
     },
     "cleanpkg": {
         "label": "clean mbedtls, libssh2, curl, and libgit2",
-        "builder_names": ["cleanpkg_" + x for x in builder_mapping],
         "command": [
             "/bin/bash",
             "-c",
@@ -35,7 +33,6 @@ nuclear_arsenal = {}
     },
     "nuke": {
         "label": "Nuke all build/package directories",
-        "builder_names": ["nuke_" + x for x in builder_mapping],
         "command": [
             "/bin/bash",
             "-c",
@@ -52,7 +49,7 @@ for name in nuclear_arsenal:
     scheduler = schedulers.ForceScheduler(
         name = name,
         label = nuclear_arsenal[name]["label"],
-        builderNames = nuclear_arsenal[name]["builder_names"],
+        builderNames = [name + "_" + builder for builder in builder_mapping],
         reason=util.FixedParameter(name="reason", default=""),
         codebases=[
             util.CodebaseParameter(
@@ -77,9 +74,9 @@ for name in nuclear_arsenal:
         ),
     ])
 
-    for packager, worker in builder_mapping.iteritems():
+    for builder, worker in builder_mapping.iteritems():
         c['builders'].append(util.BuilderConfig(
-            name=name + "_" + packager,
+            name=name + "_" + builder,
             workernames=[worker],
             tags=["Cleaning"],
             factory=factory

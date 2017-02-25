@@ -2,27 +2,6 @@
 # Define everything needed for the bottling of binaries on OSX
 ###############################################################################
 
-# Add a manual scheduler for building bottles, and ONLY a manual scheduler
-c['schedulers'].append(schedulers.ForceScheduler(
-    name="force_bottle",
-    label="Force bottle building",
-    builderNames=["bottle_" + z for z in osx_names],
-    reason=util.FixedParameter(name="reason", default=""),
-    codebases=[
-        util.CodebaseParameter(
-            "",
-            name="",
-            branch=util.FixedParameter(name="branch", default=""),
-            revision=util.FixedParameter(name="revision", default=""),
-            repository=util.FixedParameter(name="repository", default=""),
-            project=util.FixedParameter(name="project", default="Bottling"),
-        )
-    ],
-    properties=[
-        util.StringParameter(name="formula", label="Formula", size=30, default="staticfloat/juliadeps/")
-    ]
-))
-
 # Steps to build a Homebrew Bottle
 osx_bottle_factory = util.BuildFactory()
 osx_bottle_factory.useProgress = True
@@ -72,6 +51,27 @@ osx_bottle_factory.addSteps([
     	command=["rm", "-f", util.Interpolate("/tmp/bottle_cache/%(prop:filename)s")]
     ),
 ])
+
+# Add a manual scheduler for building bottles, and ONLY a manual scheduler
+c['schedulers'].append(schedulers.ForceScheduler(
+    name="force_bottle",
+    label="Force bottle building",
+    builderNames=["bottle_" + z for z in osx_names],
+    reason=util.FixedParameter(name="reason", default=""),
+    codebases=[
+        util.CodebaseParameter(
+            "",
+            name="",
+            branch=util.FixedParameter(name="branch", default=""),
+            revision=util.FixedParameter(name="revision", default=""),
+            repository=util.FixedParameter(name="repository", default=""),
+            project=util.FixedParameter(name="project", default="Bottling"),
+        )
+    ],
+    properties=[
+        util.StringParameter(name="formula", label="Formula", size=30, default="staticfloat/juliadeps/")
+    ]
+))
 
 # Add bottler builders
 for name in osx_names:

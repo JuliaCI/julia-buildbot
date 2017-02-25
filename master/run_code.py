@@ -1,32 +1,3 @@
-# Add our runners on various platforms
-code_runners  = ["runcode_osx64", "runcode_win32", "runcode_win64"]
-code_runners += ["runcode_linux%s"%(arch) for arch in ["32", "64", "armv7l", "ppc64le", "aarch64"]]
-
-# Add a manual scheduler for running code snippets
-code_scheduler = schedulers.ForceScheduler(
-    name="run_code",
-    label="Run arbitrary code block",
-    builderNames=code_runners,
-    reason=util.FixedParameter(name="reason", default=""),
-    codebases=[
-        util.CodebaseParameter(
-            "",
-            name="",
-            branch=util.FixedParameter(name="branch", default=""),
-            revision=util.FixedParameter(name="revision", default=""),
-            repository=util.FixedParameter(name="repository", default=""),
-            project=util.FixedParameter(name="project", default="Julia"),
-        )
-    ],
-    properties=[
-        util.StringParameter(name="shortcommit", label="shortcommit (e.g. 1a2b3c4d)", size=15, default=""),
-        util.StringParameter(name="majmin", label="majmin version (e.g. 0.5)", size=2, default=""),
-        util.TextParameter(name="code_block", label="Code to run", default="", cols=80, rows=5),
-    ]
-)
-c['schedulers'].append(code_scheduler)
-
-
 @util.renderer
 def download_julia(props_obj):
     # Calculate upload_filename, add to properties, then get download url
@@ -87,9 +58,37 @@ run_code_factory.addSteps([
     ),
 ])
 
-for packager, worker in builder_mapping.iteritems():
+# Add our runners on various platforms
+code_runners  = ["runcode_osx64", "runcode_win32", "runcode_win64"]
+code_runners += ["runcode_linux%s"%(arch) for arch in ["32", "64", "armv7l", "ppc64le", "aarch64"]]
+
+# Add a manual scheduler for running code snippets
+code_scheduler = schedulers.ForceScheduler(
+    name="run_code",
+    label="Run arbitrary code block",
+    builderNames=code_runners,
+    reason=util.FixedParameter(name="reason", default=""),
+    codebases=[
+        util.CodebaseParameter(
+            "",
+            name="",
+            branch=util.FixedParameter(name="branch", default=""),
+            revision=util.FixedParameter(name="revision", default=""),
+            repository=util.FixedParameter(name="repository", default=""),
+            project=util.FixedParameter(name="project", default="Julia"),
+        )
+    ],
+    properties=[
+        util.StringParameter(name="shortcommit", label="shortcommit (e.g. 1a2b3c4d)", size=15, default=""),
+        util.StringParameter(name="majmin", label="majmin version (e.g. 0.5)", size=2, default=""),
+        util.TextParameter(name="code_block", label="Code to run", default="", cols=80, rows=5),
+    ]
+)
+c['schedulers'].append(code_scheduler)
+
+for builder, worker in builder_mapping.iteritems():
     c['builders'].append(util.BuilderConfig(
-        name="runcode_" + packager,
+        name="runcode_" + builder,
         workernames=[worker],
         tags=["Coderun"],
         factory=run_code_factory
