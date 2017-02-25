@@ -3,7 +3,7 @@
 ###############################################################################
 
 # Add a manual scheduler for clearing out package_ and build_ arpack, openblas, suite-sparse deps
-nuclear_arsenal = {}
+nuclear_arsenal = {
     "clean": {
         "label": "clean arpack, openblas, suite-sparse, openlibm and openspecfun",
         "command": [
@@ -43,7 +43,7 @@ nuclear_arsenal = {}
             fi",
         ],
     },
-]
+}
 
 for name in nuclear_arsenal:
     scheduler = schedulers.ForceScheduler(
