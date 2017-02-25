@@ -65,7 +65,7 @@ for name in nuclear_arsenal:
     )
     c['schedulers'].append(scheduler)
 
-    factory = = util.BuildFactory()
+    factory = util.BuildFactory()
     factory.useProgress = True
     factory.addSteps([
         steps.ShellCommand(
