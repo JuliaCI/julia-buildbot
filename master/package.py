@@ -1,3 +1,14 @@
+## A note on unneecssary complexity
+# We have gone through a few different standards on naming Julia's build artifacts.
+# The latest, as of this writing, is the `sf/consistent_distnames` branch on github,
+# and simplifies things relative to earlier versions.  However, this buildbot needs
+# to be able to build/upload Julia versions of all reasonably recent versions.
+# `sf/consistent_distnames` should be merged before the 0.6 release, which means
+# that once the release _after_ 0.6 is out in the wild and 0.5 is put to rest,
+# we can safely remove anything that talks about non-`sf/consistent_distnames`
+# compatibility/workarounds.
+
+
 # Add our packagers on various platforms
 julia_packagers  = ["package_osx64"] + ["package_win32", "package_win64"]
 julia_packagers += ["package_linux%s"%(arch) for arch in ["32", "64", "armv7l", "ppc64le", "aarch64"]]
@@ -133,7 +144,7 @@ def render_make_app(props_obj):
     props = props_obj_to_dict(props_obj)
 
     new_way = "make {flags} app".format(**props)
-    old_way = "make {flags} -C contrib/mac/app".format(**props)
+    old_way = "make {flags} -C contrib/mac/app && mv contrib/mac/app/*.dmg {local_filename}".format(**props)
 
     # We emit a bash command that attempts to run `make app` (which is the nice
     # `sf/consistent_distnames` shortcut), and if that fails, it runs the steps
@@ -142,7 +153,7 @@ def render_make_app(props_obj):
     return [
         "/bin/bash",
         "-c",
-        "~/unlock_keychain.sh && (%s || %s)"%(new_way, old_way)
+        "~/unlock_keychain.sh && (%s || (%s))"%(new_way, old_way)
     ]
 
 julia_package_env = {
@@ -217,24 +228,6 @@ julia_package_factory.addSteps([
         env=julia_package_env,
     ),
 
-    # Make binary-dist to package it up
-    steps.ShellCommand(
-        name="make binary-dist",
-        command=["/bin/bash", "-c", util.Interpolate("make %(prop:flags)s binary-dist")],
-        haltOnFailure = True,
-        timeout=3600,
-        env=julia_package_env,
-    ),
-
-    # On OSX, deal with non-sf/consistent_distnames makefile nonsense
-    steps.ShellCommand(
-        name="make .app",
-        command=render_make_app,
-        haltOnFailure = True,
-        doStepIf=is_mac,
-        env=julia_package_env,
-    ),
-
     # Set a bunch of properties that are useful down the line
     steps.SetPropertyFromCommand(
         name="Get commitmessage",
@@ -257,6 +250,25 @@ julia_package_factory.addSteps([
         name="Munge artifact filename",
         command=munge_artifact_filename,
         property="dummy",
+    ),
+
+    # Make binary-dist to package it up
+    steps.ShellCommand(
+        name="make binary-dist",
+        command=["/bin/bash", "-c", util.Interpolate("make %(prop:flags)s binary-dist")],
+        haltOnFailure = True,
+        timeout=3600,
+        env=julia_package_env,
+    ),
+
+    # On OSX, deal with non-sf/consistent_distnames makefile nonsense by wrapping up all
+    # the complexity into `render_make_app`.
+    steps.ShellCommand(
+        name="make .app",
+        command=render_make_app,
+        haltOnFailure = True,
+        doStepIf=is_mac,
+        env=julia_package_env,
     ),
 
     # Transfer the result to the buildmaster for uploading to AWS
