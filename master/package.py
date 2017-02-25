@@ -133,7 +133,7 @@ def render_make_app(props_obj):
     props = props_obj_to_dict(props_obj)
 
     new_way = "make {flags} app".format(**props)
-    old_way = "make {flags} -C contrib/mac/app && mv contrib/mac/app/*.dmg .".format(**props)
+    old_way = "make {flags} -C contrib/mac/app".format(**props)
 
     # We emit a bash command that attempts to run `make app` (which is the nice
     # `sf/consistent_distnames` shortcut), and if that fails, it runs the steps
@@ -142,7 +142,7 @@ def render_make_app(props_obj):
     return [
         "/bin/bash",
         "-c",
-        "~/unlock_keychain.sh && (%s || (%s))"%(new_way, old_way)
+        "~/unlock_keychain.sh && (%s || %s)"%(new_way, old_way)
     ]
 
 julia_package_env = {
