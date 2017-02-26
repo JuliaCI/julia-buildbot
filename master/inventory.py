@@ -64,7 +64,8 @@ for name in all_names:
         flags += 'JULIA_CPU_TARGET=generic '
         # Add Link-Time-Optimization to ARM builder to work around this GCC bug:
         # https://github.com/JuliaLang/julia/issues/14550
-        flags += 'LLVM_LTO=1 '
+        # We need to add overrides for ar and ranlib for this to work
+        flags += 'LLVM_LTO=1 AR=/usr/local/bin/gcc-ar RANLIB=/usr/local/bin/gcc-ranlib '
         # Force LLVM cmake build to use the armv7 triple instead of armv8 from uname
         # This might not be an actual issue since we are not building clang, but BSTS
         llvm_cmake = '-DLLVM_HOST_TRIPLE=armv7l-unknown-linux-gnueabihf -DLLVM_DEFAULT_TARGET_TRIPLE=armv7l-unknown-linux-gnueabihf'
