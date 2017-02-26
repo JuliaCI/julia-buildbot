@@ -8,10 +8,16 @@ def download_julia(props_obj):
 
     # Build commands to download/install julia
     if is_mac(props_obj):
+        # Download the .dmg
         cmd  = "curl -L '%s' -o Julia.dmg && "%(download_url)
+        # Mount it, we know not where
         cmd += "hdiutil mount Julia.dmg && "
-        cmd += "cp -Ra /Volumes/Julia/*.app/Contents/Resources/julia . && "
+        # Search for a .app that contains a directory named "Contents/Resources/julia", copy that directory here
+        cmd += "cp -Ra $(find /Volumes/ -name julia -type d 2>/dev/null | grep -e '\.app/Contents/Resources/julia\$' | head -1)/* . && "
+        # Unmount the .dmg
         cmd += "hdiutil unmount Julia.dmg"
+        # Delete the .dmg
+        cmd += "rm -f Julia.dmg"
     elif is_windows(props_obj):
         # TODO: Figure out how to actually do this.  :P
         cmd = "curl -L '%s' -o Julia.exe;"%(download_url)
