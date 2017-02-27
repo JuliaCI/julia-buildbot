@@ -11,9 +11,9 @@ def download_julia(props_obj):
         # Download the .dmg
         cmd  = "curl -L '%s' -o Julia.dmg && "%(download_url)
         # Mount it, we know not where
-        cmd += "hdiutil mount Julia.dmg && "
+        cmd += "APP=$(hdiutil mount Julia.dmg | tail -1 | awk '{print $3}'); echo \"App located at: $APP;\" "
         # Search for a .app that contains a directory named "Contents/Resources/julia", copy that directory here
-        cmd += "cp -Ra $(find /Volumes/ -name julia -type d 2>/dev/null | grep -e '\.app/Contents/Resources/julia\$' | head -1)/* . && "
+        cmd += "cp -Ra $APP/Contents/Resources/julia/* . && "
         # Unmount the .dmg
         cmd += "hdiutil unmount Julia.dmg"
         # Delete the .dmg
