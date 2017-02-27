@@ -11,7 +11,7 @@ def download_julia(props_obj):
         # Download the .dmg
         cmd  = "curl -L '%s' -o Julia.dmg && "%(download_url)
         # Mount the .app, parse out the mount location, copy its `julia` folder contents here.
-        cmd += "cp -Ra $(hdiutil mount Julia.dmg | tail -1 | awk '{print $3}')/Contents/Resources/julia/* . && "
+        cmd += "cp -Ra $(hdiutil mount Julia.dmg | tail -1 | awk '{print $3}')/Julia-*.app/Contents/Resources/julia/* . && "
         # Unmount the .dmg
         cmd += "hdiutil unmount Julia.dmg"
         # Delete the .dmg
