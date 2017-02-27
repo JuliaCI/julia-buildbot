@@ -65,7 +65,7 @@ def gen_local_filename(props_obj):
             return "julia-{version}-{tar_arch}.{os_pkg_ext}".format(**props)
         else:
             # We made bad decisions in the past
-            if tar_arch == "armv7l":
+            if props['tar_arch'] == "armv7l":
                 return "julia-{shortcommit}-Linux-arm.{os_pkg_ext}".format(**props)
             return "julia-{shortcommit}-Linux-{tar_arch}.{os_pkg_ext}".format(**props)
 
