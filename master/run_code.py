@@ -10,10 +10,12 @@ def download_julia(props_obj):
     if is_mac(props_obj):
         # Download the .dmg
         cmd  = "curl -L '%s' -o Julia.dmg && "%(download_url)
-        # Mount the .app, parse out the mount location, copy its `julia` folder contents here.
-        cmd += "cp -Ra $(hdiutil mount Julia.dmg | tail -1 | awk '{print $3}')/Julia-*.app/Contents/Resources/julia/* . && "
-        # Unmount the .dmg
-        cmd += "hdiutil unmount Julia.dmg"
+        # Mount it
+        cmd += "hdiutil mount Julia.dmg && "
+        # copy its `julia` folder contents here.
+        cmd += "cp -Ra /Volumes/Julia-*/Julia-*.app/Contents/Resources/julia/* . && "
+        # Unmount any and all Julia disk images
+        cmd += "for j in /Volumes/Julia-*; do hdiutil unmount \"$j\"; done && "
         # Delete the .dmg
         cmd += "rm -f Julia.dmg"
     elif is_windows(props_obj):
