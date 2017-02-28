@@ -38,7 +38,13 @@ def run_julia(props_obj):
 run_code_factory = util.BuildFactory()
 run_code_factory.useProgress = True
 run_code_factory.addSteps([
-    # First, download Julia
+    # Cleanup
+    steps.ShellCommand(
+        name="Cleanup",
+        command=["rm", "-rf", "*"],
+    ),
+
+    # Download Julia
     steps.SetPropertyFromCommand(
         name="Download Julia",
         command=download_julia,
@@ -55,12 +61,6 @@ run_code_factory.addSteps([
         name="Run code block",
         command=run_julia,
         property="code_result",
-    ),
-
-    # Cleanup
-    steps.ShellCommand(
-        name="Cleanup",
-        command=["rm", "-rf", "*"],
     ),
 ])
 
