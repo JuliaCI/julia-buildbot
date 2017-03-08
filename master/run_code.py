@@ -97,5 +97,6 @@ for builder, worker in builder_mapping.iteritems():
         name="runcode_" + builder,
         workernames=[worker],
         tags=["Coderun"],
+        collapseRequests=False,
         factory=run_code_factory
     ))

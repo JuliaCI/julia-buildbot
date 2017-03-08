@@ -78,6 +78,7 @@ for name in osx_names:
     c['builders'].append(util.BuilderConfig(
         name="bottle_%s"%(name),
         workernames=[name],
+        collapseRequests=False,
         tags=["Bottling"],
         factory=osx_bottle_factory
     ))

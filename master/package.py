@@ -334,6 +334,7 @@ for packager, worker in packager_mapping.iteritems():
     c['builders'].append(util.BuilderConfig(
         name=packager,
         workernames=[worker],
+        collapseRequests=False,
         tags=["Packaging"],
         factory=julia_package_factory
     ))
