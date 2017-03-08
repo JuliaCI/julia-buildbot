@@ -122,7 +122,6 @@ for name in all_names:
             'tar_arch':tar_arch,
             'release':name,
             'flags':flags,
-            'extra_make_flags':'',
             'up_arch':up_arch,
             'bits':bits,
             'llvm_cmake':llvm_cmake,
