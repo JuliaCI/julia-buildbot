@@ -135,8 +135,8 @@ def render_download_url(props_obj):
 def render_make_app(props_obj):
     props = props_obj_to_dict(props_obj)
 
-    new_way = "make {flags} app".format(**props)
-    old_way = "make {flags} -C contrib/mac/app && mv contrib/mac/app/*.dmg {local_filename}".format(**props)
+    new_way = "make {flags} {extra_make_flags} app".format(**props)
+    old_way = "make {flags} {extra_make_flags} -C contrib/mac/app && mv contrib/mac/app/*.dmg {local_filename}".format(**props)
 
     # We emit a bash command that attempts to run `make app` (which is the nice
     # `sf/consistent_distnames` shortcut), and if that fails, it runs the steps
@@ -188,7 +188,7 @@ julia_package_factory.addSteps([
     # make clean first
     steps.ShellCommand(
         name="make cleanall",
-        command=["/bin/bash", "-c", util.Interpolate("make %(prop:flags)s cleanall")],
+        command=["/bin/bash", "-c", util.Interpolate("make %(prop:flags)s %(prop:extra_make_flags)s cleanall")],
         env=julia_package_env,
     ),
 
@@ -196,7 +196,7 @@ julia_package_factory.addSteps([
     # Also build `debug` and `release` in parallel, we should have enough RAM for that now
     steps.ShellCommand(
         name="make",
-        command=["/bin/bash", "-c", util.Interpolate("make -j3 %(prop:flags)s debug release")],
+        command=["/bin/bash", "-c", util.Interpolate("make -j3 %(prop:flags)s %(prop:extra_make_flags)s debug release")],
         haltOnFailure = True,
         timeout=3600,
         env=julia_package_env,
@@ -205,7 +205,7 @@ julia_package_factory.addSteps([
     # Test this build
     steps.ShellCommand(
         name="make testall",
-        command=["/bin/bash", "-c", util.Interpolate("make %(prop:flags)s testall")],
+        command=["/bin/bash", "-c", util.Interpolate("make %(prop:flags)s %(prop:extra_make_flags)s testall")],
         haltOnFailure = True,
         timeout=3600,
         env=julia_package_env,
@@ -214,7 +214,7 @@ julia_package_factory.addSteps([
     # Make win-extras on windows
     steps.ShellCommand(
         name="make win-extras",
-        command=["/bin/bash", "-c", util.Interpolate("make %(prop:flags)s win-extras")],
+        command=["/bin/bash", "-c", util.Interpolate("make %(prop:flags)s %(prop:extra_make_flags)s win-extras")],
         haltOnFailure = True,
         doStepIf=is_windows,
         env=julia_package_env,
@@ -247,7 +247,7 @@ julia_package_factory.addSteps([
     # Make binary-dist to package it up
     steps.ShellCommand(
         name="make binary-dist",
-        command=["/bin/bash", "-c", util.Interpolate("make %(prop:flags)s binary-dist")],
+        command=["/bin/bash", "-c", util.Interpolate("make %(prop:flags)s %(prop:extra_make_flags)s binary-dist")],
         haltOnFailure = True,
         timeout=3600,
         env=julia_package_env,
@@ -354,6 +354,8 @@ force_build_scheduler = schedulers.ForceScheduler(
             project=util.FixedParameter(name="project", default="Packaging"),
         )
     ],
-    properties=[]
+    properties=[
+        util.StringParameter(name="extra_make_flags", label="Extra Make Flags", size=30, default=""),
+    ]
 )
 c['schedulers'].append(force_build_scheduler)

@@ -118,17 +118,18 @@ for name in all_names:
 
     # Construct the actual BuildSlave object
     c['workers'] += [worker.Worker(name, 'julialang42', max_builds=1,
-		properties={
-			'tar_arch':tar_arch,
-			'release':name,
-			'flags':flags,
-			'up_arch':up_arch,
-			'bits':bits,
+        properties={
+            'tar_arch':tar_arch,
+            'release':name,
+            'flags':flags,
+            'extra_make_flags':'',
+            'up_arch':up_arch,
+            'bits':bits,
             'llvm_cmake':llvm_cmake,
             'os_name':os_name,
             'os_pkg_ext':os_pkg_ext,
-		}
-	)]
+        }
+    )]
 
 
 # Build a nicer mapping for us.  This is how we know things like "package_linux64"
