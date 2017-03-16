@@ -26,6 +26,28 @@ launchpad_package_factory.addSteps([
     )
 ])
 
+# Add a manual scheduler for running code snippet
+launchpad_force_scheduler = schedulers.ForceScheduler(
+    name="force_launchpad",
+    label="Run a launchpad packaging",
+    builderNames=["package_launchpad"],
+    reason=util.FixedParameter(name="reason", default=""),
+    codebases=[
+        util.CodebaseParameter(
+            "",
+            name="",
+            branch=util.FixedParameter(name="branch", default=""),
+            revision=util.FixedParameter(name="revision", default="HEAD"),
+            repository=util.FixedParameter(name="repository", default=""),
+            project=util.FixedParameter(name="project", default="Julia"),
+        )
+    ],
+    properties=[
+    ]
+)
+c['schedulers'].append(launchpad_scheduler)
+
+
 # Add launchpad julia packager
 c['builders'].append(util.BuilderConfig(
     name="package_launchpad",
