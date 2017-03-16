@@ -45,7 +45,7 @@ launchpad_force_scheduler = schedulers.ForceScheduler(
     properties=[
     ]
 )
-c['schedulers'].append(launchpad_scheduler)
+c['schedulers'].append(launchpad_force_scheduler)
 
 
 # Add launchpad julia packager
