@@ -8,11 +8,11 @@ python:
 install:
   - pip install buildbot requests
 script:
-  - echo "db_user='foo'; \
-          db_password='bar'; \
-          GITHUB_WEBHOOK_SECRET='baz'; \
-          GITHUB_OAUTH_CLIENT_ID='qux'; \
-          GITHUB_OAUTH_CLIENT_SECRET='spoon'; \
-          COVERALLS_REPO_TOKEN='nothing'; \
+  - echo "db_user='foo';
+          db_password='bar';
+          GITHUB_WEBHOOK_SECRET='baz';
+          GITHUB_OAUTH_CLIENT_ID='qux';
+          GITHUB_OAUTH_CLIENT_SECRET='spoon';
+          COVERALLS_REPO_TOKEN='nothing';
           CODECOV_REPO_TOKEN='to see';" > master/buildbot_secret.py
   - cd master; python master.cfg
