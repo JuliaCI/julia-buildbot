@@ -117,8 +117,8 @@ for name in all_names:
         flags += "MARCH=%s "%(march)
 
     # Construct the actual BuildSlave object
-    for worker_name in [name, "tabularasa-"+name]:
-        c['workers'] += [worker.Worker(name, 'julialang42', max_builds=1,
+    for worker_name in [name, "tabularasa_"+name]:
+        c['workers'] += [worker.Worker(worker_name, 'julialang42', max_builds=1,
             properties={
                 'tar_arch':tar_arch,
                 'release':name,

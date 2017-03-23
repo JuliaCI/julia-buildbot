@@ -58,7 +58,7 @@ c['schedulers'].append(separated_scheduler)
 for builder, worker in builder_mapping.iteritems():
     c['builders'].append(util.BuilderConfig(
         name="separated_tester_" + builder,
-        workernames=["tabularasa-" + worker],
+        workernames=["tabularasa_" + worker],
         tags=["Testing"],
         factory=separated_testing_factory
     ))
