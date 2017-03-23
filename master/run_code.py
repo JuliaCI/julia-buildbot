@@ -1,32 +1,4 @@
 @util.renderer
-def download_julia(props_obj):
-    # Calculate upload_filename, add to properties, then get download url
-    upload_filename = gen_upload_filename(props_obj)
-    props_obj.setProperty("upload_filename", upload_filename, "download_julia")
-    download_url = gen_download_url(props_obj)
-    props_obj.setProperty('download_url', download_url, "download_julia")
-
-    # Build commands to download/install julia
-    if is_mac(props_obj):
-        # Download the .dmg
-        cmd  = "curl -L '%s' -o Julia.dmg && "%(download_url)
-        # Mount it
-        cmd += "hdiutil mount Julia.dmg && "
-        # copy its `julia` folder contents here.
-        cmd += "cp -Ra /Volumes/Julia-*/Julia-*.app/Contents/Resources/julia/* . && "
-        # Unmount any and all Julia disk images
-        cmd += "for j in /Volumes/Julia-*; do hdiutil unmount \"$j\"; done && "
-        # Delete the .dmg
-        cmd += "rm -f Julia.dmg"
-    elif is_windows(props_obj):
-        # TODO: Figure out how to actually do this.  :P
-        cmd = "curl -L '%s' -o Julia.exe;"%(download_url)
-    else:
-        cmd = "curl -L '%s' | tar --strip-components=1 -zx"%(download_url)
-    return ["/bin/bash", "-c", cmd]
-
-
-@util.renderer
 def run_julia(props_obj):
     cmd = ["bin/julia", "command.jl"]
 
