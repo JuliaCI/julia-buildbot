@@ -12,7 +12,7 @@ def build_names(platform, versions, architectures):
 win_names    = build_names("win", ["6_2"], ["x64", "x86"])
 ubuntu_names = build_names("ubuntu", ["16_04"], ["x64", "x86"])
 osx_names    = build_names("osx", ["10_10", "10_11", "10_12"], ["x64"])
-centos_names = build_names("centos", ["5_11"], ["x64", "x86"]) + ["centos7_3-x64"]
+centos_names = build_names("centos", ["6_9"], ["x64", "x86"]) + ["centos7_3-x64"]
 debian_names = build_names("debian", ["8_6"], ["aarch64", "ppc64le"]) + ["debian7_11-armv7l"]
 all_names    = ubuntu_names + osx_names + centos_names + win_names + debian_names
 
