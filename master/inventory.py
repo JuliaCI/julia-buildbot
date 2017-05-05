@@ -106,12 +106,6 @@ for name in all_names:
     # tests are hitting memory issues, so restart workers when memory consumption gets too high
     flags += 'JULIA_TEST_MAXRSS_MB=600 '
 
-    # On ancient CentOS systems, O_CLOEXEC makes LLVM sad
-    if name[:10] == "centos5.11":
-        flags += 'DEPS_CXXFLAGS="-DO_CLOEXEC=0" '
-        # use old c++ abi https://github.com/JuliaLang/julia/issues/17446
-        flags += 'CXXFLAGS=-D_GLIBCXX_USE_CXX11_ABI=0 '
-
     # Add MARCH to flags
     if not march is None:
         flags += "MARCH=%s "%(march)
@@ -133,13 +127,13 @@ for name in all_names:
 
 
 # Build a nicer mapping for us.  This is how we know things like "package_linux64"
-# runs on "centos5_11-x64"
+# runs on "centos6_9-x64"
 builder_mapping = {
     "osx64": "osx10_10-x64",
     "win32": "win6_2-x86",
     "win64": "win6_2-x64",
-    "linux32": "centos5_11-x86",
-    "linux64": "centos5_11-x64",
+    "linux32": "centos6_9-x86",
+    "linux64": "centos6_9-x64",
     "linuxarmv7l": "debian7_11-armv7l",
     "linuxppc64le": "debian8_6-ppc64le",
     "linuxaarch64": "debian8_6-aarch64",
