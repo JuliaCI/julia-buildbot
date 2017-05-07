@@ -9,12 +9,13 @@ def build_names(platform, versions, architectures):
             names += ["%s%s-%s"%(platform, version, arch)]
     return names
 
-win_names    = build_names("win", ["6_2"], ["x64", "x86"])
-ubuntu_names = build_names("ubuntu", ["16_04"], ["x64", "x86"])
-osx_names    = build_names("osx", ["10_10", "10_11", "10_12"], ["x64"])
-centos_names = build_names("centos", ["6_9"], ["x64", "x86"]) + ["centos7_3-x64"]
-debian_names = build_names("debian", ["8_6"], ["aarch64", "ppc64le"]) + ["debian7_11-armv7l"]
-all_names    = ubuntu_names + osx_names + centos_names + win_names + debian_names
+win_names     = build_names("win", ["6_2"], ["x64", "x86"])
+ubuntu_names  = build_names("ubuntu", ["16_04"], ["x64", "x86"])
+osx_names     = build_names("osx", ["10_10", "10_11", "10_12"], ["x64"])
+centos_names  = build_names("centos", ["6_9"], ["x64", "x86"])
+centos_names += build_names("centos", ["7_3"], ["x64", "ppc64le", "aarch64"])
+debian_names  = ["debian7_11-armv7l"]
+all_names     = ubuntu_names + osx_names + centos_names + win_names + debian_names
 
 # Define all the attributes we'll use in our buildsteps
 c['workers'] = []
@@ -135,6 +136,6 @@ builder_mapping = {
     "linux32": "centos6_9-x86",
     "linux64": "centos6_9-x64",
     "linuxarmv7l": "debian7_11-armv7l",
-    "linuxppc64le": "debian8_6-ppc64le",
-    "linuxaarch64": "debian8_6-aarch64",
+    "linuxppc64le": "centos7_3-ppc64le",
+    "linuxaarch64": "centos7_3-aarch64",
 }
