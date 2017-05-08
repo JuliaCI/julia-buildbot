@@ -122,6 +122,9 @@ for name in all_names:
             }
         )]
 
+# Add in tabularasa workers to all_names so that they volunteer for things like
+# the auto_reload builders and whatnot.
+all_names += ["tabularasa_" + x for x in all_names]
 
 # Build a nicer mapping for us.  This is how we know things like "package_linux64"
 # runs on "centos6_9-x64"
