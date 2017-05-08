@@ -80,7 +80,8 @@ def gen_latest_upload_path(props_obj):
     up_arch = props_obj.getProperty("up_arch")
     upload_filename = props_obj.getProperty("upload_filename")
     if upload_filename[:6] == "julia-":
-        upload_filename = "julia-latest-%s"%(upload_filename[6:])
+        split_name = upload_filename.split("-")
+        upload_filename = "julia-latest-%s"%(split_name[2])
     os = get_os_name(props_obj)
     return "julialangnightlies/buildog/bin/%s/%s/%s"%(os, up_arch, upload_filename)
 
