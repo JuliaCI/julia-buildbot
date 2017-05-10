@@ -1,6 +1,4 @@
 ## This file used for building llvm_extras tarballs
-
-
 llvm_extras_env = {
     'CFLAGS': None,
     'CPPFLAGS': None,
@@ -79,7 +77,7 @@ llvm_extras_factory.addSteps([
         command=[
             "/bin/bash",
             "-c",
-            util.Interpolate("~/bin/try_thrice ~/bin/aws put --fail --public julialangmirror/llvm_extras-%(props:shortcommit).tar.gz /tmp/llvm_extras/llvm_extras-%(props:shortcommit).tar.gz")
+            util.Interpolate("~/bin/try_thrice ~/bin/aws put --fail --public julialangmirror/llvm_extras-%(prop:shortcommit)s.tar.gz /tmp/llvm_extras/llvm_extras-%(prop:shortcommit)s.tar.gz")
         ],
         haltOnFailure=True
     ),
@@ -104,7 +102,7 @@ for packager, worker in llvm_extras_mapping.iteritems():
 
 # Add a scheduler for triggering builds manually
 force_llvm_extras_scheduler = schedulers.ForceScheduler(
-    name="package llvm_extras",
+    name="package_llvm_extras",
     label="Force llvm_extras build/packaging",
     builderNames=llvm_extras_mapping.keys(),
     reason=util.FixedParameter(name="reason", default=""),
