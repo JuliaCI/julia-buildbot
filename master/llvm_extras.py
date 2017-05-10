@@ -29,7 +29,7 @@ llvm_extras_factory.addSteps([
 
     # make clean first
     steps.ShellCommand(
-        name="make cleanall",
+        name="make distcleanall",
         command=["/bin/bash", "-c", util.Interpolate("make %(prop:flags)s BUILD_LLVM_CLANG=1 %(prop:extra_make_flags)s -C deps distcleanall")],
         env=llvm_extras_env,
     ),
