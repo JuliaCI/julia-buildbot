@@ -34,8 +34,16 @@ llvm_extras_factory.addSteps([
         env=llvm_extras_env,
     ),
 
+    # Our llvm build process fails to properly create `$(build_libdir)` before installing llvm, so let's do it first
+    steps.ShellCommand(
+        name="make",
+        command=["/bin/bash", "-c", util.Interpolate("make -j3 %(prop:flags)s BUILD_LLVM_CLANG=1 %(prop:extra_make_flags)s usr/lib")],
+        haltOnFailure = True,
+        timeout=3600,
+        env=llvm_extras_env,
+    ),
+
     # Make, forcing some degree of parallelism to cut down compile times
-    # Also build `debug` and `release` in parallel, we should have enough RAM for that now
     steps.ShellCommand(
         name="make",
         command=["/bin/bash", "-c", util.Interpolate("make -j3 %(prop:flags)s BUILD_LLVM_CLANG=1 %(prop:extra_make_flags)s -C deps install-llvm")],
