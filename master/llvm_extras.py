@@ -30,7 +30,7 @@ llvm_extras_factory.addSteps([
     # make clean first
     steps.ShellCommand(
         name="make cleanall",
-        command=["/bin/bash", "-c", util.Interpolate("make %(prop:flags)s %(prop:extra_make_flags)s -C deps distcleanall")],
+        command=["/bin/bash", "-c", util.Interpolate("make %(prop:flags)s BUILD_LLVM_CLANG=1 %(prop:extra_make_flags)s -C deps distcleanall")],
         env=llvm_extras_env,
     ),
 
@@ -38,7 +38,7 @@ llvm_extras_factory.addSteps([
     # Also build `debug` and `release` in parallel, we should have enough RAM for that now
     steps.ShellCommand(
         name="make",
-        command=["/bin/bash", "-c", util.Interpolate("make -j3 %(prop:flags)s %(prop:extra_make_flags)s -C deps install-llvm")],
+        command=["/bin/bash", "-c", util.Interpolate("make -j3 %(prop:flags)s BUILD_LLVM_CLANG=1 %(prop:extra_make_flags)s -C deps install-llvm")],
         haltOnFailure = True,
         timeout=3600,
         env=llvm_extras_env,
