@@ -63,7 +63,7 @@ llvm_extras_factory.addSteps([
     # Make binary-dist to package it up
     steps.ShellCommand(
         name="make binary-dist",
-        command=["tar", "zcvf", util.Interpolate("llvm_extras-%(prop:shortcommit)s.tar.gz"), "usr"],
+        command=["tar", "zcvf", util.Interpolate("llvm_extras-%(prop:shortcommit)s-%(prop:os_name)s%(prop:bits)s.tar.gz"), "usr"],
         haltOnFailure = True,
         timeout=3600,
     ),
@@ -75,8 +75,8 @@ llvm_extras_factory.addSteps([
     ),
 
     steps.FileUpload(
-        workersrc=util.Interpolate("llvm_extras-%(prop:shortcommit)s.tar.gz"),
-        masterdest=util.Interpolate("/tmp/llvm_extras/llvm_extras-%(prop:shortcommit)s.tar.gz")
+        workersrc=util.Interpolate("llvm_extras-%(prop:shortcommit)s-%(prop:os_name)s%(prop:bits)s.tar.gz"),
+        masterdest=util.Interpolate("/tmp/llvm_extras/llvm_extras-%(prop:shortcommit)s-%(prop:os_name)s%(prop:bits)s.tar.gz")
     ),
 
     # Upload it to AWS and cleanup the master!
@@ -85,7 +85,7 @@ llvm_extras_factory.addSteps([
         command=[
             "/bin/bash",
             "-c",
-            util.Interpolate("~/bin/try_thrice ~/bin/aws put --fail --public julialangmirror/llvm_extras-%(prop:shortcommit)s.tar.gz /tmp/llvm_extras/llvm_extras-%(prop:shortcommit)s.tar.gz")
+            util.Interpolate("~/bin/try_thrice ~/bin/aws put --fail --public julialangmirror/llvm_extras-%(prop:shortcommit)s-%(prop:os_name)s%(prop:bits)s.tar.gz /tmp/llvm_extras/llvm_extras-%(prop:shortcommit)s-%(prop:os_name)s%(prop:bits)s.tar.gz")
         ],
         haltOnFailure=True
     ),
