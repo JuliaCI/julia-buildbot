@@ -36,7 +36,7 @@ llvm_extras_factory.addSteps([
 
     # Our llvm build process fails to properly create `$(build_libdir)` before installing llvm, so let's do it first
     steps.ShellCommand(
-        name="make",
+        name="make usr/lib",
         command=["/bin/bash", "-c", util.Interpolate("make -j3 %(prop:flags)s BUILD_LLVM_CLANG=1 %(prop:extra_make_flags)s usr/lib")],
         haltOnFailure = True,
         timeout=3600,
