@@ -50,7 +50,7 @@ llvm_extras_factory.addSteps([
     steps.SetPropertyFromCommand(
         name="Get shortcommit",
         command=["git", "log", "-1", "--pretty=format:%h"],
-        property_name="shortcommit",
+        property="shortcommit",
         want_stderr=False
     ),
 
