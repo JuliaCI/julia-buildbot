@@ -25,7 +25,7 @@ sign_juno_factory.addSteps([
 juno_scheduler = schedulers.ForceScheduler(
     name="force_juno",
     label="Force juno signing",
-    builderNames=["juno_osx10_10-x64", "juno_win6_2-x86", "juno_win6_2-x64"],
+    builderNames=["juno_osx10_10-x64", "juno_win6_3-x86", "juno_win6_3-x64"],
     reason=util.FixedParameter(name="reason", default=""),
     codebases=[
         util.CodebaseParameter(
@@ -45,7 +45,7 @@ juno_scheduler = schedulers.ForceScheduler(
 )
 c['schedulers'].append(juno_scheduler)
 
-for name in ["osx10_10-x64", "win6_2-x86", "win6_2-x64"]:
+for name in ["osx10_10-x64", "win6_3-x86", "win6_3-x64"]:
     c['builders'].append(util.BuilderConfig(
         name="juno_%s"%(name),
         workernames=[name],
