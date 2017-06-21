@@ -43,6 +43,10 @@ for name in all_names:
         os_name = "linux"
         os_pkg_ext = "tar.gz"
 
+        # Use ccache on Linux builds
+        flags += 'USECCACHE=1 '
+
+
 
     if name[-3:] == 'x86':
         tar_arch = 'i686'
@@ -51,7 +55,7 @@ for name in all_names:
         bits = '32'
         flags += 'JULIA_CPU_TARGET=pentium4 '
 
-        # On i686, when using gcc 7.1.0, we need to force see floating-point
+        # On i686, when using gcc 7.1.0, we need to force sse floating-point
         # math to avoid https://github.com/JuliaLang/julia/issues/21742
         flags += 'CFLAGS="-mfpmath=sse" '
 
