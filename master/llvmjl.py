@@ -54,7 +54,7 @@ llvmjl_factory.addSteps([
     # Package up our ill-gotten goods
     steps.ShellCommand(
         name="Package LLVM.jl deps directory",
-        command=["tar", "zcvf", util.Interpolate("llvmjl-%(prop:shortcommit)s-%(prop:os_name)s%(prop:bits)s.tar.gz"), "-C", "llvmjl_out/"],
+        command=["tar", "zcvf", util.Interpolate("llvmjl-%(prop:shortcommit)s-%(prop:os_name)s%(prop:bits)s.tar.gz"), "-C", "llvmjl_out/", "."],
         haltOnFailure = True,
     ),
 
