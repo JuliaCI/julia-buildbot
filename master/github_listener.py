@@ -18,6 +18,7 @@ class JuliaGithubListener(GitHubEventHandler):
             'when_timestamp': dateparse(payload['release']['published_at']),
             'revlink': payload['release']['url'],
             'category': 'release',
+            'comments': payload['release']['body'],
         }
 
         # Do some magic here
