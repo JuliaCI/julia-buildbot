@@ -16,7 +16,7 @@ def build_llvmjl(props_obj):
         end
         
         # Fake our build directory target into here:
-        ARGS[1] = abspath("./llvmjl_out");
+        push!(ARGS, abspath("./llvmjl_out"));
         include(Pkg.dir("LLVM", "deps", "buildbot.jl"));
     """.format(**props).strip()]
     return cmd
