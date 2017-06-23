@@ -2,6 +2,7 @@
 
 @util.renderer
 def build_llvmjl(props_obj):
+    props = props_obj_to_dict(props_obj)
     cmd = ["bin/julia", "-e"]
 
     if is_windows(props_obj):
@@ -10,7 +11,10 @@ def build_llvmjl(props_obj):
     cmd += ["""
         ENV["JULIA_PKG_DIR"] = ".";
         Pkg.clone("https://github.com/maleadt/LLVM.jl");
-        Pkg.checkout("LLVM", "{LLVMJL_TAG}");
+        Pkg.checkout("LLVM", "{revision}");
+        
+        # Fake our build directory target into here:
+        ARGS[1] = abspath("./llvmjl_out");
         include(Pkg.dir("LLVM", "deps", "buildbot.jl"));
     """.format(**props).strip()]
     return cmd
@@ -30,9 +34,15 @@ llvmjl_factory.addSteps([
         command=download_julia,
         property="julia_path",
     ),
+    # Download llvm-extras
+    steps.ShellCommand(
+        name="Download llvm-extras",
+        command=["bash", "-c", util.Interpolate("cd julia-*; curl -L 'https://s3.amazonaws.com/julialangmirror/llvm_extras-%(prop:shortcommit)s-%(prop:os_name)s%(prop:bits)s.tar.gz' | tar -zxv --strip-components=1")],
+    ),
+
     # Invoke Julia to build LLVM
     steps.SetPropertyFromCommand(
-        name="Run code block",
+        name="Install LLVM.jl",
         command=build_llvmjl,
         property="code_result",
     ),
@@ -40,7 +50,7 @@ llvmjl_factory.addSteps([
     # Package up our ill-gotten goods
     steps.ShellCommand(
         name="Package LLVM.jl deps directory",
-        command=["tar", "zcvf", util.Interpolate("llvmjl-%(prop:shortcommit)s-%(prop:os_name)s%(prop:bits)s.tar.gz"), "v0.6/LLVM/deps"],
+        command=["tar", "zcvf", util.Interpolate("llvmjl-%(prop:shortcommit)s-%(prop:os_name)s%(prop:bits)s.tar.gz"), "-C", "llvmjl_out/"],
         haltOnFailure = True,
     ),
 
