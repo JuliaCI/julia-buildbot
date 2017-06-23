@@ -11,8 +11,10 @@ def build_llvmjl(props_obj):
     cmd += ["""
         ENV["JULIA_PKGDIR"] = ".";
         Pkg.init();
-        try
-            Pkg.add("LLVM", "{revision}");
+        Pkg.add("Compat")
+        Pkg.clone("https://github.com/staticfloat/LLVM.jl")
+        cd(Pkg.dir("LLVM")) do
+            run(`git checkout {revision}`)
         end
         
         # Fake our build directory target into here:
