@@ -9,9 +9,11 @@ def build_llvmjl(props_obj):
         cmd[0] += ".exe"
 
     cmd += ["""
-        ENV["JULIA_PKG_DIR"] = ".";
+        ENV["JULIA_PKGDIR"] = ".";
         Pkg.clone("https://github.com/maleadt/LLVM.jl");
-        Pkg.checkout("LLVM", "{revision}");
+        try
+            Pkg.add("LLVM", "{revision}");
+        end
         
         # Fake our build directory target into here:
         ARGS[1] = abspath("./llvmjl_out");
