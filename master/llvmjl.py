@@ -90,7 +90,11 @@ tag_llvmjl_scheduler = schedulers.AnyBranchScheduler(
         project=['maleadt/LLVM.jl', 'staticfloat/LLVM.jl'],
     ),
     builderNames=llvmjl_mapping.keys(),
-    treeStableTimer=1
+    treeStableTimer=1,
+    properties=[
+        util.StringParameter(name="shortcommit", label="shortcommit (e.g. 1a2b3c4d)", size=15, default="903644385b"),
+        util.StringParameter(name="majmin", label="majmin version (e.g. 0.6)", size=2, default="0.6"),
+    ]
 )
 c['schedulers'].append(tag_llvmjl_scheduler)
 
