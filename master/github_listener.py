@@ -13,10 +13,10 @@ class JuliaGithubListener(GitHubEventHandler):
         change = {
             'repository': payload['repository']['url'],
             'project': payload['repository']['full_name'],
-            'tag_name': payload['release']['tag_name'],
             'revision': payload['release']['tag_name'],
             'when_timestamp': dateparse(payload['release']['published_at']),
             'revlink': payload['release']['url'],
+            'category': 'release',
         }
 
         # Do some magic here
