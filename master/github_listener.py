@@ -11,6 +11,7 @@ class JuliaGithubListener(GitHubEventHandler):
             payload = json.loads(payload['payload'][0])
         
         change = {
+            'author': payload['release']['author']['login'],
             'repository': payload['repository']['url'],
             'project': payload['repository']['full_name'],
             'revision': payload['release']['tag_name'],
