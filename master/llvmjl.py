@@ -9,8 +9,8 @@ def build_llvmjl(props_obj):
         cmd[0] += ".exe"
 
     cmd += ["""
-        ENV["JULIA_PKGDIR"] = ".";
-        Pkg.init();
+        ENV["JULIA_PKGDIR"] = "."
+        Pkg.init()
         Pkg.add("Compat")
         Pkg.clone("https://github.com/staticfloat/LLVM.jl")
         cd(Pkg.dir("LLVM")) do
@@ -18,8 +18,8 @@ def build_llvmjl(props_obj):
         end
         
         # Fake our build directory target into here:
-        push!(ARGS, abspath("./llvmjl_out"));
-        include(Pkg.dir("LLVM", "deps", "buildbot.jl"));
+        push!(ARGS, abspath("./llvmjl_out"))
+        include(Pkg.dir("LLVM", "deps", "buildbot.jl"))
     """.format(**props).strip()]
     return cmd
 
@@ -29,7 +29,7 @@ llvmjl_factory.addSteps([
     # Cleanup
     steps.ShellCommand(
         name="Cleanup",
-        command=["rm", "-rf", "*"],
+        command=["bash", "-c", "rm -rf *"],
     ),
 
     # Download Julia
