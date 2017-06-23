@@ -91,10 +91,11 @@ tag_llvmjl_scheduler = schedulers.AnyBranchScheduler(
     ),
     builderNames=llvmjl_mapping.keys(),
     treeStableTimer=1,
-    properties=[
-        util.StringParameter(name="shortcommit", label="shortcommit (e.g. 1a2b3c4d)", size=15, default="903644385b"),
-        util.StringParameter(name="majmin", label="majmin version (e.g. 0.6)", size=2, default="0.6"),
-    ]
+    # Bake these properties in hard, we can always override with a force scheduler
+    properties={
+        'shortcommit': '903644385b',
+        'majmin': '0.6',
+    }
 )
 c['schedulers'].append(tag_llvmjl_scheduler)
 
