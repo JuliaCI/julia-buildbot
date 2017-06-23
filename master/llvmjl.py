@@ -65,8 +65,8 @@ llvmjl_factory.addSteps([
     ),
 
     steps.FileUpload(
-        workersrc=util.Interpolate("llvmjl-%(prop:shortcommit)s-%(prop:os_name)s%(prop:bits)s.tar.gz"),
-        masterdest=util.Interpolate("/tmp/llvm_jl/llvmjl-%(prop:shortcommit)s-%(prop:os_name)s%(prop:bits)s.tar.gz")
+        workersrc=util.Interpolate("llvmjl-%(prop:revision)s-%(prop:shortcommit)s-%(prop:os_name)s%(prop:bits)s.tar.gz"),
+        masterdest=util.Interpolate("/tmp/llvm_jl/llvmjl-%(prop:revision)s-%(prop:shortcommit)s-%(prop:os_name)s%(prop:bits)s.tar.gz")
     ),
 
     # Upload it to AWS and cleanup the master!
@@ -75,13 +75,13 @@ llvmjl_factory.addSteps([
         command=[
             "/bin/bash",
             "-c",
-            util.Interpolate("~/bin/try_thrice ~/bin/aws put --fail --public julialangmirror/llvmjl-%(prop:shortcommit)s-%(prop:os_name)s%(prop:bits)s.tar.gz /tmp/llvm_jl/llvmjl-%(prop:shortcommit)s-%(prop:os_name)s%(prop:bits)s.tar.gz")
+            util.Interpolate("~/bin/try_thrice ~/bin/aws put --fail --public julialangmirror/llvmjl-%(prop:revision)s-%(prop:shortcommit)s-%(prop:os_name)s%(prop:bits)s.tar.gz /tmp/llvm_jl/llvmjl-%(prop:revision)s-%(prop:shortcommit)s-%(prop:os_name)s%(prop:bits)s.tar.gz")
         ],
         haltOnFailure=True
     ),
     steps.MasterShellCommand(
         name="Cleanup Master",
-        command=["rm", "-f", util.Interpolate("/tmp/llvm_jl/llvmjl-%(prop:shortcommit)s-%(prop:os_name)s%(prop:bits)s.tar.gz")]
+        command=["rm", "-f", util.Interpolate("/tmp/llvm_jl/llvmjl-%(prop:revision)s-%(prop:shortcommit)s-%(prop:os_name)s%(prop:bits)s.tar.gz")]
     ),
 ])
 
