@@ -10,9 +10,8 @@ def build_llvmjl(props_obj):
 
     cmd += ["""
         ENV["JULIA_PKGDIR"] = ".";
-        Pkg.clone("https://github.com/maleadt/LLVM.jl");
+        Pkg.init();
         try
-            Pkg.init();
             Pkg.add("LLVM", "{revision}");
         end
         
