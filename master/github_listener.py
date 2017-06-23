@@ -16,7 +16,7 @@ class JuliaGithubListener(GitHubEventHandler):
             'project': payload['repository']['full_name'],
             'revision': payload['release']['tag_name'],
             'when_timestamp': dateparse(payload['release']['published_at']),
-            'revlink': payload['release']['url'],
+            'revlink': payload['release']['html_url'],
             'category': 'release',
             'comments': payload['release']['body'],
         }
