@@ -87,9 +87,9 @@ for packager, worker in llvmjl_mapping.iteritems():
 tag_llvmjl_scheduler = schedulers.AnyBranchScheduler(
     name="LLVM.jl deps packaging",
     change_filter=util.ChangeFilter(
-        project=['maleadt/LLVM.jl','staticfloat/LLVM.jl'],
+        project=['maleadt/LLVM.jl', 'staticfloat/LLVM.jl'],
     ),
-    builderNames=packager_mapping.keys(),
+    builderNames=llvmjl_mapping.keys(),
     treeStableTimer=1
 )
 c['schedulers'].append(tag_llvmjl_scheduler)
@@ -110,7 +110,8 @@ force_llvmjl_scheduler = schedulers.ForceScheduler(
         )
     ],
     properties=[
-        util.StringParameter(name="LLVMJL_TAG", label="LLVM.jl tag", size=30, default=""),
+        util.StringParameter(name="shortcommit", label="shortcommit (e.g. 1a2b3c4d)", size=15, default="903644385b"),
+        util.StringParameter(name="majmin", label="majmin version (e.g. 0.6)", size=2, default="0.6"),
     ]
 )
 c['schedulers'].append(force_llvmjl_scheduler)
