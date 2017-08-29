@@ -87,7 +87,7 @@ for name in all_names:
         bits = 'aarch64'
         march = 'armv8-a'
         flags += 'JULIA_CPU_TARGET=generic '
-        flags += 'LLVM_VER=3.9.0 '
+        flags += 'LLVM_VER=3.9.1 '
 
     # On windows, disable running doc/genstdlib.jl due to julia issue #11727
     # and add XC_HOST dependent on the architecture
