@@ -144,7 +144,7 @@ c['schedulers'].append(schedulers.ForceScheduler(
 # Add coverage builders
 c['builders'].append(util.BuilderConfig(
     name="coverage_ubuntu16_04-x64",
-    workernames=["ubuntu16_04-x64"],
+    workernames=["tabularasa_ubuntu16_04-x64"],
     tags=["Coverage"],
     factory=julia_coverage_factory
 ))
