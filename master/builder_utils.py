@@ -50,7 +50,7 @@ def gen_local_filename(props_obj):
 
     # First, see if we got a JULIA_BINARYDIST_FILENAME output
     if artifact[:26] == "JULIA_BINARYDIST_FILENAME=" and len(artifact) > 26:
-        return artifact[26:] + "{os_pkg_ext}".format(**props)
+        return artifact[26:] + ".{os_pkg_ext}".format(**props)
     else:
         # If not, use non-sf/consistent_distnames naming
         if is_mac(props_obj):
