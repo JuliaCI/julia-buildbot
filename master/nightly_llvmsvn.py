@@ -42,7 +42,7 @@ julia_llvmsvn_factory.addSteps([
     # Make!
     steps.ShellCommand(
     	name="make",
-    	command=["/bin/bash", "-c", util.Interpolate("make %(prop:flags)s")],
+    	command=["/bin/bash", "-c", util.Interpolate("make -j3 %(prop:flags)s")],
     	haltOnFailure = True
     ),
 

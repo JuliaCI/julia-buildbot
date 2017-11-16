@@ -57,7 +57,7 @@ julia_threading_factory.addSteps([
     # Make!
     steps.ShellCommand(
         name="make binary-dist",
-        command=["/bin/bash", "-c", util.Interpolate("make %(prop:flags)s binary-dist")],
+        command=["/bin/bash", "-c", util.Interpolate("make -j3 %(prop:flags)s binary-dist")],
         haltOnFailure = True
     ),
 
