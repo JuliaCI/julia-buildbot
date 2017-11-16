@@ -74,7 +74,7 @@ def gen_upload_path(props_obj):
     majmin = props_obj.getProperty("majmin")
     upload_fname = props_obj.getProperty("upload_filename")
     os = get_os_name(props_obj)
-    return "julialangnightlies/buildog/bin/%s/%s/%s/%s"%(os, up_arch, majmin, upload_fname)
+    return "julialangnightlies/bin/%s/%s/%s/%s"%(os, up_arch, majmin, upload_fname)
 
 def gen_latest_upload_path(props_obj):
     up_arch = props_obj.getProperty("up_arch")
@@ -83,7 +83,7 @@ def gen_latest_upload_path(props_obj):
         split_name = upload_filename.split("-")
         upload_filename = "julia-latest-%s"%(split_name[2])
     os = get_os_name(props_obj)
-    return "julialangnightlies/buildog/bin/%s/%s/%s"%(os, up_arch, upload_filename)
+    return "julialangnightlies/bin/%s/%s/%s"%(os, up_arch, upload_filename)
 
 
 def gen_download_url(props_obj):
