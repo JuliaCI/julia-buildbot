@@ -159,25 +159,25 @@ def munge_artifact_filename(props_obj):
 
 @util.renderer
 def render_upload_command(props_obj):
-    upload_path = gen_upload_path(props_obj, namespace="pretesting")
+    upload_path = gen_upload_path(props_obj, namespace="buildog_pretesting")
     upload_filename = props_obj.getProperty("upload_filename")
     return ["/bin/sh", "-c", "aws s3 cp --acl public-read /tmp/julia_package/%s s3://%s"%(upload_filename, upload_path)]
 
 @util.renderer
 def render_promotion_command(props_obj):
-    src_path = gen_upload_path(props_obj, namespace="pretesting")
-    dst_path = gen_upload_path(props_obj)
+    src_path = gen_upload_path(props_obj, namespace="buildog_pretesting")
+    dst_path = gen_upload_path(props_obj, namespace="buildog")
     return ["/bin/sh", "-c", "aws s3 cp --acl public-read s3://%s s3://%s"%(src_path, dst_path)]
 
 @util.renderer
 def render_latest_promotion_command(props_obj):
-    src_path = gen_upload_path(props_obj, namespace="pretesting")
-    dst_path = gen_latest_upload_path(props_obj)
+    src_path = gen_upload_path(props_obj, namespace="buildog_pretesting")
+    dst_path = gen_latest_upload_path(props_obj, namespace="buildog")
     return ["/bin/sh", "-c", "aws s3 cp --acl public-read s3://%s s3://%s"%(src_path, dst_path)]
 
 @util.renderer
 def render_cleanup_pretesting_command(props_obj):
-    del_path = gen_upload_path(props_obj, namespace="pretesting")
+    del_path = gen_upload_path(props_obj, namespace="buildog_pretesting")
     return ["/bin/sh", "-c", "aws s3 rm s3://%s"%(del_path)]
 
 @util.renderer
@@ -186,7 +186,7 @@ def render_download_url(props_obj):
 
 @util.renderer
 def render_pretesting_download_url(props_obj):
-    return gen_download_url(props_obj, namespace="pretesting")
+    return gen_download_url(props_obj, namespace="buildog_pretesting")
 
 @util.renderer
 def render_make_app(props_obj):

@@ -1,4 +1,4 @@
-reload_scheduler = schedulers.AnyBranchScheduler(name="Buildbot Auto reload", change_filter=util.ChangeFilter(project='JuliaCI/julia-buildbot', branch=['master']), builderNames=["auto_reload"], treeStableTimer=1)
+reload_scheduler = schedulers.AnyBranchScheduler(name="Buildbot Auto reload", change_filter=util.ChangeFilter(project='JuliaCI/julia-buildbot', branch=['buildog']), builderNames=["auto_reload"], treeStableTimer=1)
 c['schedulers'].append(reload_scheduler)
 
 
