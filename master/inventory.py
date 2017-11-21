@@ -14,7 +14,7 @@ ubuntu_names  = build_names("ubuntu", ["16_04"], ["x64", "x86"])
 osx_names     = build_names("osx", ["10_10", "10_11", "10_12"], ["x64"])
 centos_names  = build_names("centos", ["6_9"], ["x64", "x86"])
 centos_names += build_names("centos", ["7_3"], ["x64", "ppc64le", "aarch64"])
-debian_names  = ["debian7_11-armv7l"]
+debian_names  = ["debian7_11-armv7l", "debian8_9-x86"]
 all_names     = ubuntu_names + osx_names + centos_names + win_names + debian_names
 
 # Define all the attributes we'll use in our buildsteps
@@ -140,7 +140,8 @@ builder_mapping = {
     "osx64": "osx10_10-x64",
     "win32": "win10_0-x86",
     "win64": "win10_0-x64",
-    "linux32": "centos6_9-x86",
+    #"linux32": "centos6_9-x86",
+    "linux32": "debian8_9-x86",
     "linux64": "centos6_9-x64",
     "linuxarmv7l": "debian7_11-armv7l",
     "linuxppc64le": "centos7_3-ppc64le",
