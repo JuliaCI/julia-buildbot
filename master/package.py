@@ -47,7 +47,7 @@ julia_package_factory.addSteps([
         name="Clean out temporary windows cruft",
         command=["/bin/bash", "-c", "rm -rf julia-*"],
         doStepIf=is_windows,
-        flunOnFailure=False,
+        flunkOnFailure=False,
     ),
 
     # Make, forcing some degree of parallelism to cut down compile times
