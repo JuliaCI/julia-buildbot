@@ -1,13 +1,8 @@
-%global uvcommit %{libuvcommit}
-%global uvversion 0.11.26
-
-%global Rmathjuliaversion 0.1
-%global Rmathversion 3.0.1
+%global uvcommit 52d72a52cc7ccd570929990f010ed16e2ec604c8
+%global uvversion 1.9.0
 
 %global unwindversion 1.1-julia2
-
-%global llvm_version 3.7
-%global llvmversion 37
+%global llvmversion 3.9
 
 Name:           julia
 Version:        %{juliaversion}
@@ -16,19 +11,14 @@ Summary:        High-level, high-performance dynamic language for technical comp
 Group:          Development/Languages
 # Julia itself is MIT, with a few LGPLv2+ and GPLv2+ files
 # libuv is MIT
-# Rmath is  GPLv2+
 License:        MIT and LGPLv2+ and GPLv2+
 URL:            http://julialang.org/
 # These URLs are bogus, just here to help rpmbuild to find the needed files
 Source0:        https://api.github.com/repos/JuliaLang/julia/tarball/master#/julia.tar.gz
 # Julia currently uses a custom version of libuv, patches are not yet upstream
 Source1:        https://api.github.com/repos/JuliaLang/libuv/tarball/%{uvcommit}#/libuv-%{uvcommit}.tar.gz
-# Julia currently uses a custom version of Rmath, called Rmath-julia, with a custom RNG system (temporary)
-Source2:        https://api.github.com/repos/JuliaLang/Rmath-julia/tarball/v%{Rmathjuliaversion}#/Rmath-julia-%{Rmathjuliaversion}.tar.gz
-#Source3:        http://download.savannah.gnu.org/releases/libunwind/libunwind-%{unwindversion}.tar.gz
-Source3:        https://s3.amazonaws.com/julialang/src/libunwind-%{unwindversion}.tar.gz
+Source2:        https://s3.amazonaws.com/julialang/src/libunwind-%{unwindversion}.tar.gz
 Provides:       bundled(libuv) = %{uvversion}
-Provides:       bundled(Rmath) = %{Rmathversion}
 Provides:       bundled(libunwind) = %{unwindversion}
 BuildRequires:  arpack-devel
 BuildRequires:  desktop-file-utils
@@ -48,12 +38,9 @@ BuildRequires:  gmp5-devel >= 5.0
 %else
 BuildRequires:  gmp-devel >= 5.0
 %endif
+# Needed for libgit2 test
+BuildRequires:  hostname
 BuildRequires:  ImageMagick
-%if 0%{?rhel} && 0%{?rhel} == 6
-BuildRequires:  libgit2-devel >= 1:0.23
-%else
-BuildRequires:  libgit2-devel >= 0.23
-%endif
 BuildRequires:  libunwind-devel
 BuildRequires:  llvm%{llvmversion}-devel
 %if 0%{?rhel} && 0%{?rhel} <= 6
@@ -64,10 +51,20 @@ BuildRequires:  mpfr-devel >= 3.0
 BuildRequires:  openblas-threads
 BuildRequires:  openlibm-devel >= 0.4
 BuildRequires:  openspecfun-devel >= 0.4
+BuildRequires:  libgit2-devel
+# Needed for libgit2 test
+BuildRequires:  openssl
+BuildRequires:  mbedtls-devel
+BuildRequires:  libssh2-devel
+BuildRequires:  http-parser-devel
+BuildRequires:  openssl-devel
+BuildRequires:  libcurl-devel
+BuildRequires:  curl
 BuildRequires:  pcre2-devel
+BuildRequires:  cmake
 BuildRequires:  perl
 BuildRequires:  suitesparse-devel
-BuildRequires:  utf8proc-devel >= 2
+BuildRequires:  utf8proc-devel >= 2.1
 BuildRequires:  zlib-devel
 # Needed for package management until the switch  to libgit2
 Requires:       git
@@ -138,7 +135,6 @@ pushd deps/srccache
     # https://github.com/JuliaLang/julia/pull/10280
     cp -p %SOURCE1 .
     cp -p %SOURCE2 .
-    cp -p %SOURCE3 .
 popd
 
 # Required so that the image is not optimized for the build CPU
@@ -165,7 +161,7 @@ popd
 
 # About build, build_libdir and build_bindir, see https://github.com/JuliaLang/julia/issues/5063#issuecomment-32628111
 %global julia_builddir %{_builddir}/%{name}/build
-%global commonopts USE_SYSTEM_LLVM=1 USE_LLVM_SHLIB=1 LLVM_CONFIG=llvm-config-%{__isa_bits}-%{llvm_version} USE_SYSTEM_LIBUNWIND=0 USE_SYSTEM_READLINE=1 USE_SYSTEM_PCRE=1 USE_SYSTEM_OPENSPECFUN=1 USE_SYSTEM_BLAS=1 USE_SYSTEM_LAPACK=1 USE_SYSTEM_FFTW=1 USE_SYSTEM_GMP=1 USE_SYSTEM_MPFR=1 USE_SYSTEM_ARPACK=1 USE_SYSTEM_SUITESPARSE=1 USE_SYSTEM_ZLIB=1 USE_SYSTEM_GRISU=1 USE_SYSTEM_DSFMT=1 USE_SYSTEM_LIBUV=0 USE_SYSTEM_RMATH=0 USE_SYSTEM_UTF8PROC=1 USE_SYSTEM_LIBGIT2=1 USE_SYSTEM_LIBSSH2=1 USE_SYSTEM_MBEDTLS=1 USE_SYSTEM_PATCHELF=1 USE_SYSTEM_LIBM=0 USE_SYSTEM_OPENLIBM=1 VERBOSE=1 MARCH=%{march} %{blas} prefix=%{_prefix} bindir=%{_bindir} libdir=%{_libdir} libexecdir=%{_libexecdir} datarootdir=%{_datarootdir} includedir=%{_includedir} sysconfdir=%{_sysconfdir} build_prefix=%{julia_builddir} build_bindir=%{julia_builddir}%{_bindir} build_libdir=%{julia_builddir}%{_libdir} build_private_libdir=%{julia_builddir}%{_libdir}/julia build_libexecdir=%{julia_builddir}%{_libexecdir} build_datarootdir=%{julia_builddir}%{_datarootdir} build_includedir=%{julia_builddir}%{_includedir} build_sysconfdir=%{julia_builddir}%{_sysconfdir} JULIA_CPU_CORES=$(echo %{?_smp_mflags} | sed s/-j//)
+%global commonopts USE_SYSTEM_LLVM=1 USE_LLVM_SHLIB=1 LLVM_CONFIG=%{_libdir}/llvm%{llvmversion}/bin/llvm-config USE_SYSTEM_LIBUNWIND=0 USE_SYSTEM_READLINE=1 USE_SYSTEM_PCRE=1 USE_SYSTEM_OPENSPECFUN=1 USE_SYSTEM_BLAS=1 USE_SYSTEM_LAPACK=1 USE_SYSTEM_FFTW=1 USE_SYSTEM_GMP=1 USE_SYSTEM_MPFR=1 USE_SYSTEM_ARPACK=1 USE_SYSTEM_SUITESPARSE=1 USE_SYSTEM_ZLIB=1 USE_SYSTEM_GRISU=1 USE_SYSTEM_DSFMT=1 USE_SYSTEM_LIBUV=0 USE_SYSTEM_UTF8PROC=1 USE_SYSTEM_LIBGIT2=0 USE_SYSTEM_LIBSSH2=0 USE_SYSTEM_MBEDTLS=0 USE_SYSTEM_CURL=0 USE_SYSTEM_PATCHELF=1 USE_SYSTEM_LIBM=0 USE_SYSTEM_OPENLIBM=1 VERBOSE=1 MARCH=%{march} %{blas} prefix=%{_prefix} bindir=%{_bindir} libdir=%{_libdir} libexecdir=%{_libexecdir} datarootdir=%{_datarootdir} includedir=%{_includedir} sysconfdir=%{_sysconfdir} build_prefix=%{julia_builddir} build_bindir=%{julia_builddir}%{_bindir} build_libdir=%{julia_builddir}%{_libdir} build_private_libdir=%{julia_builddir}%{_libdir}/julia build_libexecdir=%{julia_builddir}%{_libexecdir} build_datarootdir=%{julia_builddir}%{_datarootdir} build_includedir=%{julia_builddir}%{_includedir} build_sysconfdir=%{julia_builddir}%{_sysconfdir} JULIA_CPU_CORES=$(echo %{?_smp_mflags} | sed s/-j//)
 
 %build
 %if 0%{?rhel} && 0%{?rhel} <= 6
@@ -174,14 +170,15 @@ popd
 
 # Need to repeat -march here to override i686 from optflags
 # USE_ORCJIT needs to be set directly since it's disabled by default with USE_SYSTEM_LLVM=1
-%global buildflags CFLAGS="%{optflags} -march=%{march}" CXXFLAGS="%{optflags} -march=%{march} -DUSE_ORCJIT"
+# -Wno-error=format-security is needed to get libgit2 to build correctly
+%global buildflags CFLAGS="%{optflags} -march=%{march} -Wno-error=format-security" CXXFLAGS="%{optflags} -march=%{march} -DUSE_ORCJIT -Wno-error=format-security"
 
+# Required to work around a bug when building libunwind on RHEL7:
+# https://github.com/JuliaLang/julia/issues/15496
 echo "MAKEOVERRIDES =" >> deps/Makefile
-make %{?_smp_mflags} %{buildflags} %{commonopts} release
+
 # If debug is not built here, it is built during make install
-# And both targets cannot be on the same call currently:
-# https://github.com/JuliaLang/julia/issues/10088
-make %{?_smp_mflags} %{buildflags} %{commonopts} debug
+make %{?_smp_mflags} %{buildflags} %{commonopts} release debug
 
 %check
 make %{commonopts} test
@@ -196,19 +193,17 @@ make %{commonopts} DESTDIR=%{buildroot} install
 # dependencies can be detected (just as what happens with the C linker).
 # Automatic dependency detection is smart enough to add Requires as needed.
 pushd %{buildroot}%{_libdir}/julia
-    for LIB in arpack cholmod dSFMT git2 fftw3 gmp mpfr openspecfun pcre2-8 umfpack
+    for LIB in arpack cholmod dSFMT fftw3 gmp mpfr openspecfun pcre2-8 umfpack
     do
         ln -s %{_libdir}/$(readelf -d %{_libdir}/lib$LIB.so | sed -n '/SONAME/s/.*\(lib[^ ]*\.so\.[0-9]*\).*/\1/p') lib$LIB.so
         # Raise an error in case of failure
         realpath -e lib$LIB.so
     done
 
-%ifarch %{ix86} x86_64
     # Note the "libopen" trick because of greedy matching
     ln -s %{_libdir}/libopen$(readelf -d %{_libdir}/libopenlibm.so | sed -n '/SONAME/s/.*\(lib[^ ]*\.so\.[0-9]*\).*/\1/p') libopenlibm.so
     # Raise an error in case of failure
     realpath -e libopenlibm.so
-%endif
 popd
 
 cp -p CONTRIBUTING.md LICENSE.md NEWS.md README.md %{buildroot}%{_docdir}/julia/
@@ -224,23 +219,17 @@ mkdir -p %{buildroot}%{_datarootdir}/icons/hicolor/24x24/apps/
 mkdir -p %{buildroot}%{_datarootdir}/icons/hicolor/32x32/apps/
 mkdir -p %{buildroot}%{_datarootdir}/icons/hicolor/48x48/apps/
 mkdir -p %{buildroot}%{_datarootdir}/icons/hicolor/256x256/apps/
-cp -p doc/_build/html/_static/julia-logo.svg \
-    %{buildroot}%{_datarootdir}/icons/hicolor/scalable/apps/%{name}.svg
+cp -p contrib/julia.svg %{buildroot}%{_datarootdir}/icons/hicolor/scalable/apps/%{name}.svg
 convert -scale 16x16 -extent 16x16 -gravity center -background transparent \
-    doc/_build/html/_static/julia-logo.svg \
-    %{buildroot}%{_datarootdir}/icons/hicolor/16x16/apps/%{name}.png
+    contrib/julia.svg %{buildroot}%{_datarootdir}/icons/hicolor/16x16/apps/%{name}.png
 convert -scale 24x24 -extent 24x24 -gravity center -background transparent \
-    doc/_build/html/_static/julia-logo.svg \
-    %{buildroot}%{_datarootdir}/icons/hicolor/24x24/apps/%{name}.png
+    contrib/julia.svg %{buildroot}%{_datarootdir}/icons/hicolor/24x24/apps/%{name}.png
 convert -scale 32x32 -extent 32x32 -gravity center -background transparent \
-    doc/_build/html/_static/julia-logo.svg \
-    %{buildroot}%{_datarootdir}/icons/hicolor/32x32/apps/%{name}.png
+    contrib/julia.svg %{buildroot}%{_datarootdir}/icons/hicolor/32x32/apps/%{name}.png
 convert -scale 48x48 -extent 48x48 -gravity center -background transparent \
-    doc/_build/html/_static/julia-logo.svg \
-    %{buildroot}%{_datarootdir}/icons/hicolor/48x48/apps/%{name}.png
+    contrib/julia.svg %{buildroot}%{_datarootdir}/icons/hicolor/48x48/apps/%{name}.png
 convert -scale 256x256 -extent 256x256 -gravity center -background transparent \
-    doc/_build/html/_static/julia-logo.svg \
-    %{buildroot}%{_datarootdir}/icons/hicolor/256x256/apps/%{name}.png
+    contrib/julia.svg %{buildroot}%{_datarootdir}/icons/hicolor/256x256/apps/%{name}.png
 desktop-file-validate %{buildroot}%{_datarootdir}/applications/%{name}.desktop
 
 %files
@@ -267,7 +256,10 @@ desktop-file-validate %{buildroot}%{_datarootdir}/applications/%{name}.desktop
 %files common
 %dir %{_datarootdir}/julia/
 %{_datarootdir}/julia/*.jl
+%{_datarootdir}/julia/site/
 %{_datarootdir}/julia/base/
+%{_datarootdir}/julia/cert.pem
+%{_datarootdir}/julia/base.cache
 
 %dir %{_sysconfdir}/julia/
 %config(noreplace) %{_sysconfdir}/julia/juliarc.jl
@@ -300,6 +292,33 @@ exit 0
 /usr/bin/gtk-update-icon-cache %{_datarootdir}/icons/hicolor &>/dev/null || :
 
 %changelog
+* Tue Sep 20 2016 Milan Bouchet-Valat <nalimilan@club.fr> - 0.5.0-1
+- New upstream release.
+
+* Thu Sep 15 2016 Milan Bouchet-Valat <nalimilan@club.fr> - 0.5.0-0.rc4
+- New upstream release candidate.
+
+* Mon Jun 20 2016 Milan Bouchet-Valat <nalimilan@club.fr> - 0.4.6-1
+- New upstream release.
+- Drop tridiag patch, now included upstream.
+
+* Wed Mar 30 2016 Igor Gnatenko <i.gnatenko.brain@gmail.com> - 0.4.5-2
+- Rebuild for libgit2 0.24.0 once more
+
+* Sun Mar 20 2016 Milan Bouchet-Valat <nalimilan@club.fr> - 0.4.5-1
+- New upstream release.
+
+* Sun Mar 20 2016 Milan Bouchet-Valat <nalimilan@club.fr> - 0.4.3-9
+- Add patch to fix non-deterministic test failure with OpenBLAS 0.2.16.
+
+* Sun Mar 20 2016 Igor Gnatenko <i.gnatenko.brain@gmail.com> - 0.4.3-8
+- Rebuild for libgit2 0.24.0
+
+* Tue Mar 8 2016 Milan Bouchet-Valat <nalimilan@club.fr> - 0.4.3-7
+- Fix generation of library symlinks to rely only on major version.
+- Rebuild for openlibm SONAME bump.
+- Use openlibm on all platforms.
+
 * Wed Mar 2 2016 Milan Bouchet-Valat <nalimilan@club.fr> - 0.4.3-6
 - Fix missing PCRE2 dependency, use realpath -e to detect this problem.
 
