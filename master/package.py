@@ -42,6 +42,14 @@ julia_package_factory.addSteps([
         env=julia_package_env,
     ),
 
+    # Windows has a nasty habit of leaving julia-<gitsha> folders lying around....
+    steps.ShellCommand(
+        name="Clean out temporary windows cruft",
+        command=["/bin/bash", "-c", "rm -rf julia-*"],
+        doStepIf=is_windows,
+        flunOnFailure=False,
+    ),
+
     # Make, forcing some degree of parallelism to cut down compile times
     # Also build `debug` and `release` in parallel, we should have enough RAM for that now
     steps.ShellCommand(
