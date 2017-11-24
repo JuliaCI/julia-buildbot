@@ -66,7 +66,11 @@ def gen_local_filename(props_obj):
 
 def gen_upload_filename(props_obj):
     props = props_obj_to_dict(props_obj)
-    return "julia-{shortcommit}-{os_name}{bits}.{os_pkg_ext}".format(**props)
+    # We don't like "winnt" at the end of files, we use just "win" instead.
+    props["os_name_file"] = props["os_name"]
+    if props["os_name_file"] == "winnt":
+        props["os_name_file"] = "win"
+    return "julia-{shortcommit}-{os_name_file}{bits}.{os_pkg_ext}".format(**props)
 
 
 def gen_upload_path(props_obj):
