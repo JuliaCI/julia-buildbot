@@ -2,7 +2,6 @@ julia_package_env = {
     'CFLAGS':None,
     'CPPFLAGS': None,
     'LLVM_CMAKE': util.Property('llvm_cmake', default=None),
-    'JULIA_CPU_CORES': '6',
 }
 
 # Steps to build a `make binary-dist` tarball that should work on just about every linux ever
