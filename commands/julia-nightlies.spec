@@ -48,6 +48,7 @@ BuildRequires:  mpfr3-devel >= 3.0
 %else
 BuildRequires:  mpfr-devel >= 3.0
 %endif
+BuildRequires:  openblas-devel
 BuildRequires:  openblas-threads
 BuildRequires:  openlibm-devel >= 0.4
 BuildRequires:  openspecfun-devel >= 0.4
@@ -157,7 +158,7 @@ popd
 %global march armv8-a
 %endif
 
-%global blas USE_BLAS64=0 LIBBLAS=-lopenblasp LIBBLASNAME=libopenblasp.so.0 LIBLAPACK=-lopenblasp LIBLAPACKNAME=libopenblasp.so.0
+%global blas USE_BLAS64=0 LIBBLAS=-lopenblasp LIBBLASNAME=libopenblasp LIBLAPACK=-lopenblasp LIBLAPACKNAME=libopenblasp
 
 # About build, build_libdir and build_bindir, see https://github.com/JuliaLang/julia/issues/5063#issuecomment-32628111
 %global julia_builddir %{_builddir}/%{name}/build
@@ -185,26 +186,6 @@ make %{commonopts} test
 
 %install
 make %{commonopts} DESTDIR=%{buildroot} install
-
-# Julia currently needs the unversioned .so files:
-# https://github.com/JuliaLang/julia/issues/6742
-# By creating symlinks to versioned libraries, we hardcode a dependency
-# on the specific SOVERSION so that any breaking update in one of the
-# dependencies can be detected (just as what happens with the C linker).
-# Automatic dependency detection is smart enough to add Requires as needed.
-pushd %{buildroot}%{_libdir}/julia
-    for LIB in arpack cholmod dSFMT fftw3 gmp mpfr openspecfun pcre2-8 umfpack
-    do
-        ln -s %{_libdir}/$(readelf -d %{_libdir}/lib$LIB.so | sed -n '/SONAME/s/.*\(lib[^ ]*\.so\.[0-9]*\).*/\1/p') lib$LIB.so
-        # Raise an error in case of failure
-        realpath -e lib$LIB.so
-    done
-
-    # Note the "libopen" trick because of greedy matching
-    ln -s %{_libdir}/libopen$(readelf -d %{_libdir}/libopenlibm.so | sed -n '/SONAME/s/.*\(lib[^ ]*\.so\.[0-9]*\).*/\1/p') libopenlibm.so
-    # Raise an error in case of failure
-    realpath -e libopenlibm.so
-popd
 
 cp -p CONTRIBUTING.md LICENSE.md NEWS.md README.md %{buildroot}%{_docdir}/julia/
 
