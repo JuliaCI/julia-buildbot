@@ -57,10 +57,6 @@ for name in all_names:
         # Sysimg multi-versioning
         flags += 'JULIA_CPU_TARGET="pentium4;sandybridge,-xsaveopt,clone_all" '
 
-        # On i686, when using gcc 7.1.0, we need to force sse floating-point
-        # math to avoid https://github.com/JuliaLang/julia/issues/21742
-        flags += 'CFLAGS="-mfpmath=sse" '
-
     if name[-3:] == 'x64':
         tar_arch = 'x86_64'
         march = 'x86-64'
