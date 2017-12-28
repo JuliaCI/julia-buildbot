@@ -76,7 +76,7 @@ for name in all_names:
         bits = 'armv7l'
 
         # Sysimg multi-versioning!
-        flags += 'JULIA_CPU_TARGET=armv7-a;armv7-a,neon;armv7-a;armv7-a,neon,vfp4 '
+        flags += 'JULIA_CPU_TARGET="armv7-a;armv7-a,neon;armv7-a;armv7-a,neon,vfp4" '
         # Force LLVM cmake build to use the armv7 triple instead of armv8 from uname
         # This might not be an actual issue since we are not building clang, but BSTS
         llvm_cmake = '-DLLVM_HOST_TRIPLE=armv7l-unknown-linux-gnueabihf -DLLVM_DEFAULT_TARGET_TRIPLE=armv7l-unknown-linux-gnueabihf'
