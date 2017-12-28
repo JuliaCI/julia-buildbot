@@ -53,7 +53,9 @@ for name in all_names:
         march = 'pentium4'
         up_arch = 'x86'
         bits = '32'
-        flags += 'JULIA_CPU_TARGET=pentium4 '
+
+        # Sysimg multi-versioning
+        flags += 'JULIA_CPU_TARGET="pentium4;sandybridge,-xsaveopt,clone_all" '
 
         # On i686, when using gcc 7.1.0, we need to force sse floating-point
         # math to avoid https://github.com/JuliaLang/julia/issues/21742
@@ -65,12 +67,20 @@ for name in all_names:
         up_arch = 'x64'
         bits = '64'
 
+        # Sysimg multi-versioning!
+        cpu_target  = 'generic;'
+        cpu_target += 'sandybridge,-xsaveopt,clone_all;'
+        cpu_target += 'haswell,-rdrnd,base(1)'
+        flags += 'JULIA_CPU_TARGET="%s" '%(cpu_target)
+
     if name[-6:] == 'armv7l':
         tar_arch = 'armv7l'
         march = 'armv7-a'
         up_arch = 'armv7l'
         bits = 'armv7l'
-        flags += 'JULIA_CPU_TARGET=generic '
+
+        # Sysimg multi-versioning!
+        flags += 'JULIA_CPU_TARGET=armv7-a;armv7-a,neon;armv7-a;armv7-a,neon,vfp4 '
         # Force LLVM cmake build to use the armv7 triple instead of armv8 from uname
         # This might not be an actual issue since we are not building clang, but BSTS
         llvm_cmake = '-DLLVM_HOST_TRIPLE=armv7l-unknown-linux-gnueabihf -DLLVM_DEFAULT_TARGET_TRIPLE=armv7l-unknown-linux-gnueabihf'
