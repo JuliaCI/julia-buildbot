@@ -49,6 +49,13 @@ julia_package_factory.addSteps([
         flunkOnFailure=False,
     ),
 
+    # Clear out old .cov and .mem files.  Note that this should be removed once we always start from scratch. 
+    steps.ShellCommand(
+        name="Clear out usr",
+        command=["/bin/bash", "-c", "find . \(-name *.jl.*.cov -o -name *.jl.mem \) -print -delete"],
+        env=julia_package_env,
+    ),
+
     # Make, forcing some degree of parallelism to cut down compile times
     # Also build `debug` and `release` in parallel, we should have enough RAM for that now
     steps.ShellCommand(
