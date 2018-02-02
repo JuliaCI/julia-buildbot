@@ -3,8 +3,7 @@
 ###############################################################################
 
 run_coverage_cmd = """
-import CoverageBase
-using Base.Test
+using CoverageBase, Compat, Compat.Test
 CoverageBase.runtests(CoverageBase.testnames())
 """
 
@@ -15,15 +14,15 @@ cd(joinpath(CoverageBase.julia_top()))
 results = Coverage.process_folder("base")
 
 # Create git_info for Coveralls
-git_info = @compat Dict(
+git_info = Dict(
     "branch" => Base.GIT_VERSION_INFO.branch,
     "remotes" => [
-        @compat Dict(
+        Dict(
             "name" => "origin",
             "url" => "https://github.com/JuliaLang/julia.git"
         )
     ],
-    "head" => @compat Dict(
+    "head" => Dict(
         "id" => Base.GIT_VERSION_INFO.commit,
         "message" => "%(prop:commitmessage)s",
         "committer_name" => "%(prop:commitname)s",
@@ -98,12 +97,12 @@ julia_coverage_factory.addSteps([
     # Run Julia, gathering coverage statistics
     steps.ShellCommand(
         name="Run inlined tests",
-        command=[util.Interpolate("%(prop:juliadir)s/bin/julia"), "--precompiled=no", "--code-coverage=all", "-e", run_coverage_cmd],
+        command=[util.Interpolate("%(prop:juliadir)s/bin/julia"), "--sysimage-native-code=no", "--code-coverage=all", "-e", run_coverage_cmd],
         timeout=3600,
     ),
     steps.ShellCommand(
         name="Run non-inlined tests",
-        command=[util.Interpolate("%(prop:juliadir)s/bin/julia"), "--precompiled=no", "--code-coverage=all", "--inline=no", "-e", run_coverage_cmd],
+        command=[util.Interpolate("%(prop:juliadir)s/bin/julia"), "--sysimage-native-code=no", "--code-coverage=all", "--inline=no", "-e", run_coverage_cmd],
         timeout=7200,
     ),
     #submit the results!
@@ -137,7 +136,11 @@ c['schedulers'].append(schedulers.ForceScheduler(
         )
     ],
     properties=[
-        util.StringParameter(name="url", size=60, default="https://status.julialang.org/download/linux-x86_64"),
+        util.StringParameter(
+            name="url",
+            size=60,
+            default="https://julialangnightlies-s3.julialang.org/bin/linux/x64/julia-latest-linux64.tar.gz"
+        ),
     ]
 ))
 
