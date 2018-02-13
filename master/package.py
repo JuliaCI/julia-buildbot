@@ -52,7 +52,7 @@ julia_package_factory.addSteps([
     # Clear out old .cov and .mem files.  Note that this should be removed once we always start from scratch. 
     steps.ShellCommand(
         name="Clear out usr",
-        command=["/bin/bash", "-c", "find . \(-name *.jl.*.cov -o -name *.jl.mem \) -print -delete"],
+        command=["/bin/bash", "-c", "find . \( -name *.jl.*.cov -o -name *.jl.mem \) -print -delete"],
         env=julia_package_env,
     ),
 
