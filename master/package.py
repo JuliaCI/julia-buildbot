@@ -57,10 +57,16 @@ julia_package_factory.addSteps([
     ),
 
     # Make, forcing some degree of parallelism to cut down compile times
-    # Also build `debug` and `release` in parallel, we should have enough RAM for that now
     steps.ShellCommand(
-        name="make",
-        command=["/bin/bash", "-c", util.Interpolate("make -j3 %(prop:flags)s %(prop:extra_make_flags)s debug release")],
+        name="make release",
+        command=["/bin/bash", "-c", util.Interpolate("make -j3 %(prop:flags)s %(prop:extra_make_flags)s release")],
+        haltOnFailure = True,
+        timeout=3600,
+        env=julia_package_env,
+    ),
+    steps.ShellCommand(
+        name="make debug",
+        command=["/bin/bash", "-c", util.Interpolate("make -j3 %(prop:flags)s %(prop:extra_make_flags)s debug")],
         haltOnFailure = True,
         timeout=3600,
         env=julia_package_env,
