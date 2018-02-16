@@ -55,6 +55,15 @@ julia_package_factory.addSteps([
         command=["/bin/bash", "-c", "find . \( -name *.jl.*.cov -o -name *.jl.mem \) -print -delete"],
         env=julia_package_env,
     ),
+ 
+    # Get win-extras files ready on windows
+    steps.ShellCommand(
+        name="make win-extras",
+        command=["/bin/bash", "-c", util.Interpolate("make %(prop:flags)s %(prop:extra_make_flags)s win-extras")],
+        haltOnFailure = True,
+        doStepIf=is_windows,
+        env=julia_package_env,
+    ),
 
     # Make, forcing some degree of parallelism to cut down compile times
     steps.ShellCommand(
@@ -78,15 +87,6 @@ julia_package_factory.addSteps([
         command=["/bin/bash", "-c", util.Interpolate("make %(prop:flags)s %(prop:extra_make_flags)s testall")],
         haltOnFailure = True,
         timeout=3600,
-        env=julia_package_env,
-    ),
-
-    # Make win-extras on windows
-    steps.ShellCommand(
-        name="make win-extras",
-        command=["/bin/bash", "-c", util.Interpolate("make %(prop:flags)s %(prop:extra_make_flags)s win-extras")],
-        haltOnFailure = True,
-        doStepIf=is_windows,
         env=julia_package_env,
     ),
 
