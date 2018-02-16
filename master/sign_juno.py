@@ -6,7 +6,7 @@ sign_juno_factory = util.BuildFactory()
 sign_juno_factory.useProgress = True
 sign_juno_factory.addSteps([
     # Download our sign_juno.sh script over to the slave: (we don't use steps.FileDownload here because of stupid buildbot problems)
-    steps.ShellCommand(command=["/usr/bin/curl", "-L", "https://raw.githubusercontent.com/staticfloat/julia-buildbot/master/commands/sign_juno.sh", "-o", "sign_juno.sh"]),
+    steps.ShellCommand(command=["/usr/bin/curl", "-L", "https://raw.githubusercontent.com/JuliaCI/julia-buildbot/master/commands/sign_juno.sh", "-o", "sign_juno.sh"]),
 
     # Invoke it
     steps.ShellCommand(command=["/bin/bash", "sign_juno.sh", util.Property('osx64_url'), util.Property('win32_url'), util.Property('win64_url')], haltOnFailure=True),
