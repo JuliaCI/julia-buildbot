@@ -41,11 +41,10 @@ julia_package_factory.addSteps([
         env=julia_package_env,
     ),
 
-    # Windows has a nasty habit of leaving julia-<gitsha> folders lying around....
+    # Cleanup old julia build directories, .dmg files, etc...
     steps.ShellCommand(
         name="Clean out temporary windows cruft",
         command=["/bin/bash", "-c", "rm -rf julia-*"],
-        doStepIf=is_windows,
         flunkOnFailure=False,
     ),
 
