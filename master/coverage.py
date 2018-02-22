@@ -14,7 +14,7 @@ cd(joinpath(CoverageBase.julia_top()))
 results = Coverage.process_folder("base")
 if isdefined(CoverageBase.BaseTestRunner, STDLIBS)
     for stdlib in CoverageBase.BaseTestRunner.STDLIBS
-        results = Coverage.process_folder("stdlib/$stdlib/src")
+        append!(results, Coverage.process_folder("stdlib/$stdlib/src"))
     end
 end
 
