@@ -135,12 +135,14 @@ julia_package_factory.addSteps([
     # Transfer the result to the buildmaster for uploading to AWS
     steps.MasterShellCommand(
         name="mkdir julia_package",
-        command=["mkdir", "-p", "/tmp/julia_package"]
+        command=["mkdir", "-p", "/tmp/julia_package"],
+        doStepIf=should_upload,
     ),
 
     steps.FileUpload(
         workersrc=util.Interpolate("%(prop:local_filename)s"),
-        masterdest=util.Interpolate("/tmp/julia_package/%(prop:upload_filename)s")
+        masterdest=util.Interpolate("/tmp/julia_package/%(prop:upload_filename)s"),
+        doStepIf=should_upload,
     ),
 
     # Upload it to AWS and cleanup the master!
