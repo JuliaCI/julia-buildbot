@@ -34,6 +34,14 @@ julia_package_factory.addSteps([
         flunkOnFailure=False
     ),
 
+    # If we're on linux, we're super fast and we use ccache.  So auto-nuke.
+    steps.ShellCommand(
+        name="git clean -fdx, if we use ccache",
+        command=["git", "clean", "-fdx"],
+        doStepIf=is_linux,
+        flunkOnFailure=False,
+    ),
+
     # make clean first
     steps.ShellCommand(
         name="make cleanall",
