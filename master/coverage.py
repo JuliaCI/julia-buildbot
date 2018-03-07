@@ -12,7 +12,7 @@ using Coverage, CoverageBase, Compat
 
 cd(joinpath(CoverageBase.julia_top()))
 results = Coverage.process_folder("base")
-if isdefined(CoverageBase.BaseTestRunner, STDLIBS)
+if isdefined(CoverageBase.BaseTestRunner, :STDLIBS)
     for stdlib in CoverageBase.BaseTestRunner.STDLIBS
         append!(results, Coverage.process_folder("stdlib/$stdlib/src"))
     end
