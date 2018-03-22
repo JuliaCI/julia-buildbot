@@ -26,14 +26,6 @@ julia_package_factory.addSteps([
         progress=True
     ),
 
-    # Ensure gcc and cmake are installed on OSX
-    steps.ShellCommand(
-        name="Install necessary brew dependencies",
-        command=["brew", "install", "gcc", "cmake"],
-        doStepIf=is_mac,
-        flunkOnFailure=False
-    ),
-
     # If we're on linux, we're super fast and we use ccache.  So auto-nuke.
     steps.ShellCommand(
         name="git clean -fdx, if we use ccache",
