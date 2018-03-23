@@ -74,7 +74,7 @@ llvmjl_factory.addSteps([
         command=[
             "/bin/bash",
             "-c",
-            util.Interpolate("~/bin/try_thrice ~/bin/aws put --fail --public julialangmirror/llvmjl-%(prop:revision)s-%(prop:shortcommit)s-%(prop:os_name)s%(prop:bits)s.tar.gz /tmp/llvm_jl/llvmjl-%(prop:revision)s-%(prop:shortcommit)s-%(prop:os_name)s%(prop:bits)s.tar.gz")
+            util.Interpolate("aws s3 cp --acl public-read /tmp/llvm_jl/llvmjl-%(prop:revision)s-%(prop:shortcommit)s-%(prop:os_name)s%(prop:bits)s.tar.gz s3://julialangmirror/llvmjl-%(prop:revision)s-%(prop:shortcommit)s-%(prop:os_name)s%(prop:bits)s.tar.gz")
         ],
         haltOnFailure=True
     ),

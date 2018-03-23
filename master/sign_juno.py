@@ -15,7 +15,7 @@ sign_juno_factory.addSteps([
     steps.SetPropertyFromCommand(name="Get filename", command=["/bin/bash", "-c", "ls *-signed*"], property="filename"),
     steps.MasterShellCommand(name="mkdir juno_cache", command=["mkdir", "-p", "/tmp/juno_cache"]),
     steps.FileUpload(workersrc=util.Interpolate("%(prop:filename)s"), masterdest=util.Interpolate("/tmp/juno_cache/%(prop:filename)s")),
-    steps.MasterShellCommand(name="Upload to AWS", command=["/bin/bash", "-c", util.Interpolate("~/bin/try_thrice ~/bin/aws put --fail --public junolab/latest/signed/%(prop:filename)s /tmp/juno_cache/%(prop:filename)s")], haltOnFailure=True),
+    steps.MasterShellCommand(name="Upload to AWS", command=["/bin/bash", "-c", util.Interpolate("aws s3 cp --acl public-read /tmp/juno_cache/%(prop:filename)s s3://junolab/latest/signed/%(prop:filename)s")], haltOnFailure=True),
 
     # Cleanup!
     steps.MasterShellCommand(name="Cleanup", command=["rm", "-f", util.Interpolate("/tmp/juno_cache/%(prop:filename)s")])

@@ -128,24 +128,24 @@ def munge_artifact_filename(props_obj):
 def render_upload_command(props_obj):
     upload_path = gen_upload_path(props_obj, namespace="pretesting")
     upload_filename = props_obj.getProperty("upload_filename")
-    return ["/bin/bash", "-c", "~/bin/try_thrice ~/bin/aws put --fail --public %s /tmp/julia_package/%s"%(upload_path, upload_filename)]
+    return ["/bin/bash", "-c", "aws s3 cp --acl public-read /tmp/julia_package/%s s3://%s"%(upload_filename, upload_path)]
 
 @util.renderer
 def render_promotion_command(props_obj):
     src_path = gen_upload_path(props_obj, namespace="pretesting")
     dst_path = gen_upload_path(props_obj)
-    return ["/bin/bash", "-c", "~/bin/try_thrice ~/bin/aws cp --fail --public %s /%s"%(dst_path, src_path)]
+    return ["/bin/bash", "-c", "aws s3 cp --acl public-read s3://%s s3://%s"%(src_path, dst_path)]
 
 @util.renderer
 def render_latest_promotion_command(props_obj):
     src_path = gen_upload_path(props_obj, namespace="pretesting")
     dst_path = gen_latest_upload_path(props_obj)
-    return ["/bin/bash", "-c", "~/bin/try_thrice ~/bin/aws cp --fail --public %s /%s"%(dst_path, src_path)]
+    return ["/bin/bash", "-c", "aws s3 cp --acl public-read s3://%s s3://%s"%(src_path, dst_path)]
 
 @util.renderer
 def render_cleanup_pretesting_command(props_obj):
     del_path = gen_upload_path(props_obj, namespace="pretesting")
-    return ["/bin/bash", "-c", "~/bin/try_thrice ~/bin/aws rm %s"%(del_path)]
+    return ["/bin/bash", "-c", "aws s3 rm s3://%s"%(del_path)]
 
 @util.renderer
 def render_download_url(props_obj):

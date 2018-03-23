@@ -83,38 +83,10 @@ julia_threading_factory.addSteps([
         property="shortcommit"
     ),
 
-    # Upload the result!
-#    steps.MasterShellCommand(
-#        name="mkdir julia_package",
-#        command=["mkdir", "-p", "/tmp/julia_package"]
-#    ),
-#    steps.FileUpload(
-#        workersrc=util.Interpolate("julia-%(prop:shortcommit)s-Linux-%(prop:tar_arch)s.tar.gz"),
-#        masterdest=util.Interpolate("/tmp/julia_package/juliathreading-%(prop:shortcommit)s-Linux-%(prop:tar_arch)s.tar.gz")
-#    ),
-
-    # Upload it to AWS and cleanup the master!
-#    steps.MasterShellCommand(
-#        name="Upload to AWS",
-#        command=["/bin/bash", "-c", util.Interpolate("~/bin/try_thrice ~/bin/aws put --fail --public julianightlies/bin/linux/%(prop:up_arch)s/%(prop:majmin)s/juliathreading-%(prop:version)s-%(prop:shortcommit)s-linux%(prop:bits)s.tar.gz /tmp/julia_package/juliathreading-%(prop:shortcommit)s-Linux-%(prop:tar_arch)s.tar.gz")],
-#        haltOnFailure=True
-#    ),
-#    steps.MasterShellCommand(
-#        name="Upload to AWS (latest)",
-#        command=["/bin/bash", "-c", util.Interpolate("~/bin/try_thrice ~/bin/aws put --fail --public julianightlies/bin/linux/%(prop:up_arch)s/juliathreading-latest-linux%(prop:bits)s.tar.gz /tmp/julia_package/julia-%(prop:shortcommit)s-Linux-%(prop:tar_arch)s.tar.gz")],
-#        doStepIf=is_nightly_build,
-#        haltOnFailure=True
-#    ),
     steps.MasterShellCommand(
         name="Cleanup Master",
         command=["rm", "-f", util.Interpolate("/tmp/julia_package/juliathreading-%(prop:shortcommit)s-Linux-%(prop:tar_arch)s.tar.gz")]
     ),
-
-#    steps.MasterShellCommand(
-#        name="Report success",
-#        command=["/bin/bash", "-c", util.Interpolate("~/bin/try_thrice curl -L -H 'Content-type: application/json' -d '{\"target\": \"linux_threading-%(prop:tar_arch)s\", \"url\": \"https://s3.amazonaws.com/julianightlies/bin/linux/%(prop:up_arch)s/%(prop:majmin)s/juliathreading-%(prop:version)s-%(prop:shortcommit)s-linux%(prop:bits)s.tar.gz\", \"version\": \"%(prop:shortcommit)s\"}' https://status.julialang.org/put/nightly")],
-#        doStepIf=is_nightly_build
-#    ),
 ])
 
 julia_threading_builders = ["nightly_threading-x86", "nightly_threading-x64"]
