@@ -80,15 +80,6 @@ julia_package_factory.addSteps([
         env=julia_package_env,
     ),
 
-    # Test this build
-    steps.ShellCommand(
-        name="make testall",
-        command=["/bin/bash", "-c", util.Interpolate("make %(prop:flags)s %(prop:extra_make_flags)s testall")],
-        haltOnFailure = True,
-        timeout=3600,
-        env=julia_package_env,
-    ),
-
     # Set a bunch of properties that are useful down the line
     steps.SetPropertyFromCommand(
         name="Get commitmessage",
@@ -136,39 +127,32 @@ julia_package_factory.addSteps([
     steps.MasterShellCommand(
         name="mkdir julia_package",
         command=["mkdir", "-p", "/tmp/julia_package"],
-        doStepIf=should_upload,
     ),
 
     steps.FileUpload(
         workersrc=util.Interpolate("%(prop:local_filename)s"),
         masterdest=util.Interpolate("/tmp/julia_package/%(prop:upload_filename)s"),
-        doStepIf=should_upload,
     ),
 
     # Upload it to AWS and cleanup the master!
     steps.MasterShellCommand(
         name="Upload to AWS",
         command=render_upload_command,
-        doStepIf=should_upload,
-        haltOnFailure=True
-    ),
-    steps.MasterShellCommand(
-        name="Upload to AWS (latest)",
-        command=render_latest_upload_command,
-        doStepIf=should_upload_latest,
         haltOnFailure=True
     ),
 
     steps.MasterShellCommand(
         name="Cleanup Master",
         command=["rm", "-f", util.Interpolate("/tmp/julia_package/%(prop:upload_filename)s")],
-        doStepIf=should_upload
     ),
 
-    # Trigger a download of this file onto another worker for coverage purposes
-    steps.Trigger(schedulerNames=["Julia Coverage Testing"],
+    # Trigger a download of this file onto another worker for testing
+    steps.Trigger(
+        schedulerNames=[render_tester_name],
         set_properties={
-            'url': render_download_url,
+            'download_url': render_pretesting_download_url,
+            'majmin': util.Property('majmin'),
+            'upload_filename': util.Property('upload_filename'),
             'commitmessage': util.Property('commitmessage'),
             'commitname': util.Property('commitname'),
             'commitemail': util.Property('commitemail'),
@@ -177,7 +161,6 @@ julia_package_factory.addSteps([
             'shortcommit': util.Property('shortcommit'),
         },
         waitForFinish=False,
-        doStepIf=should_run_coverage
     )
 ])
 
@@ -185,12 +168,12 @@ julia_package_factory.addSteps([
 packager_mapping = {("package_" + k): v for k, v in builder_mapping.iteritems()}
 
 # Add a few builders that don't exist in the typical mapping
-packager_mapping["build_ubuntu32"] = "ubuntu16_04-x86"
-packager_mapping["build_ubuntu64"] = "ubuntu16_04-x64"
-packager_mapping["build_centos64"] = "centos7_3-x64"
+#packager_mapping["build_ubuntu32"] = "ubuntu16_04-x86"
+#packager_mapping["build_ubuntu64"] = "ubuntu16_04-x64"
+#packager_mapping["build_centos64"] = "centos7_3-x64"
 
 packager_scheduler = schedulers.AnyBranchScheduler(
-    name="Julia binary packaging",
+    name="Julia Binary Packaging",
     change_filter=util.ChangeFilter(
         project=['JuliaLang/julia','staticfloat/julia'],
         # Only build `master` or `release-*`
