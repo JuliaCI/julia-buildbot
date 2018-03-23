@@ -72,27 +72,33 @@ def gen_upload_filename(props_obj):
         props["os_name_file"] = "win"
     return "julia-{shortcommit}-{os_name_file}{bits}.{os_pkg_ext}".format(**props)
 
-
-def gen_upload_path(props_obj):
+def gen_upload_path(props_obj, namespace=None):
     up_arch = props_obj.getProperty("up_arch")
     majmin = props_obj.getProperty("majmin")
-    upload_fname = props_obj.getProperty("upload_filename")
+    upload_filename = props_obj.getProperty("upload_filename")
     os = get_os_name(props_obj)
-    return "julialangnightlies/bin/%s/%s/%s/%s"%(os, up_arch, majmin, upload_fname)
+    if namespace is None:
+        return "julialangnightlies/bin/%s/%s/%s/%s"%(os, up_arch, majmin, upload_filename)
+    else:
+        return "julialangnightlies/%s/bin/%s/%s/%s/%s"%(namespace, os, up_arch, majmin, upload_filename)
 
-def gen_latest_upload_path(props_obj):
+def gen_latest_upload_path(props_obj, namespace=None):
     up_arch = props_obj.getProperty("up_arch")
     upload_filename = props_obj.getProperty("upload_filename")
     if upload_filename[:6] == "julia-":
         split_name = upload_filename.split("-")
         upload_filename = "julia-latest-%s"%(split_name[2])
     os = get_os_name(props_obj)
-    return "julialangnightlies/bin/%s/%s/%s"%(os, up_arch, upload_filename)
+    if namespace is None:
+        return "julialangnightlies/bin/%s/%s/%s"%(os, up_arch, upload_filename)
+    else:
+        return "julialangnightlies/%s/bin/%s/%s/%s"%(namespace, os, up_arch, upload_filename)
 
 
-def gen_download_url(props_obj):
+
+def gen_download_url(props_obj, namespace=None):
     base = 'https://s3.amazonaws.com'
-    return '%s/%s'%(base, gen_upload_path(props_obj))
+    return '%s/%s'%(base, gen_upload_path(props_obj, namespace=namespace))
 
 def gen_latest_download_url(props_obj):
     base = 'https://s3.amazonaws.com'
@@ -120,19 +126,34 @@ def munge_artifact_filename(props_obj):
 
 @util.renderer
 def render_upload_command(props_obj):
-    upload_path = gen_upload_path(props_obj)
+    upload_path = gen_upload_path(props_obj, namespace="pretesting")
     upload_filename = props_obj.getProperty("upload_filename")
     return ["/bin/bash", "-c", "~/bin/try_thrice ~/bin/aws put --fail --public %s /tmp/julia_package/%s"%(upload_path, upload_filename)]
 
 @util.renderer
-def render_latest_upload_command(props_obj):
-    latest_upload_path = gen_latest_upload_path(props_obj)
-    upload_filename = props_obj.getProperty("upload_filename")
-    return ["/bin/bash", "-c", "~/bin/try_thrice ~/bin/aws put --fail --public %s /tmp/julia_package/%s"%(latest_upload_path, upload_filename)]
+def render_promotion_command(props_obj):
+    src_path = gen_upload_path(props_obj, namespace="pretesting")
+    dst_path = gen_upload_path(props_obj)
+    return ["/bin/bash", "-c", "~/bin/try_thrice ~/bin/aws cp --fail --public %s /%s"%(dst_path, src_path)]
+
+@util.renderer
+def render_latest_promotion_command(props_obj):
+    src_path = gen_upload_path(props_obj, namespace="pretesting")
+    dst_path = gen_latest_upload_path(props_obj)
+    return ["/bin/bash", "-c", "~/bin/try_thrice ~/bin/aws cp --fail --public %s /%s"%(dst_path, src_path)]
+
+@util.renderer
+def render_cleanup_pretesting_command(props_obj):
+    del_path = gen_upload_path(props_obj, namespace="pretesting")
+    return ["/bin/bash", "-c", "~/bin/try_thrice ~/bin/aws rm %s"%(del_path)]
 
 @util.renderer
 def render_download_url(props_obj):
     return gen_download_url(props_obj)
+
+@util.renderer
+def render_pretesting_download_url(props_obj):
+    return gen_download_url(props_obj, namespace="pretesting")
 
 @util.renderer
 def render_make_app(props_obj):
@@ -144,7 +165,8 @@ def render_make_app(props_obj):
     # We emit a bash command that attempts to run `make app` (which is the nice
     # `sf/consistent_distnames` shortcut), and if that fails, it runs the steps
     # manually, which boil down to `make -C contrib/mac/app` and moving the
-    # result to the top-level, where we can find it.
+    # result to the top-level, where we can find it.  We can remove this once
+    # 0.6 is no longer being built.
     return [
         "/bin/bash",
         "-c",
@@ -157,30 +179,39 @@ def build_download_julia_cmd(props_obj):
     # Build commands to download/install julia
     if is_mac(props_obj):
         # Download the .dmg
-        cmd  = "curl -L '%s' -o Julia.dmg && "%(download_url)
+        cmd  = "curl -L '%s' -o julia-installer.dmg && "%(download_url)
         # Mount it
-        cmd += "hdiutil mount Julia.dmg && "
+        cmd += "hdiutil mount julia-installer.dmg && "
         # copy its `julia` folder contents here.
         cmd += "cp -Ra /Volumes/Julia-*/Julia-*.app/Contents/Resources/julia/* . && "
         # Unmount any and all Julia disk images
         cmd += "for j in /Volumes/Julia-*; do hdiutil unmount \"$j\"; done && "
         # Delete the .dmg
-        cmd += "rm -f Julia.dmg"
+        cmd += "rm -f julia-installer.dmg"
     elif is_windows(props_obj):
-        # TODO: Figure out how to actually do this.  :P
-        cmd = "curl -L '%s' -o Julia.exe;"%(download_url)
+        # Download the .exe
+        cmd = "curl -L '%s' -o julia-installer.exe && "%(download_url)
+        # Make it executable
+        cmd += "chmod +x julia-installer.exe && "
+        # Extract it into the current directory
+        cmd += "./julia-installer.exe /S /D=$(cygpath -w $(pwd)) && "
+        # Remove the .exe
+        cmd += "rm -f julia-installer.exe"
     else:
+        # Oh linux.  Your simplicity always gets me
         cmd = "curl -L '%s' | tar --strip-components=1 -zx"%(download_url)
     return ["/bin/bash", "-c", cmd]
 
 
 @util.renderer
-def download_julia(props_obj):
-    # Calculate upload_filename, add to properties, then get download url
-    upload_filename = gen_upload_filename(props_obj)
-    props_obj.setProperty("upload_filename", upload_filename, "download_julia")
-    download_url = gen_download_url(props_obj)
-    props_obj.setProperty("download_url", download_url, "download_julia")
+def download_julia(props_obj, namespace=None):
+    # If we already have an "url", use that, otherwise try to generate it:
+    if not props_obj.hasProperty('download_url'):
+        # Calculate upload_filename, add to properties, then get download url
+        upload_filename = gen_upload_filename(props_obj)
+        props_obj.setProperty("upload_filename", upload_filename, "download_julia")
+        download_url = gen_download_url(props_obj)
+        props_obj.setProperty("download_url", download_url, "download_julia")
     return build_download_julia_cmd(props_obj)
 
 def download_latest_julia(props_obj):
@@ -193,3 +224,8 @@ def download_latest_julia(props_obj):
     download_url = gen_latest_download_url(props_obj)
     props_obj.setProperty("download_url", download_url, "download_latest_julia")
     return build_download_julia_cmd(props_obj)
+
+@util.renderer
+def render_tester_name(props_obj):
+    props = props_obj_to_dict(props_obj)
+    return "Julia %s Testing"%(props['buildername'].replace('package_', ''))

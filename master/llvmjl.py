@@ -33,10 +33,9 @@ llvmjl_factory.addSteps([
     ),
 
     # Download Julia
-    steps.SetPropertyFromCommand(
+    steps.ShellCommand(
         name="Download Julia",
         command=download_julia,
-        property="julia_path",
     ),
     # Download llvm-extras
     steps.ShellCommand(
