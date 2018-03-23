@@ -85,7 +85,7 @@ llvm_extras_factory.addSteps([
         command=[
             "/bin/bash",
             "-c",
-            util.Interpolate("~/bin/try_thrice ~/bin/aws put --fail --public julialangmirror/llvm_extras-%(prop:shortcommit)s-%(prop:os_name)s%(prop:bits)s.tar.gz /tmp/llvm_extras/llvm_extras-%(prop:shortcommit)s-%(prop:os_name)s%(prop:bits)s.tar.gz")
+            util.Interpolate("aws s3 cp --acl public-read /tmp/llvm_extras/llvm_extras-%(prop:shortcommit)s-%(prop:os_name)s%(prop:bits)s.tar.gz s3://julialangmirror/llvm_extras-%(prop:shortcommit)s-%(prop:os_name)s%(prop:bits)s.tar.gz")
         ],
         haltOnFailure=True
     ),

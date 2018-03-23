@@ -115,7 +115,7 @@ julia_srpm_package_factory.addSteps([
     ),
     steps.MasterShellCommand(
         name="Upload to AWS",
-        command=["/bin/bash", "-c", util.Interpolate("~/bin/try_thrice ~/bin/aws put --fail --public julialangnightlies/bin/srpm/%(prop:filename)s /tmp/julia_package/%(prop:filename)s")],
+        command=["/bin/bash", "-c", util.Interpolate("aws s3 cp --acl public-read /tmp/julia_package/%(prop:filename)s s3://julialangnightlies/bin/srpm/%(prop:filename)s ")],
         haltOnFailure=True
     ),
 
