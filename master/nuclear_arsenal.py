@@ -4,33 +4,6 @@
 
 # Add a manual scheduler for clearing out package_ and build_ arpack, openblas, suite-sparse deps
 nuclear_arsenal = {
-    "clean": {
-        "label": "clean arpack, openblas, suite-sparse, openlibm and openspecfun",
-        "command": [
-            "/bin/bash",
-            "-c",
-            "for f in ../../{package_,build_,coverage_,juno_,nightly_,perf_}*; do ( \
-                [[ -d $f/build/deps ]] && \
-                cd $f/build/deps && \
-                make distclean-arpack distclean-suitesparse distclean-openblas \
-                     distclean-openlibm distclean-openspecfun \
-            ); done; \
-            echo Done",
-        ],
-    },
-    "cleanpkg": {
-        "label": "clean mbedtls, libssh2, curl, and libgit2",
-        "command": [
-            "/bin/bash",
-            "-c",
-            "for f in ../../{package_,build_,coverage_,juno_,nightly_,perf_}*; do (\
-                [[ -d $f/build/deps ]] && \
-                cd $f/build/deps && \
-                make distclean-mbedtls distclean-libssh2 distclean-curl distclean-libgit2 \
-            ); done; \
-            echo Done",
-        ],
-    },
     "nuke": {
         "label": "Nuke all build/package directories",
         "command": [
