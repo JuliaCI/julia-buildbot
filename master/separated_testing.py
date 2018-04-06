@@ -20,6 +20,7 @@ julia_testing_factory.addSteps([
     steps.ShellCommand(
         name="clean it out",
         command=["/bin/bash", "-c", "rm -rf *"],
+        flunkOnFailure=False,
     ),
 
     # Download the appropriate tarball and extract it
