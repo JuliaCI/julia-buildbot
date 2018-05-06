@@ -99,10 +99,13 @@ for name in all_names:
     # and add XC_HOST dependent on the architecture
     if name[:3] == 'win':
         flags += 'JULIA_ENABLE_DOCBUILD=0 '
+        flags += 'USE_BINARYBUILDER_LLVM=1 '
         if march == 'x86-64':
             flags += 'XC_HOST=x86_64-w64-mingw32 '
+            flags += 'BINARYBUILDER_TRIPLET=x86_64-w64-mingw32 '
         else:
             flags += 'XC_HOST=i686-w64-mingw32 '
+            flags += 'BINARYBUILDER_TRIPLET=i686-w64-mingw32 '
 
 
     if name[:3] == "osx":
