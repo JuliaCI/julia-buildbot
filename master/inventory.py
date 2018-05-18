@@ -43,8 +43,8 @@ for name in all_names:
         os_name = "linux"
         os_pkg_ext = "tar.gz"
 
-        # Use ccache on Linux builds
-        flags += 'USECCACHE=1 '
+    # Use ccache everywhere
+    flags += 'USECCACHE=1 '
 
 
 

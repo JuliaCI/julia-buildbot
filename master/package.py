@@ -19,42 +19,13 @@ julia_package_factory.addSteps([
     steps.Git(
         name="Julia checkout",
         repourl=util.Property('repository', default='git://github.com/JuliaLang/julia.git'),
-        mode='incremental',
-        method='clean',
+        mode='full',
+        method='fresh',
         submodules=True,
         clobberOnFailure=True,
         progress=True
     ),
 
-    # If we're on linux, we're super fast and we use ccache.  So auto-nuke.
-    steps.ShellCommand(
-        name="git clean -fdx, if we use ccache",
-        command=["git", "clean", "-fdx"],
-        doStepIf=is_linux,
-        flunkOnFailure=False,
-    ),
-
-    # make clean first
-    steps.ShellCommand(
-        name="make cleanall",
-        command=["/bin/bash", "-c", util.Interpolate("make %(prop:flags)s %(prop:extra_make_flags)s cleanall")],
-        env=julia_package_env,
-    ),
-
-    # Cleanup old julia build directories, .dmg files, etc...
-    steps.ShellCommand(
-        name="Clean out temporary windows cruft",
-        command=["/bin/bash", "-c", "rm -rf julia-*"],
-        flunkOnFailure=False,
-    ),
-
-    # Clear out old .cov and .mem files.  Note that this should be removed once we always start from scratch. 
-    steps.ShellCommand(
-        name="Clear out usr",
-        command=["/bin/bash", "-c", "find . \( -name *.jl.*.cov -o -name *.jl.mem \) -print -delete"],
-        env=julia_package_env,
-    ),
- 
     # Get win-extras files ready on windows
     steps.ShellCommand(
         name="make win-extras",
