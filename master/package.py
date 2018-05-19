@@ -38,14 +38,14 @@ julia_package_factory.addSteps([
     # Make, forcing some degree of parallelism to cut down compile times
     steps.ShellCommand(
         name="make release",
-        command=["/bin/bash", "-c", util.Interpolate("make -j3 %(prop:flags)s %(prop:extra_make_flags)s release")],
+        command=["/bin/bash", "-c", util.Interpolate("make -j%(prop:nthreads)s %(prop:flags)s %(prop:extra_make_flags)s release")],
         haltOnFailure = True,
         timeout=3600,
         env=julia_package_env,
     ),
     steps.ShellCommand(
         name="make debug",
-        command=["/bin/bash", "-c", util.Interpolate("make -j3 %(prop:flags)s %(prop:extra_make_flags)s debug")],
+        command=["/bin/bash", "-c", util.Interpolate("make -j%(prop:nthreads)s %(prop:flags)s %(prop:extra_make_flags)s debug")],
         haltOnFailure = True,
         timeout=3600,
         env=julia_package_env,
