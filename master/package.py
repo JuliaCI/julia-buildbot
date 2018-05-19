@@ -51,6 +51,15 @@ julia_package_factory.addSteps([
         env=julia_package_env,
     ),
 
+    # Get info about ccache
+    steps.ShellCommand(
+        name="ccache stats",
+        command=["/bin/bash", "-c", "ccache -s -p"],
+        haltOnFailure = False,
+        timeout=3600,
+        env=julia_package_env,
+    ),
+
     # Set a bunch of properties that are useful down the line
     steps.SetPropertyFromCommand(
         name="Get commitmessage",
