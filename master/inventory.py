@@ -110,8 +110,10 @@ for name in all_names:
 
         # Our OSX builder only devotes 2 cores to each VM
         flags += 'JULIA_CPU_CORES=2 '
+        nthreads = 3
     else:
         flags += 'JULIA_CPU_CORES=6 '
+        nthreads = 6
 
     # tests are hitting memory issues, so restart workers when memory consumption gets too high
     flags += 'JULIA_TEST_MAXRSS_MB=1000 '
@@ -127,6 +129,7 @@ for name in all_names:
                 'tar_arch':tar_arch,
                 'release':name,
                 'flags':flags,
+                'nthreads':nthreads,
                 'up_arch':up_arch,
                 'bits':bits,
                 'llvm_cmake':llvm_cmake,
