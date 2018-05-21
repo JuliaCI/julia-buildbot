@@ -65,9 +65,8 @@ julia_package_factory.addSteps([
     # Get info about ccache
     steps.ShellCommand(
         name="ccache stats",
-        command=["/bin/bash", "-c", "ccache -s -p"],
-        haltOnFailure = False,
-        timeout=3600,
+        command=["/bin/bash", "-c", "ccache -s"],
+        flunkOnFailure=False,
         env=julia_package_env,
     ),
 
