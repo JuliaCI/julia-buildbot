@@ -32,20 +32,20 @@ julia_gc_debug_factory.addSteps([
     # make clean first, and nuke llvm
     steps.ShellCommand(
     	name="make cleanall",
-    	command=["/bin/bash", "-c", util.Interpolate("make %(prop:flags)s cleanall")]
+    	command=["/bin/sh", "-c", util.Interpolate("make %(prop:flags)s cleanall")]
     ),
 
     # Make!
     steps.ShellCommand(
     	name="make",
-    	command=["/bin/bash", "-c", util.Interpolate("make -j3 %(prop:flags)s")],
+    	command=["/bin/sh", "-c", util.Interpolate("make -j3 %(prop:flags)s")],
     	haltOnFailure = True
     ),
 
     # Test!
     steps.ShellCommand(
     	name="make testall",
-    	command=["/bin/bash", "-c", util.Interpolate("make %(prop:flags)s testall")]
+    	command=["/bin/sh", "-c", util.Interpolate("make %(prop:flags)s testall")]
     )
 ])
 

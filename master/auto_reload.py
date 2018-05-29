@@ -8,7 +8,7 @@ reload_factory.addSteps([
     # Fetch first (allowing failure if no existing clone is present)
     steps.MasterShellCommand(
         name="Reload buildbot configuration",
-        command=["/bin/bash", "-c", "cd /buildbot; git pull && buildbot reconfig master && git log -1"],
+        command=["/bin/sh", "-c", "cd /buildbot; git pull && buildbot reconfig master && git log -1"],
         flunkOnFailure=True
     )
 ])

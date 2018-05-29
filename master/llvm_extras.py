@@ -30,14 +30,14 @@ llvm_extras_factory.addSteps([
     # make clean first
     steps.ShellCommand(
         name="make distcleanall",
-        command=["/bin/bash", "-c", util.Interpolate("make %(prop:flags)s BUILD_LLVM_CLANG=1 %(prop:extra_make_flags)s -C deps distcleanall")],
+        command=["/bin/sh", "-c", util.Interpolate("make %(prop:flags)s BUILD_LLVM_CLANG=1 %(prop:extra_make_flags)s -C deps distcleanall")],
         env=llvm_extras_env,
     ),
 
     # Our llvm build process fails to properly create `$(build_libdir)` before installing llvm, so let's do it first
     steps.ShellCommand(
         name="make usr/lib",
-        command=["/bin/bash", "-c", util.Interpolate("make -j3 %(prop:flags)s BUILD_LLVM_CLANG=1 %(prop:extra_make_flags)s usr/lib")],
+        command=["/bin/sh", "-c", util.Interpolate("make -j3 %(prop:flags)s BUILD_LLVM_CLANG=1 %(prop:extra_make_flags)s usr/lib")],
         haltOnFailure = True,
         timeout=3600,
         env=llvm_extras_env,
@@ -46,7 +46,7 @@ llvm_extras_factory.addSteps([
     # Make, forcing some degree of parallelism to cut down compile times
     steps.ShellCommand(
         name="make",
-        command=["/bin/bash", "-c", util.Interpolate("make -j3 %(prop:flags)s BUILD_LLVM_CLANG=1 %(prop:extra_make_flags)s -C deps install-llvm")],
+        command=["/bin/sh", "-c", util.Interpolate("make -j3 %(prop:flags)s BUILD_LLVM_CLANG=1 %(prop:extra_make_flags)s -C deps install-llvm")],
         haltOnFailure = True,
         timeout=3600,
         env=llvm_extras_env,
@@ -83,7 +83,7 @@ llvm_extras_factory.addSteps([
     steps.MasterShellCommand(
         name="Upload to AWS",
         command=[
-            "/bin/bash",
+            "/bin/sh",
             "-c",
             util.Interpolate("aws s3 cp --acl public-read /tmp/llvm_extras/llvm_extras-%(prop:shortcommit)s-%(prop:os_name)s%(prop:bits)s.tar.gz s3://julialangmirror/llvm_extras-%(prop:shortcommit)s-%(prop:os_name)s%(prop:bits)s.tar.gz")
         ],

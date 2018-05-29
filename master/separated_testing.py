@@ -19,7 +19,7 @@ julia_testing_factory.addSteps([
     # Clean the place out from previous runs
     steps.ShellCommand(
         name="clean it out",
-        command=["/bin/bash", "-c", "rm -rf *"],
+        command=["/bin/sh", "-c", "rm -rf *"],
         flunkOnFailure=False,
     ),
 

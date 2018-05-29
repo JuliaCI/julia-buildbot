@@ -35,27 +35,27 @@ julia_srpm_package_factory.addSteps([
     # Get Julia version, commit and date of commit
     steps.SetPropertyFromCommand(
     	name="Get Julia version",
-    	command=["/bin/bash", "-c", "echo $(cat ./VERSION | cut -f1 -d'-')"],
+    	command=["/bin/sh", "-c", "echo $(cat ./VERSION | cut -f1 -d'-')"],
     	property="juliaversion"
     ),
     steps.SetPropertyFromCommand(
         name="Get full Julia version",
-        command=["/bin/bash", "-c", "echo $(cat ./VERSION)"],
+        command=["/bin/sh", "-c", "echo $(cat ./VERSION)"],
         property="juliafullversion"
     ),
     steps.SetPropertyFromCommand(
         name="Get commit",
-        command=["/bin/bash", "-c", "echo $(git rev-parse --short=10 HEAD)"],
+        command=["/bin/sh", "-c", "echo $(git rev-parse --short=10 HEAD)"],
         property="juliacommit"
     ),
     steps.SetPropertyFromCommand(
     	name="Get date of commit",
-    	command=["/bin/bash", "-c", "echo $(git log --pretty=format:'%cd' --date=short -n 1 | tr -d '-')"],
+    	command=["/bin/sh", "-c", "echo $(git log --pretty=format:'%cd' --date=short -n 1 | tr -d '-')"],
     	property="datecommit"
     ),
     steps.SetPropertyFromCommand(
         name="Get libuv commit",
-        command=["/bin/bash", "-c", "cat deps/libuv.version | cut -f2 -d'=' | tail -n 1"],
+        command=["/bin/sh", "-c", "cat deps/libuv.version | cut -f2 -d'=' | tail -n 1"],
         property="libuvcommit"
     ),
 
@@ -70,7 +70,7 @@ julia_srpm_package_factory.addSteps([
     ),
     steps.ShellCommand(
         name="Tarballify julia",
-        command=["/bin/bash", "-c", util.Interpolate("make light-source-dist && tar xzf julia-%(prop:juliafullversion)s_%(prop:juliacommit)s.tar.gz && mv $(basename $(pwd)) julia && tar czf ../SOURCES/julia.tar.gz julia && rm -R julia/ julia-%(prop:juliafullversion)s_%(prop:juliacommit)s.tar.gz")]
+        command=["/bin/sh", "-c", util.Interpolate("make light-source-dist && tar xzf julia-%(prop:juliafullversion)s_%(prop:juliacommit)s.tar.gz && mv $(basename $(pwd)) julia && tar czf ../SOURCES/julia.tar.gz julia && rm -R julia/ julia-%(prop:juliafullversion)s_%(prop:juliacommit)s.tar.gz")]
     ),
 
     # Prepare .spec file
@@ -84,19 +84,19 @@ julia_srpm_package_factory.addSteps([
     ),
     steps.ShellCommand(
         name="replace datecommit and juliaversion in .spec",
-        command=["/bin/bash", "-c", util.Interpolate("sed -i -e 's/%%{datecommit}/%(prop:datecommit)s/g' -e 's/%%{juliaversion}/%(prop:juliaversion)s/g' -e 's/%%{uvcommit}/%(prop:libuvcommit)s/g' ../SPECS/julia-nightlies.spec")]
+        command=["/bin/sh", "-c", util.Interpolate("sed -i -e 's/%%{datecommit}/%(prop:datecommit)s/g' -e 's/%%{juliaversion}/%(prop:juliaversion)s/g' -e 's/%%{uvcommit}/%(prop:libuvcommit)s/g' ../SPECS/julia-nightlies.spec")]
     ),
 
     # Download non-submodule dependencies (currently Rmath-julia and libuv)
     steps.ShellCommand(
         name="Download missing tarballs",
-        command=["/bin/bash", "-c", "cd ../SOURCES && spectool -g ../SPECS/julia-nightlies.spec"]
+        command=["/bin/sh", "-c", "cd ../SOURCES && spectool -g ../SPECS/julia-nightlies.spec"]
     ),
 
     # Build SRPM
     steps.ShellCommand(
         name="Build SRPM",
-        command=["/bin/bash", "-c", "rpmbuild -bs SPECS/julia-nightlies.spec --define '_topdir .' --define '_source_filedigest_algorithm md5' --define '_binary_filedigest_algorithm md5'"],
+        command=["/bin/sh", "-c", "rpmbuild -bs SPECS/julia-nightlies.spec --define '_topdir .' --define '_source_filedigest_algorithm md5' --define '_binary_filedigest_algorithm md5'"],
         workdir=".",
         haltOnFailure = True
     ),
@@ -104,7 +104,7 @@ julia_srpm_package_factory.addSteps([
     # Upload SRPM to master, which in turn uploads it to AWS
     steps.SetPropertyFromCommand(
         name="Get SRPM filename",
-        command=["/bin/bash", "-c", "echo *.rpm"],
+        command=["/bin/sh", "-c", "echo *.rpm"],
         workdir="SRPMS",
         property="filename"
     ),
@@ -115,7 +115,7 @@ julia_srpm_package_factory.addSteps([
     ),
     steps.MasterShellCommand(
         name="Upload to AWS",
-        command=["/bin/bash", "-c", util.Interpolate("aws s3 cp --acl public-read /tmp/julia_package/%(prop:filename)s s3://julialangnightlies/bin/srpm/%(prop:filename)s ")],
+        command=["/bin/sh", "-c", util.Interpolate("aws s3 cp --acl public-read /tmp/julia_package/%(prop:filename)s s3://julialangnightlies/bin/srpm/%(prop:filename)s ")],
         haltOnFailure=True
     ),
 
@@ -130,12 +130,12 @@ julia_srpm_package_factory.addSteps([
     # Report back to the mothership
     steps.SetPropertyFromCommand(
         name="Get shortcommit",
-        command=["/bin/bash", "-c", util.Interpolate("echo %(prop:revision)s | cut -c1-10")],
+        command=["/bin/sh", "-c", util.Interpolate("echo %(prop:revision)s | cut -c1-10")],
         property="shortcommit"
     ),
     steps.MasterShellCommand(
         name="Report success",
-        command=["/bin/bash", "-c", util.Interpolate("~/bin/try_thrice curl -L -H 'Content-type: application/json' -d '{\"target\": \"Copr\", \"url\": \"https://s3.amazonaws.com/julialangnightlies/buildog/bin/srpm/%(prop:filename)s\", \"version\": \"%(prop:shortcommit)s\"}' https://status.julialang.org/put/nightly")],
+        command=["/bin/sh", "-c", util.Interpolate("~/bin/try_thrice curl -L -H 'Content-type: application/json' -d '{\"target\": \"Copr\", \"url\": \"https://s3.amazonaws.com/julialangnightlies/buildog/bin/srpm/%(prop:filename)s\", \"version\": \"%(prop:shortcommit)s\"}' https://status.julialang.org/put/nightly")],
     )
 ])
 

@@ -128,24 +128,24 @@ def munge_artifact_filename(props_obj):
 def render_upload_command(props_obj):
     upload_path = gen_upload_path(props_obj, namespace="pretesting")
     upload_filename = props_obj.getProperty("upload_filename")
-    return ["/bin/bash", "-c", "aws s3 cp --acl public-read /tmp/julia_package/%s s3://%s"%(upload_filename, upload_path)]
+    return ["/bin/sh", "-c", "aws s3 cp --acl public-read /tmp/julia_package/%s s3://%s"%(upload_filename, upload_path)]
 
 @util.renderer
 def render_promotion_command(props_obj):
     src_path = gen_upload_path(props_obj, namespace="pretesting")
     dst_path = gen_upload_path(props_obj)
-    return ["/bin/bash", "-c", "aws s3 cp --acl public-read s3://%s s3://%s"%(src_path, dst_path)]
+    return ["/bin/sh", "-c", "aws s3 cp --acl public-read s3://%s s3://%s"%(src_path, dst_path)]
 
 @util.renderer
 def render_latest_promotion_command(props_obj):
     src_path = gen_upload_path(props_obj, namespace="pretesting")
     dst_path = gen_latest_upload_path(props_obj)
-    return ["/bin/bash", "-c", "aws s3 cp --acl public-read s3://%s s3://%s"%(src_path, dst_path)]
+    return ["/bin/sh", "-c", "aws s3 cp --acl public-read s3://%s s3://%s"%(src_path, dst_path)]
 
 @util.renderer
 def render_cleanup_pretesting_command(props_obj):
     del_path = gen_upload_path(props_obj, namespace="pretesting")
-    return ["/bin/bash", "-c", "aws s3 rm s3://%s"%(del_path)]
+    return ["/bin/sh", "-c", "aws s3 rm s3://%s"%(del_path)]
 
 @util.renderer
 def render_download_url(props_obj):
@@ -162,13 +162,13 @@ def render_make_app(props_obj):
     new_way = "make {flags} app".format(**props)
     old_way = "make {flags} -C contrib/mac/app && mv contrib/mac/app/*.dmg {local_filename}".format(**props)
 
-    # We emit a bash command that attempts to run `make app` (which is the nice
+    # We emit a shell command that attempts to run `make app` (which is the nice
     # `sf/consistent_distnames` shortcut), and if that fails, it runs the steps
     # manually, which boil down to `make -C contrib/mac/app` and moving the
     # result to the top-level, where we can find it.  We can remove this once
     # 0.6 is no longer being built.
     return [
-        "/bin/bash",
+        "/bin/sh",
         "-c",
         "~/unlock_keychain.sh && (%s || (%s))"%(new_way, old_way)
     ]
@@ -200,7 +200,7 @@ def build_download_julia_cmd(props_obj):
     else:
         # Oh linux.  Your simplicity always gets me
         cmd = "curl -L '%s' | tar --strip-components=1 -zx"%(download_url)
-    return ["/bin/bash", "-c", cmd]
+    return ["/bin/sh", "-c", cmd]
 
 
 @util.renderer

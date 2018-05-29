@@ -20,7 +20,7 @@ julia_package_factory.addSteps([
     # `.git` folder
     steps.ShellCommand(
         name="[Win] wipe state",
-        command=["/bin/bash", "-c", "cmd /c del /s /q *"],
+        command=["/bin/sh", "-c", "cmd /c del /s /q *"],
         flunkOnFailure = False,
         doStepIf=is_windows,
         env=julia_package_env,
@@ -40,7 +40,7 @@ julia_package_factory.addSteps([
     # Get win-extras files ready on windows
     steps.ShellCommand(
         name="make win-extras",
-        command=["/bin/bash", "-c", util.Interpolate("make %(prop:flags)s %(prop:extra_make_flags)s win-extras")],
+        command=["/bin/sh", "-c", util.Interpolate("make %(prop:flags)s %(prop:extra_make_flags)s win-extras")],
         haltOnFailure = True,
         doStepIf=is_windows,
         env=julia_package_env,
@@ -49,14 +49,14 @@ julia_package_factory.addSteps([
     # Make, forcing some degree of parallelism to cut down compile times
     steps.ShellCommand(
         name="make release",
-        command=["/bin/bash", "-c", util.Interpolate("make -j%(prop:nthreads)s %(prop:flags)s %(prop:extra_make_flags)s release")],
+        command=["/bin/sh", "-c", util.Interpolate("make -j%(prop:nthreads)s %(prop:flags)s %(prop:extra_make_flags)s release")],
         haltOnFailure = True,
         timeout=3600,
         env=julia_package_env,
     ),
     steps.ShellCommand(
         name="make debug",
-        command=["/bin/bash", "-c", util.Interpolate("make -j%(prop:nthreads)s %(prop:flags)s %(prop:extra_make_flags)s debug")],
+        command=["/bin/sh", "-c", util.Interpolate("make -j%(prop:nthreads)s %(prop:flags)s %(prop:extra_make_flags)s debug")],
         haltOnFailure = True,
         timeout=3600,
         env=julia_package_env,
@@ -65,7 +65,7 @@ julia_package_factory.addSteps([
     # Get info about ccache
     steps.ShellCommand(
         name="ccache stats",
-        command=["/bin/bash", "-c", "ccache -s"],
+        command=["/bin/sh", "-c", "ccache -s"],
         flunkOnFailure=False,
         env=julia_package_env,
     ),
@@ -97,7 +97,7 @@ julia_package_factory.addSteps([
     # Make binary-dist to package it up
     steps.ShellCommand(
         name="make binary-dist",
-        command=["/bin/bash", "-c", util.Interpolate("make %(prop:flags)s %(prop:extra_make_flags)s binary-dist")],
+        command=["/bin/sh", "-c", util.Interpolate("make %(prop:flags)s %(prop:extra_make_flags)s binary-dist")],
         haltOnFailure = True,
         timeout=3600,
         env=julia_package_env,
