@@ -15,7 +15,8 @@ osx_names     = build_names("osx", ["10_10", "10_11", "10_12"], ["x64"])
 centos_names  = build_names("centos", ["6_9"], ["x64", "x86"])
 centos_names += build_names("centos", ["7_3"], ["x64", "ppc64le", "aarch64"])
 debian_names  = ["debian7_11-armv7l", "debian8_9-x86"]
-all_names     = ubuntu_names + osx_names + centos_names + win_names + debian_names
+freebsd_names = ["freebsd11_1-x64"]
+all_names     = ubuntu_names + osx_names + centos_names + win_names + debian_names + freebsd_names
 
 # Define all the attributes we'll use in our buildsteps
 c['workers'] = []
@@ -39,13 +40,15 @@ for name in all_names:
     elif name[:3] == "osx":
         os_name = "mac"
         os_pkg_ext = "dmg"
+    elif name[:7] == "freebsd":
+        os_name = "freebsd"
+        os_pkg_ext = "tar.gz"
     else:
         os_name = "linux"
         os_pkg_ext = "tar.gz"
 
     # Use ccache everywhere
     flags += 'USECCACHE=1 '
-
 
 
     if name[-3:] == 'x86':
@@ -154,4 +157,5 @@ builder_mapping = {
     "linuxarmv7l": "debian7_11-armv7l",
     "linuxppc64le": "centos7_3-ppc64le",
     "linuxaarch64": "centos7_3-aarch64",
+    "freebsd64": "freebsd11_1-x64",
 }
