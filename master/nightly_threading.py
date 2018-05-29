@@ -51,20 +51,20 @@ julia_threading_factory.addSteps([
     # make clean first
     steps.ShellCommand(
     	name="make cleanall",
-    	command=["/bin/bash", "-c", util.Interpolate("make %(prop:flags)s cleanall")]
+    	command=["/bin/sh", "-c", util.Interpolate("make %(prop:flags)s cleanall")]
     ),
 
     # Make!
     steps.ShellCommand(
         name="make binary-dist",
-        command=["/bin/bash", "-c", util.Interpolate("make -j3 %(prop:flags)s binary-dist")],
+        command=["/bin/sh", "-c", util.Interpolate("make -j3 %(prop:flags)s binary-dist")],
         haltOnFailure = True
     ),
 
     # Test!
     steps.ShellCommand(
     	name="make testall",
-    	command=["/bin/bash", "-c", util.Interpolate("make %(prop:flags)s testall")]
+    	command=["/bin/sh", "-c", util.Interpolate("make %(prop:flags)s testall")]
     ),
 
     steps.SetPropertyFromCommand(

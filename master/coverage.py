@@ -60,19 +60,19 @@ julia_coverage_factory.addSteps([
     # Clean the place out from previous runs
     steps.ShellCommand(
         name="clean it out",
-        command=["/bin/bash", "-c", "rm -rf *"]
+        command=["/bin/sh", "-c", "rm -rf *"]
     ),
 
     # Download the appropriate tarball and extract it
     steps.ShellCommand(
         name="download/extract tarball",
-        command=["/bin/bash", "-c", util.Interpolate("curl -L %(prop:url)s | tar zx")],
+        command=["/bin/sh", "-c", util.Interpolate("curl -L %(prop:url)s | tar zx")],
     ),
 
     # Find Julia directory (so we don't have to know the shortcommit)
     steps.SetPropertyFromCommand(
         name="Find Julia executable",
-        command=["/bin/bash", "-c", "echo julia-*"],
+        command=["/bin/sh", "-c", "echo julia-*"],
         property="juliadir"
     ),
 

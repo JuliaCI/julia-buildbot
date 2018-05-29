@@ -7,7 +7,7 @@ nuclear_arsenal = {
     "nuke": {
         "label": "Nuke all build/package directories",
         "command": [
-            "/bin/bash",
+            "/bin/sh",
             "-c",
             "if [ `uname` = Darwin ]; \
                 then sudo rm -rf ../../{package_,build_,coverage_,juno_,nightly_,perf_}*; \

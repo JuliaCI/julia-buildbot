@@ -29,7 +29,7 @@ llvmjl_factory.addSteps([
     # Cleanup
     steps.ShellCommand(
         name="Cleanup",
-        command=["bash", "-c", "rm -rf *"],
+        command=["/bin/sh", "-c", "rm -rf *"],
     ),
 
     # Download Julia
@@ -40,7 +40,7 @@ llvmjl_factory.addSteps([
     # Download llvm-extras
     steps.ShellCommand(
         name="Download llvm-extras",
-        command=["bash", "-c", util.Interpolate("cd julia-*; curl -L 'https://s3.amazonaws.com/julialangmirror/llvm_extras-%(prop:shortcommit)s-%(prop:os_name)s%(prop:bits)s.tar.gz' | tar -zxv --strip-components=1")],
+        command=["/bin/sh", "-c", util.Interpolate("cd julia-*; curl -L 'https://s3.amazonaws.com/julialangmirror/llvm_extras-%(prop:shortcommit)s-%(prop:os_name)s%(prop:bits)s.tar.gz' | tar -zxv --strip-components=1")],
     ),
 
     # Invoke Julia to build LLVM
@@ -72,7 +72,7 @@ llvmjl_factory.addSteps([
     steps.MasterShellCommand(
         name="Upload to AWS",
         command=[
-            "/bin/bash",
+            "/bin/sh",
             "-c",
             util.Interpolate("aws s3 cp --acl public-read /tmp/llvm_jl/llvmjl-%(prop:revision)s-%(prop:shortcommit)s-%(prop:os_name)s%(prop:bits)s.tar.gz s3://julialangmirror/llvmjl-%(prop:revision)s-%(prop:shortcommit)s-%(prop:os_name)s%(prop:bits)s.tar.gz")
         ],

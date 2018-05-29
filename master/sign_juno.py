@@ -9,13 +9,13 @@ sign_juno_factory.addSteps([
     steps.ShellCommand(command=["/usr/bin/curl", "-L", "https://raw.githubusercontent.com/JuliaCI/julia-buildbot/master/commands/sign_juno.sh", "-o", "sign_juno.sh"]),
 
     # Invoke it
-    steps.ShellCommand(command=["/bin/bash", "sign_juno.sh", util.Property('osx64_url'), util.Property('win32_url'), util.Property('win64_url')], haltOnFailure=True),
+    steps.ShellCommand(command=["/bin/sh", "sign_juno.sh", util.Property('osx64_url'), util.Property('win32_url'), util.Property('win64_url')], haltOnFailure=True),
 
     # Grab the output and transfer it back!
-    steps.SetPropertyFromCommand(name="Get filename", command=["/bin/bash", "-c", "ls *-signed*"], property="filename"),
+    steps.SetPropertyFromCommand(name="Get filename", command=["/bin/sh", "-c", "ls *-signed*"], property="filename"),
     steps.MasterShellCommand(name="mkdir juno_cache", command=["mkdir", "-p", "/tmp/juno_cache"]),
     steps.FileUpload(workersrc=util.Interpolate("%(prop:filename)s"), masterdest=util.Interpolate("/tmp/juno_cache/%(prop:filename)s")),
-    steps.MasterShellCommand(name="Upload to AWS", command=["/bin/bash", "-c", util.Interpolate("aws s3 cp --acl public-read /tmp/juno_cache/%(prop:filename)s s3://junolab/latest/signed/%(prop:filename)s")], haltOnFailure=True),
+    steps.MasterShellCommand(name="Upload to AWS", command=["/bin/sh", "-c", util.Interpolate("aws s3 cp --acl public-read /tmp/juno_cache/%(prop:filename)s s3://junolab/latest/signed/%(prop:filename)s")], haltOnFailure=True),
 
     # Cleanup!
     steps.MasterShellCommand(name="Cleanup", command=["rm", "-f", util.Interpolate("/tmp/juno_cache/%(prop:filename)s")])
