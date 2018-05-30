@@ -7,36 +7,36 @@ julia_srpm_package_factory.useProgress = True
 julia_srpm_package_factory.addSteps([
     # Clone julia, clear out temporary files from last time...
     steps.Git(
-    	name="Julia checkout",
-    	repourl=util.Property('repository', default='git://github.com/JuliaLang/julia.git'),
-    	mode='incremental',
-    	method='clean',
-    	submodules=True,
-    	clobberOnFailure=True,
-    	progress=True
+        name="Julia checkout",
+        repourl=util.Property('repository', default='git://github.com/JuliaLang/julia.git'),
+        mode='incremental',
+        method='clean',
+        submodules=True,
+        clobberOnFailure=True,
+        progress=True
     ),
     # Fetch so that remote branches get updated as well.
     steps.ShellCommand(
-    	name="git fetch",
-    	command=["git", "fetch"],
-    	flunkOnFailure=False
+        name="git fetch",
+        command=["git", "fetch"],
+        flunkOnFailure=False
     ),
     steps.ShellCommand(
-    	name="Cleanup build artifacts",
-    	command=["rm", "-rf", "../SOURCES", "../SPECS", "../SRPMS", "../BUILD", "../BUILDROOT", "../RPMS"]
+        name="Cleanup build artifacts",
+        command=["rm", "-rf", "../SOURCES", "../SPECS", "../SRPMS", "../BUILD", "../BUILDROOT", "../RPMS"]
     ),
 
     # Bake in version_git.jl.phony
     steps.ShellCommand(
-    	name="Bake in versioning info",
-    	command=["make", "-C", "base", "version_git.jl.phony"]
+        name="Bake in versioning info",
+        command=[util.Interpolate("%(prop:make_cmd)s"), "-C", "base", "version_git.jl.phony"]
     ),
 
     # Get Julia version, commit and date of commit
     steps.SetPropertyFromCommand(
-    	name="Get Julia version",
-    	command=["/bin/sh", "-c", "echo $(cat ./VERSION | cut -f1 -d'-')"],
-    	property="juliaversion"
+        name="Get Julia version",
+        command=["/bin/sh", "-c", "echo $(cat ./VERSION | cut -f1 -d'-')"],
+        property="juliaversion"
     ),
     steps.SetPropertyFromCommand(
         name="Get full Julia version",
@@ -49,9 +49,9 @@ julia_srpm_package_factory.addSteps([
         property="juliacommit"
     ),
     steps.SetPropertyFromCommand(
-    	name="Get date of commit",
-    	command=["/bin/sh", "-c", "echo $(git log --pretty=format:'%cd' --date=short -n 1 | tr -d '-')"],
-    	property="datecommit"
+        name="Get date of commit",
+        command=["/bin/sh", "-c", "echo $(git log --pretty=format:'%cd' --date=short -n 1 | tr -d '-')"],
+        property="datecommit"
     ),
     steps.SetPropertyFromCommand(
         name="Get libuv commit",
@@ -61,8 +61,8 @@ julia_srpm_package_factory.addSteps([
 
     # Build tarballs for Julia and all dependencies
     steps.ShellCommand(
-    	name="mkdir SOURCES",
-    	command=["mkdir", "-p", "../SOURCES"]
+        name="mkdir SOURCES",
+        command=["mkdir", "-p", "../SOURCES"]
     ),
     steps.FileDownload(
         mastersrc="../commands/julia_juliadoc.patch",
@@ -70,7 +70,7 @@ julia_srpm_package_factory.addSteps([
     ),
     steps.ShellCommand(
         name="Tarballify julia",
-        command=["/bin/sh", "-c", util.Interpolate("make light-source-dist && tar xzf julia-%(prop:juliafullversion)s_%(prop:juliacommit)s.tar.gz && mv $(basename $(pwd)) julia && tar czf ../SOURCES/julia.tar.gz julia && rm -R julia/ julia-%(prop:juliafullversion)s_%(prop:juliacommit)s.tar.gz")]
+        command=["/bin/sh", "-c", util.Interpolate("%(prop:make_cmd)s light-source-dist && tar xzf julia-%(prop:juliafullversion)s_%(prop:juliacommit)s.tar.gz && mv $(basename $(pwd)) julia && tar czf ../SOURCES/julia.tar.gz julia && rm -R julia/ julia-%(prop:juliafullversion)s_%(prop:juliacommit)s.tar.gz")]
     ),
 
     # Prepare .spec file
