@@ -57,6 +57,8 @@ def gen_local_filename(props_obj):
             return "contrib/mac/app/Julia-{version}-{shortcommit}.{os_pkg_ext}".format(**props)
         elif is_windows(props_obj):
             return "julia-{version}-{tar_arch}.{os_pkg_ext}".format(**props)
+        elif is_freebsd(props_obj):
+            return "julia-{shortcommit}-FreeBSD-{tar_arch}.{os_pkg_ext}".format(**props)
         else:
             # We made bad decisions in the past
             if props['tar_arch'] == "armv7l":
