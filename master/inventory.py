@@ -125,6 +125,11 @@ for name in all_names:
     if not march is None:
         flags += "MARCH=%s "%(march)
 
+    if os_name == "freebsd":
+        make_cmd = "gmake"
+    else:
+        make_cmd = "make"
+
     # Construct the actual BuildSlave object
     for worker_name in [name, "tabularasa_"+name]:
         c['workers'] += [worker.Worker(worker_name, 'julialang42', max_builds=1,
@@ -138,6 +143,7 @@ for name in all_names:
                 'llvm_cmake':llvm_cmake,
                 'os_name':os_name,
                 'os_pkg_ext':os_pkg_ext,
+                'make_cmd':make_cmd,
             }
         )]
 
