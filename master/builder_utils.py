@@ -201,7 +201,7 @@ def build_download_julia_cmd(props_obj):
         cmd += "rm -f julia-installer.exe"
     else:
         # Oh linux.  Your simplicity always gets me
-        cmd = "curl -L '%s' | tar --strip-components=1 -zx"%(download_url)
+        cmd = "curl -L '%s' | tar --strip-components=1 -zxf -"%(download_url)
     return ["/bin/sh", "-c", cmd]
 
 
