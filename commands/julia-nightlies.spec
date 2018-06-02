@@ -1,8 +1,8 @@
-%global uvcommit 52d72a52cc7ccd570929990f010ed16e2ec604c8
+%global uvcommit be317349252699670131395f125c3861d793ca86
 %global uvversion 1.9.0
 
 %global unwindversion 1.1-julia2
-%global llvmversion 3.9
+%global llvmversion 6
 
 Name:           julia
 Version:        %{juliaversion}
@@ -41,17 +41,12 @@ BuildRequires:  gmp-devel >= 5.0
 # Needed for libgit2 test
 BuildRequires:  hostname
 BuildRequires:  ImageMagick
+BuildRequires:  libatomic
 BuildRequires:  libunwind-devel
 BuildRequires:  llvm%{llvmversion}-devel
-%if 0%{?rhel} && 0%{?rhel} <= 6
-BuildRequires:  mpfr3-devel >= 3.0
-%else
-BuildRequires:  mpfr-devel >= 3.0
-%endif
 BuildRequires:  openblas-devel
 BuildRequires:  openblas-threads
 BuildRequires:  openlibm-devel >= 0.4
-BuildRequires:  openspecfun-devel >= 0.4
 BuildRequires:  libgit2-devel
 # Needed for libgit2 test
 BuildRequires:  openssl
@@ -128,6 +123,9 @@ Julia into external programs or debugging Julia itself.
 %prep
 %setup -qn %{name}
 
+# Work around https://github.com/JuliaLang/julia/issues/27109
+sed -i 's/const STDLIBS = readdir(STDLIB_DIR)/const STDLIBS = setdiff(readdir(STDLIB_DIR), ["LibGit2"])/g' test/choosetests.jl
+
 mkdir -p deps/srccache
 
 pushd deps/srccache
@@ -162,17 +160,20 @@ popd
 
 # About build, build_libdir and build_bindir, see https://github.com/JuliaLang/julia/issues/5063#issuecomment-32628111
 %global julia_builddir %{_builddir}/%{name}/build
-%global commonopts USE_SYSTEM_LLVM=1 USE_LLVM_SHLIB=1 LLVM_CONFIG=%{_libdir}/llvm%{llvmversion}/bin/llvm-config USE_SYSTEM_LIBUNWIND=0 USE_SYSTEM_READLINE=1 USE_SYSTEM_PCRE=1 USE_SYSTEM_OPENSPECFUN=1 USE_SYSTEM_BLAS=1 USE_SYSTEM_LAPACK=1 USE_SYSTEM_FFTW=1 USE_SYSTEM_GMP=1 USE_SYSTEM_MPFR=1 USE_SYSTEM_ARPACK=1 USE_SYSTEM_SUITESPARSE=1 USE_SYSTEM_ZLIB=1 USE_SYSTEM_GRISU=1 USE_SYSTEM_DSFMT=1 USE_SYSTEM_LIBUV=0 USE_SYSTEM_UTF8PROC=1 USE_SYSTEM_LIBGIT2=0 USE_SYSTEM_LIBSSH2=0 USE_SYSTEM_MBEDTLS=0 USE_SYSTEM_CURL=0 USE_SYSTEM_PATCHELF=1 USE_SYSTEM_LIBM=0 USE_SYSTEM_OPENLIBM=1 VERBOSE=1 MARCH=%{march} %{blas} prefix=%{_prefix} bindir=%{_bindir} libdir=%{_libdir} libexecdir=%{_libexecdir} datarootdir=%{_datarootdir} includedir=%{_includedir} sysconfdir=%{_sysconfdir} build_prefix=%{julia_builddir} build_bindir=%{julia_builddir}%{_bindir} build_libdir=%{julia_builddir}%{_libdir} build_private_libdir=%{julia_builddir}%{_libdir}/julia build_libexecdir=%{julia_builddir}%{_libexecdir} build_datarootdir=%{julia_builddir}%{_datarootdir} build_includedir=%{julia_builddir}%{_includedir} build_sysconfdir=%{julia_builddir}%{_sysconfdir} JULIA_CPU_CORES=$(echo %{?_smp_mflags} | sed s/-j//)
+%global commonopts USE_SYSTEM_LLVM=1 LLVM_CONFIG=%{_libdir}/llvm%{llvmversion}/bin/llvm-config USE_SYSTEM_LIBUNWIND=0 USE_SYSTEM_PCRE=1 USE_SYSTEM_BLAS=1 USE_SYSTEM_LAPACK=1 USE_SYSTEM_FFTW=1 USE_SYSTEM_GMP=1 USE_SYSTEM_MPFR=0 USE_SYSTEM_ARPACK=1 USE_SYSTEM_SUITESPARSE=1 USE_SYSTEM_ZLIB=1 USE_SYSTEM_DSFMT=1 USE_SYSTEM_LIBUV=0 USE_SYSTEM_UTF8PROC=1 USE_SYSTEM_LIBGIT2=0 USE_SYSTEM_LIBSSH2=0 USE_SYSTEM_MBEDTLS=0 USE_SYSTEM_CURL=0 USE_SYSTEM_PATCHELF=1 USE_SYSTEM_LIBM=0 USE_SYSTEM_OPENLIBM=1 VERBOSE=1 MARCH=%{march} %{blas} prefix=%{_prefix} bindir=%{_bindir} libdir=%{_libdir} libexecdir=%{_libexecdir} datarootdir=%{_datarootdir} includedir=%{_includedir} sysconfdir=%{_sysconfdir} build_prefix=%{julia_builddir} build_bindir=%{julia_builddir}%{_bindir} build_libdir=%{julia_builddir}%{_libdir} build_private_libdir=%{julia_builddir}%{_libdir}/julia build_libexecdir=%{julia_builddir}%{_libexecdir} build_datarootdir=%{julia_builddir}%{_datarootdir} build_includedir=%{julia_builddir}%{_includedir} build_sysconfdir=%{julia_builddir}%{_sysconfdir} JULIA_CPU_CORES=$(echo %{?_smp_mflags} | sed s/-j//)
+
 
 %build
 %if 0%{?rhel} && 0%{?rhel} <= 6
 . /opt/rh/devtoolset-2/enable
 %endif
 
+# Temporary workaround for https://github.com/JuliaLang/julia/issues/27118
+%global optflags %(echo %{optflags} | sed 's/-Wp,-D_GLIBCXX_ASSERTIONS //')
+
 # Need to repeat -march here to override i686 from optflags
-# USE_ORCJIT needs to be set directly since it's disabled by default with USE_SYSTEM_LLVM=1
 # -Wno-error=format-security is needed to get libgit2 to build correctly
-%global buildflags CFLAGS="%{optflags} -march=%{march} -Wno-error=format-security" CXXFLAGS="%{optflags} -march=%{march} -DUSE_ORCJIT -Wno-error=format-security"
+%global buildflags CFLAGS="%{optflags} -march=%{march} -Wno-error=format-security" CXXFLAGS="%{optflags} -march=%{march} -Wno-error=format-security"
 
 # Required to work around a bug when building libunwind on RHEL7:
 # https://github.com/JuliaLang/julia/issues/15496
@@ -237,13 +238,13 @@ desktop-file-validate %{buildroot}%{_datarootdir}/applications/%{name}.desktop
 %files common
 %dir %{_datarootdir}/julia/
 %{_datarootdir}/julia/*.jl
-%{_datarootdir}/julia/site/
 %{_datarootdir}/julia/base/
+%{_datarootdir}/julia/stdlib/
 %{_datarootdir}/julia/cert.pem
 %{_datarootdir}/julia/base.cache
 
 %dir %{_sysconfdir}/julia/
-%config(noreplace) %{_sysconfdir}/julia/juliarc.jl
+%config(noreplace) %{_sysconfdir}/julia/startup.jl
 
 %files doc
 %doc %{_docdir}/julia/
