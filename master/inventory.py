@@ -112,10 +112,10 @@ for name in all_names:
         march = "core2"
 
         # Our OSX builder only devotes 2 cores to each VM
-        flags += 'JULIA_CPU_CORES=2 '
+        flags += 'JULIA_CPU_THREADS=2 '
         nthreads = 3
     else:
-        flags += 'JULIA_CPU_CORES=6 '
+        flags += 'JULIA_CPU_THREADS=6 '
         nthreads = 6
 
     # tests are hitting memory issues, so restart workers when memory consumption gets too high
