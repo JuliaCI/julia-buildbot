@@ -31,7 +31,7 @@ for name in all_names:
     flags = 'VERBOSE=1 '
 
     # Add on the tagged release banner
-    flags += 'TAGGED_RELEASE_BANNER="Official http://julialang.org/ release" '
+    flags += 'TAGGED_RELEASE_BANNER="Official https://julialang.org/ release" '
 
     # First, set OS-dependent stuff
     if name[:3] == "win":
