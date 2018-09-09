@@ -1,5 +1,5 @@
 julia_package_env = {
-    'CFLAGS':None,
+    'CFLAGS': None,
     'CPPFLAGS': None,
     'LLVM_CMAKE': util.Property('llvm_cmake', default=None),
 }
