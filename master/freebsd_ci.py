@@ -3,8 +3,8 @@
 ###############################################################################
 
 freebsdci_workers = [
-    worker.Worker("abeing", "pass", max_builds=1),
-    worker.Worker("gaebolg", "pass", max_builds=1),
+    bworker.Worker("abeing", "pass", max_builds=1),
+    bworker.Worker("gaebolg", "pass", max_builds=1),
 ]
 
 ###############################################################################
