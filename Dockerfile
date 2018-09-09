@@ -2,6 +2,7 @@ FROM python:2
 
 # Install necessary packages
 RUN pip install buildbot requests
+RUN pip install txrequests git+https://github.com/iblis17/buildbot-freebsd.git
 
 # Setup our image to live in the right place and run the right command
 WORKDIR /app
