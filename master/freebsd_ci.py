@@ -3,8 +3,14 @@
 ###############################################################################
 
 freebsdci_workers = [
-    bworker.Worker("abeing", "pass", max_builds=1),
-    bworker.Worker("gaebolg", "pass", max_builds=1),
+    bworker.Worker('abeing', 'pass', max_builds=1),
+    bworker.Worker('gaebolg', 'pass', max_builds=1),
+    bworker.Worker('csisw3', 'pass', max_builds=1),
+    bworker.Worker('fragarach', 'pass', max_builds=1),
+    bworker.Worker('caladbolg', 'pass', max_builds=1),
+    bworker.Worker('rhongomyniad', 'pass', max_builds=1),
+    bworker.Worker('hrunting', 'pass', max_builds=1),
+    bworker.Worker('balmung', 'pass', max_builds=1),
 ]
 
 ###############################################################################
@@ -152,7 +158,8 @@ freebsdci_builders = [
 
     util.BuilderConfig(
         name=freebsdci_builder_names['test'],
-        workernames=[],
+        workernames=['csisw3', 'fragarach', 'rhongomyniad',
+                     'hrunting', 'balmung'],
         factory=freebsdci_test_factory),
 ]
 
