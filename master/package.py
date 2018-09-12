@@ -187,7 +187,7 @@ for packager, worker in packager_mapping.iteritems():
 # Add a scheduler for building release candidates/triggering builds manually
 force_build_scheduler = schedulers.ForceScheduler(
     name="package",
-    label="Force Julia build/packaging",
+    label="Force build/packaging",
     builderNames=packager_mapping.keys(),
     reason=util.FixedParameter(name="reason", default=""),
     codebases=[
