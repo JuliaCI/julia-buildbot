@@ -66,7 +66,7 @@ julia_coverage_factory.addSteps([
     # Download the appropriate tarball and extract it
     steps.ShellCommand(
         name="download/extract tarball",
-        command=["/bin/sh", "-c", util.Interpolate("curl -L %(prop:url)s | tar zx")],
+        command=["/bin/sh", "-c", util.Interpolate("curl -L %(prop:download_url)s | tar zx")],
     ),
 
     # Find Julia directory (so we don't have to know the shortcommit)
@@ -142,7 +142,7 @@ c['schedulers'].append(schedulers.ForceScheduler(
     ],
     properties=[
         util.StringParameter(
-            name="url",
+            name="download_url",
             size=60,
             default="https://julialangnightlies-s3.julialang.org/bin/linux/x64/julia-latest-linux64.tar.gz"
         ),
