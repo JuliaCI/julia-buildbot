@@ -79,23 +79,23 @@ julia_coverage_factory.addSteps([
     # Update packages
     steps.ShellCommand(
         name="Update packages",
-        command=[util.Interpolate("%(prop:juliadir)s/bin/julia"), "-e", "Pkg.update(); Pkg.build()"],
+        command=[util.Interpolate("%(prop:juliadir)s/bin/julia"), "-e", "import Pkg; Pkg.update(); Pkg.build()"],
     ),
 
     # Install Coverage, CoverageBase
     steps.ShellCommand(
         name="Install Coverage and checkout latest master",
-        command=[util.Interpolate("%(prop:juliadir)s/bin/julia"), "-e", "Pkg.add(\"Coverage\"); Pkg.checkout(\"Coverage\", \"master\")"],
+        command=[util.Interpolate("%(prop:juliadir)s/bin/julia"), "-e", "import Pkg; Pkg.add(\"Coverage\"); Pkg.checkout(\"Coverage\", \"master\")"],
     ),
     steps.ShellCommand(
         name="Install CoverageBase and checkout latest master",
-        command=[util.Interpolate("%(prop:juliadir)s/bin/julia"), "-e", "Pkg.add(\"CoverageBase\"); Pkg.checkout(\"CoverageBase\", \"master\")"],
+        command=[util.Interpolate("%(prop:juliadir)s/bin/julia"), "-e", "import Pkg; Pkg.add(\"CoverageBase\"); Pkg.checkout(\"CoverageBase\", \"master\")"],
     ),
 
     # Test CoverageBase to make sure everything's on the up-and-up
     steps.ShellCommand(
         name="Test CoverageBase.jl",
-        command=[util.Interpolate("%(prop:juliadir)s/bin/julia"), "-e", "Pkg.test(\"CoverageBase\")"],
+        command=[util.Interpolate("%(prop:juliadir)s/bin/julia"), "-e", "import Pkg; Pkg.test(\"CoverageBase\")"],
         haltOnFailure=True,
     ),
 
