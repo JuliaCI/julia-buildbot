@@ -54,6 +54,7 @@ julia_testing_factory.addSteps([
     steps.MasterShellCommand(
         name="Cleanup pretesting",
         command=render_cleanup_pretesting_command,
+        doStepIf=should_promote,
     ),
 
     # Trigger coverage build if everything goes well
