@@ -41,11 +41,13 @@ julia_testing_factory.addSteps([
         name="Promote on AWS",
         command=render_promotion_command,
         haltOnFailure=True,
+        doStepIf=should_promote,
     ),
     steps.MasterShellCommand(
         name="Promote on AWS (latest)",
         command=render_latest_promotion_command,
         haltOnFailure=True,
+        doStepIf=should_promote,
     ),
 
     # Cleanup AWS
