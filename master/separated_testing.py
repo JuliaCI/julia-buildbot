@@ -67,6 +67,7 @@ julia_testing_factory.addSteps([
             'authorname': util.Property('authorname'),
             'authoremail': util.Property('authoremail'),
             'shortcommit': util.Property('shortcommit'),
+            'scheduler': util.Property('scheduler'),
         },
         waitForFinish=False,
         doStepIf=should_run_coverage,
