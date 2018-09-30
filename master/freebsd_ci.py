@@ -154,12 +154,14 @@ freebsdci_builders = [
     util.BuilderConfig(
         name=freebsdci_builder_names['main'],
         workernames=['gaebolg', 'abeing'],
+        tags=['freebsdci'],
         factory=freebsdci_factory),
 
     util.BuilderConfig(
         name=freebsdci_builder_names['test'],
         workernames=['csisw3', 'fragarach', 'rhongomyniad',
                      'hrunting', 'balmung'],
+        tags=['freebsdci-test'],
         factory=freebsdci_test_factory),
 ]
 
@@ -200,6 +202,7 @@ freebsdci_report = reporters.GitHubStatusPush(
     token=FREEBSDCI_OAUTH_TOKEN,
     context='julia freebsd ci',
     startDescription='Build started',
+    builders=[freebsdci_builder_names['main']],
     endDescription='Build done')
 
 ###############################################################################
