@@ -1,6 +1,9 @@
 ###############################################################################
 # Define our buildworker inventory, and define attributes for each worker
+# Worker naming convension: <os>-<arch>-<identifyer>
 ###############################################################################
+
+import itertools
 
 def build_names(platform, versions, architectures):
     names = []
@@ -9,14 +12,33 @@ def build_names(platform, versions, architectures):
             names += ["%s%s-%s"%(platform, version, arch)]
     return names
 
-win_names     = build_names("win", ["10_0"], ["x64", "x86"])
-ubuntu_names  = build_names("ubuntu", ["16_04"], ["x64", "x86"])
-osx_names     = build_names("osx", ["10_10", "10_11", "10_12"], ["x64"])
-centos_names  = build_names("centos", ["6_9"], ["x64", "x86"])
-centos_names += build_names("centos", ["7_3"], ["x64", "ppc64le", "aarch64"])
-debian_names  = ["debian7_11-armv7l", "debian8_9-x86"]
-freebsd_names = ["freebsd11_1-x64"]
-all_names     = ubuntu_names + osx_names + centos_names + win_names + debian_names + freebsd_names
+
+def build_names_new(platform, arch, id_):
+    """
+    Apply new worker naming convension, it will replace build_names
+    in the future.
+
+    >>> build_names_new('freebsd', ['amd64'], ['foo', 'bar'])
+    ['freebsd-amd64-foo', 'freebsd-amd64-bar']
+    """
+    return map(lambda x: '-'.join(x), itertools.product([platform], arch, id_))
+
+
+win_names       = build_names("win", ["10_0"], ["x64", "x86"])
+ubuntu_names    = build_names("ubuntu", ["16_04"], ["x64", "x86"])
+osx_names       = build_names("osx", ["10_10", "10_11", "10_12"], ["x64"])
+centos_names    = build_names("centos", ["6_9"], ["x64", "x86"])
+centos_names   += build_names("centos", ["7_3"], ["x64", "ppc64le", "aarch64"])
+debian_names    = ["debian7_11-armv7l", "debian8_9-x86"]
+freebsd_names   = ["freebsd11_1-x64"]
+freebsdci_names = {
+    'main': build_names_new("freebsd", ["amd64"], ['abeing']),
+    'test': build_names_new("freebsd", ["amd64"],
+                            ['csisw3', 'fragarach', 'caladbolg', 'rhongomyniad',
+                             'hrunting', 'balmung']),
+}
+all_names       = (ubuntu_names + osx_names + centos_names + win_names +
+                   debian_names + freebsd_names)
 
 # Define all the attributes we'll use in our buildsteps
 c['workers'] = []
@@ -147,6 +169,11 @@ for name in all_names:
                 'make_cmd':make_cmd,
             }
         )]
+
+# temp handler for freebsd ci workers,
+# this should be merging into previous code block if possible.
+c['workers'] += [worker.Worker(name, 'julialang42', max_builds=1)
+                 for name in freebsdci_names['main'] + freebsdci_names['test']]
 
 # Add in tabularasa workers to all_names so that they volunteer for things like
 # the auto_reload builders and whatnot.

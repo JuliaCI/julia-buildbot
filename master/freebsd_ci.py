@@ -1,19 +1,4 @@
 ###############################################################################
-#  Workers
-###############################################################################
-
-freebsdci_workers = [
-    bworker.Worker('abeing', 'pass', max_builds=1),
-    bworker.Worker('gaebolg', 'pass', max_builds=1),
-    bworker.Worker('csisw3', 'pass', max_builds=1),
-    bworker.Worker('fragarach', 'pass', max_builds=1),
-    bworker.Worker('caladbolg', 'pass', max_builds=1),
-    bworker.Worker('rhongomyniad', 'pass', max_builds=1),
-    bworker.Worker('hrunting', 'pass', max_builds=1),
-    bworker.Worker('balmung', 'pass', max_builds=1),
-]
-
-###############################################################################
 #  Factory
 ###############################################################################
 
@@ -153,14 +138,13 @@ freebsdci_builder_names = {
 freebsdci_builders = [
     util.BuilderConfig(
         name=freebsdci_builder_names['main'],
-        workernames=['gaebolg', 'abeing'],
+        workernames=freebsdci_names['main'],
         tags=['freebsdci'],
         factory=freebsdci_factory),
 
     util.BuilderConfig(
         name=freebsdci_builder_names['test'],
-        workernames=['csisw3', 'fragarach', 'rhongomyniad',
-                     'hrunting', 'balmung'],
+        workernames=freebsdci_names['test'],
         tags=['freebsdci-test'],
         factory=freebsdci_test_factory),
 ]
@@ -221,7 +205,6 @@ freebsdci_gh_setting = {
 #  Master Config
 ###############################################################################
 
-c['workers'].extend(freebsdci_workers)
 c['services'].append(freebsdci_report)
 c['builders'].extend(freebsdci_builders)
 c['schedulers'].extend(freebsdci_schedulers)
