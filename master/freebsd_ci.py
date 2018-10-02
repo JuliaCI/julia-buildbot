@@ -213,8 +213,6 @@ freebsdci_gh_setting = {
     'skips': [
         r'\[ *skip *ci *\]',
         r'\[ *ci *skip *\]',
-        r'\[ *skip *bsd *\]',
-        r'\[ *bsd *skip *\]'
     ],
     'github_property_whitelist': ['base'],
 }
