@@ -185,8 +185,9 @@ freebsdci_schedulers = [
 freebsdci_report = reporters.GitHubStatusPush(
     token=FREEBSDCI_OAUTH_TOKEN,
     context='julia freebsd ci',
-    startDescription='Build started',
     builders=[freebsdci_builder_names['main']],
+    verbose=True,
+    startDescription='Build started',
     endDescription='Build done')
 
 ###############################################################################
