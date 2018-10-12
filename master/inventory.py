@@ -35,7 +35,7 @@ freebsdci_names = {
     'main': build_names_new("freebsd", ["amd64"], ['abeing']),
     'test': build_names_new("freebsd", ["amd64"],
                             ['csisw3', 'fragarach', 'caladbolg', 'rhongomyniad',
-                             'hrunting', 'balmung']),
+                             'hrunting', 'balmung', 'gaebolg']),
 }
 all_names       = (ubuntu_names + osx_names + centos_names + win_names +
                    debian_names + freebsd_names)
