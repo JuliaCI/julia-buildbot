@@ -5,14 +5,14 @@
 run_coverage_cmd = """
 using Pkg
 Pkg.activate("CoverageBase")
-using CoverageBase, Compat, Compat.Test
+using CoverageBase
 CoverageBase.runtests(CoverageBase.testnames())
 """
 
 analyse_and_submit_cov_cmd = """
 using Pkg
 Pkg.activate("CoverageBase")
-using Coverage, CoverageBase, Compat
+using Coverage, CoverageBase
 
 cd(joinpath(CoverageBase.julia_top()))
 results = Coverage.process_folder("base")
