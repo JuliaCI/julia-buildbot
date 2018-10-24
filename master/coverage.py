@@ -3,12 +3,16 @@
 ###############################################################################
 
 run_coverage_cmd = """
-using CoverageBase, Compat, Compat.Test
+using Pkg
+Pkg.activate("CoverageBase")
+using CoverageBase
 CoverageBase.runtests(CoverageBase.testnames())
 """
 
 analyse_and_submit_cov_cmd = """
-using Coverage, CoverageBase, Compat
+using Pkg
+Pkg.activate("CoverageBase")
+using Coverage, CoverageBase
 
 cd(joinpath(CoverageBase.julia_top()))
 results = Coverage.process_folder("base")
