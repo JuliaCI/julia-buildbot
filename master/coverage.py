@@ -22,6 +22,16 @@ if isdefined(CoverageBase.BaseTestRunner, :STDLIBS)
     end
 end
 
+# Create git_info for codecov
+git_info = Any[
+    :branch => Base.GIT_VERSION_INFO.branch,
+    :commit => Base.GIT_VERSION_INFO.commit,
+    :token => ENV["CODECOV_REPO_TOKEN"],
+    ]
+
+# Submit to codecov
+Codecov.submit_generic(results; git_info...)
+
 # Create git_info for Coveralls
 git_info = Dict(
     "branch" => Base.GIT_VERSION_INFO.branch,
@@ -45,16 +55,6 @@ git_info = Dict(
 ENV["REPO_TOKEN"] = ENV["COVERALLS_REPO_TOKEN"]
 Coveralls.submit_token(results, git_info)
 delete!(ENV, "REPO_TOKEN")
-
-# Create git_info for codecov
-git_info = Any[
-    :branch => Base.GIT_VERSION_INFO.branch,
-    :commit => Base.GIT_VERSION_INFO.commit,
-    :token => ENV["CODECOV_REPO_TOKEN"],
-    ]
-
-# Submit to codecov
-Codecov.submit_generic(results; git_info...)
 """
 
 # Steps to download a linux tarball, extract it, run coverage on it, and upload coverage stats
