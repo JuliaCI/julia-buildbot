@@ -2,6 +2,11 @@ julia_package_env = {
     'CFLAGS': None,
     'CPPFLAGS': None,
     'LLVM_CMAKE': util.Property('llvm_cmake', default=None),
+
+    # On platforms that use jemalloc, we can ask it to fill all allocated and
+    # freed memory with junk, to ensure that we crash often if we attempt to
+    # use memory after freeing it.
+    'MALLOC_CONF': 'junk:true',
 }
 
 # Steps to build a `make binary-dist` tarball that should work on just about every linux ever
@@ -15,6 +20,15 @@ julia_package_factory.addSteps([
         flunkOnFailure=False
     ),
 
+    # Add LLVM and Julia assertion flags if we're doing an assert build
+    steps.SetProperty(
+        name="Set assertion make flags",
+        property="flags",
+        value=util.Interpolate("%(prop:flags)s LLVM_ASSERTIONS=1 FORCE_ASSERTIONS=1"),
+        doStepIf=lambda step: step.getProperty('assertions'),
+        hideStepIf=lambda results, s: results==SKIPPED,
+    ),
+
     # Recursive `git clean` on windows is very slow. It is faster to
     # wipe the dir and reset it. Important is that we don't delete our
     # `.git` folder
@@ -23,6 +37,7 @@ julia_package_factory.addSteps([
         command=["/bin/sh", "-c", "cmd /c del /s /q *"],
         flunkOnFailure = False,
         doStepIf=is_windows,
+        hideStepIf=lambda results, s: results==SKIPPED,
         env=julia_package_env,
     ),
 
@@ -43,6 +58,7 @@ julia_package_factory.addSteps([
         command=["/bin/sh", "-c", util.Interpolate("%(prop:make_cmd)s %(prop:flags)s %(prop:extra_make_flags)s win-extras")],
         haltOnFailure = True,
         doStepIf=is_windows,
+        hideStepIf=lambda results, s: results==SKIPPED,
         env=julia_package_env,
     ),
 
@@ -66,6 +82,14 @@ julia_package_factory.addSteps([
     steps.ShellCommand(
         name="ccache stats",
         command=["/bin/sh", "-c", "ccache -s"],
+        flunkOnFailure=False,
+        env=julia_package_env,
+    ),
+
+    # Get build stats
+    steps.ShellCommand(
+        name="build stats",
+        command=["/bin/sh", "-c", util.Interpolate("%(prop:make_cmd)s %(prop:flags)s %(prop:extra_make_flags)s build-stats")],
         flunkOnFailure=False,
         env=julia_package_env,
     ),
@@ -110,6 +134,7 @@ julia_package_factory.addSteps([
         command=render_make_app,
         haltOnFailure = True,
         doStepIf=is_mac,
+        hideStepIf=lambda results, s: results==SKIPPED,
         env=julia_package_env,
     ),
 
@@ -142,6 +167,7 @@ julia_package_factory.addSteps([
         set_properties={
             'download_url': render_pretesting_download_url,
             'majmin': util.Property('majmin'),
+            'assertions': util.Property('assertions'),
             'upload_filename': util.Property('upload_filename'),
             'commitmessage': util.Property('commitmessage'),
             'commitname': util.Property('commitname'),
@@ -158,32 +184,40 @@ julia_package_factory.addSteps([
 # Build a builder-worker mapping based off of the parent mapping in inventory.py
 packager_mapping = {("package_" + k): v for k, v in builder_mapping.iteritems()}
 
-# Add a few builders that don't exist in the typical mapping
-#packager_mapping["build_ubuntu32"] = "ubuntu16_04-x86"
-#packager_mapping["build_ubuntu64"] = "ubuntu16_04-x64"
-#packager_mapping["build_centos64"] = "centos7_3-x64"
+# This is the official binary packaging scheduler, we do two builds, one with assertions,
+# one without any assertions.
+for name in ("Julia Binary Packaging", "Julia Binary Packaging (assertions enabled)"):
+    props = {}
+    branch_fn = None
 
-packager_scheduler = schedulers.AnyBranchScheduler(
-    name="Julia Binary Packaging",
-    change_filter=util.ChangeFilter(
-        project=['JuliaLang/julia','staticfloat/julia'],
-        # Only build `master` or `release-*`
+    # If this is an assert build, store that in properties
+    if "assertions" in name:
+        props["assertions"] = True
+    else:
+        # non-assert builds only build against `master` and `release-*`
         branch_fn=lambda b: b == "master" or b.startswith("release-")
-    ),
-    builderNames=packager_mapping.keys(),
-    treeStableTimer=1
-)
-c['schedulers'].append(packager_scheduler)
 
-for packager, worker in packager_mapping.iteritems():
+    scheduler = schedulers.AnyBranchScheduler(
+        name=name,
+        change_filter=util.ChangeFilter(
+            project=['JuliaLang/julia','staticfloat/julia'],
+            branch_fn=branch_fn,
+        ),
+        builderNames=packager_mapping.keys(),
+        treeStableTimer=1,
+        properties=props
+    )
+    c['schedulers'].append(scheduler)
+
+# Add workers for these jobs
+for packager, workers in packager_mapping.iteritems():
     c['builders'].append(util.BuilderConfig(
         name=packager,
-        workernames=[worker],
+        workernames=workers,
         collapseRequests=False,
         tags=["Packaging"],
-        factory=julia_package_factory
+        factory=julia_package_factory,
     ))
-
 
 # Add a scheduler for building release candidates/triggering builds manually
 force_build_scheduler = schedulers.ForceScheduler(
@@ -201,7 +235,17 @@ force_build_scheduler = schedulers.ForceScheduler(
         )
     ],
     properties=[
-        util.StringParameter(name="extra_make_flags", label="Extra Make Flags", size=30, default=""),
-    ]
+        util.StringParameter(
+            name="extra_make_flags",
+            label="Extra Make Flags",
+            size=30,
+            default="",
+        ),
+        util.BooleanParameter(
+            name="assert_build",
+            label="Build with Assertions",
+            default=False,
+        ),
+    ],
 )
 c['schedulers'].append(force_build_scheduler)

@@ -121,7 +121,7 @@ julia_coverage_factory.addSteps([
 
 
 # Add a dependent scheduler for running coverage after we build tarballs
-julia_coverage_builders = ["coverage_ubuntu16_04-x64"]
+julia_coverage_builders = ["coverage_linux64"]
 julia_coverage_scheduler = schedulers.Triggerable(name="Julia Coverage Testing", builderNames=julia_coverage_builders)
 c['schedulers'].append(julia_coverage_scheduler)
 
@@ -151,8 +151,8 @@ c['schedulers'].append(schedulers.ForceScheduler(
 
 # Add coverage builders
 c['builders'].append(util.BuilderConfig(
-    name="coverage_ubuntu16_04-x64",
-    workernames=["tabularasa_ubuntu16_04-x64"],
+    name="coverage_linux64",
+    workernames=["tabularasa_" + x for x in builder_mapping["linux64"]],
     tags=["Coverage"],
     factory=julia_coverage_factory
 ))

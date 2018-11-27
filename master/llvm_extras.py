@@ -98,10 +98,10 @@ llvm_extras_factory.addSteps([
 # Build a builder-worker mapping based off of the parent mapping in inventory.py
 llvm_extras_mapping = {("llvm_extras_" + k): v for k, v in builder_mapping.iteritems()}
 
-for packager, worker in llvm_extras_mapping.iteritems():
+for packager, workers in llvm_extras_mapping.iteritems():
     c['builders'].append(util.BuilderConfig(
         name=packager,
-        workernames=[worker],
+        workernames=workers,
         collapseRequests=False,
         tags=["llvm_extras"],
         factory=llvm_extras_factory

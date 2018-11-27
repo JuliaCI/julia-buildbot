@@ -49,14 +49,27 @@ julia_gc_debug_factory.addSteps([
     )
 ])
 
-gc_debug_nightly_scheduler = schedulers.Nightly(name="Julia GC Debug Build", builderNames=["nightly_gc_debug-x86", "nightly_gc_debug-x64"], hour=[3], change_filter=util.ChangeFilter(project=['JuliaLang/julia','staticfloat/julia'], branch='master'), onlyIfChanged=True)
+gc_debug_nightly_scheduler = schedulers.Nightly(
+    name="Julia GC Debug Build",
+    builderNames=[
+        "nightly_gc_debug-linux32",
+        "nightly_gc_debug-linux64",
+        "nightly_gc_debug-linuxaarch64",
+    ],
+    hour=[3],
+    change_filter=util.ChangeFilter(
+        project=['JuliaLang/julia','staticfloat/julia'],
+        branch='master',
+    ),
+    onlyIfChanged=True,
+)
 c['schedulers'].append(gc_debug_nightly_scheduler)
 
-for arch in ["x86", "x64"]:
+for arch in ["linux64", "linux32", "linuxaarch64"]:
     force_scheduler = schedulers.ForceScheduler(
         name="force_gc_%s"%(arch),
         label="Force Julia %s GC debug building"%(arch),
-        builderNames=["nightly_gc_debug-%s" % arch],
+        builderNames=["nightly_gc_debug-%s"%(arch)],
         reason=util.FixedParameter(name="reason", default=""),
         codebases=[
             util.CodebaseParameter(
@@ -70,10 +83,10 @@ for arch in ["x86", "x64"]:
         properties=[])
     c['schedulers'].append(force_scheduler)
 
-for arch in ["x86", "x64"]:
+for arch in ["linux64", "linux32", "linuxaarch64"]:
     c['builders'].append(util.BuilderConfig(
         name="nightly_gc_debug-%s"%(arch),
-        workernames=["ubuntu16_04-%s"%(arch)],
+        workernames=builder_mapping[arch],
         tags=["Nightlies"],
         factory=julia_gc_debug_factory
     ))

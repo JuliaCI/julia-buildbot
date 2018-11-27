@@ -65,6 +65,16 @@ def gen_local_filename(props_obj):
                 return "julia-{shortcommit}-Linux-arm.{os_pkg_ext}".format(**props)
             return "julia-{shortcommit}-Linux-{tar_arch}.{os_pkg_ext}".format(**props)
 
+# Map from property to upload OS name on the JuliaLang S3 bucket
+def get_upload_os_name(props):
+    if is_windows(props):
+        return "winnt"
+    elif is_mac(props):
+        return "mac"
+    elif is_freebsd(props):
+        return "freebsd"
+    else:
+        return "linux"
 
 def gen_upload_filename(props_obj):
     props = props_obj_to_dict(props_obj)
@@ -74,23 +84,44 @@ def gen_upload_filename(props_obj):
         props["os_name_file"] = "win"
     return "julia-{shortcommit}-{os_name_file}{bits}.{os_pkg_ext}".format(**props)
 
-def gen_upload_path(props_obj, namespace=None):
+def gen_upload_path(props_obj, namespace=None, latest=False):
+    # First, pull information out of props_obj
     up_arch = props_obj.getProperty("up_arch")
     majmin = props_obj.getProperty("majmin")
     upload_filename = props_obj.getProperty("upload_filename")
-    os = get_os_name(props_obj)
-    if namespace is None:
-        return "julialangnightlies/bin/%s/%s/%s/%s"%(os, up_arch, majmin, upload_filename)
-    else:
-        return "julialangnightlies/%s/bin/%s/%s/%s/%s"%(namespace, os, up_arch, majmin, upload_filename)
+    assertions = props_obj.getProperty("assertions")
+
+    # If we're asking for the latest information, 
+    if latest and upload_filename[:6] == "julia-":
+        split_name = upload_filename.split("-")
+        upload_filename = "julia-latest-%s"%(split_name[2])
+    os = get_upload_os_name(props_obj)
+
+    url = "julialangnightlies/"
+
+    # If we have a namespace add that on first
+    if namespace is not None:
+        url += namespace * "/"
+
+    url += os * "/" * up_arch * "/"
+
+    # If we're asking for latest, don't go into majmin
+    if not latest:
+        url += majmin * "/"
+    url += upload_filename
+
+    return url
 
 def gen_latest_upload_path(props_obj, namespace=None):
+    assertions = props_obj.getProperty("assertions")
+
     up_arch = props_obj.getProperty("up_arch")
     upload_filename = props_obj.getProperty("upload_filename")
     if upload_filename[:6] == "julia-":
         split_name = upload_filename.split("-")
         upload_filename = "julia-latest-%s"%(split_name[2])
-    os = get_os_name(props_obj)
+    os = get_upload_os_name(props_obj)
+    
     if namespace is None:
         return "julialangnightlies/bin/%s/%s/%s"%(os, up_arch, upload_filename)
     else:
@@ -161,18 +192,10 @@ def render_pretesting_download_url(props_obj):
 def render_make_app(props_obj):
     props = props_obj_to_dict(props_obj)
 
-    new_way = "make {flags} app".format(**props)
-    old_way = "make {flags} -C contrib/mac/app && mv contrib/mac/app/*.dmg {local_filename}".format(**props)
-
-    # We emit a shell command that attempts to run `make app` (which is the nice
-    # `sf/consistent_distnames` shortcut), and if that fails, it runs the steps
-    # manually, which boil down to `make -C contrib/mac/app` and moving the
-    # result to the top-level, where we can find it.  We can remove this once
-    # 0.6 is no longer being built.
     return [
         "/bin/sh",
         "-c",
-        "~/unlock_keychain.sh && (%s || (%s))"%(new_way, old_way)
+        "~/unlock_keychain.sh && make {flags} app".format(**props)
     ]
 
 def build_download_julia_cmd(props_obj):
@@ -220,11 +243,16 @@ def download_latest_julia(props_obj):
     # Fake `gen_upload_filename()` into giving us something like
     # `julia-latest-linux64.tar.gz` instead of a true shortcommit
     props_obj.setProperty("shortcommit", "latest", "download_latest_julia")
-    upload_filename = gen_upload_filename(props_obj)
-    props_obj.setProperty("upload_filename", upload_filename, "download_latest_julia")
-
-    download_url = gen_latest_download_url(props_obj)
-    props_obj.setProperty("download_url", download_url, "download_latest_julia")
+    props_obj.setProperty(
+        "upload_filename",
+        gen_upload_filename(props_obj),
+        "download_latest_julia",
+    )
+    props_obj.setProperty(
+        "download_url",
+        gen_latest_download_url(props_obj),
+        "download_latest_julia",
+    )
     return build_download_julia_cmd(props_obj)
 
 @util.renderer

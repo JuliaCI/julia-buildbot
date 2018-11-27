@@ -5,15 +5,7 @@
 
 import itertools
 
-def build_names(platform, versions, architectures):
-    names = []
-    for version in versions:
-        for arch in architectures:
-            names += ["%s%s-%s"%(platform, version, arch)]
-    return names
-
-
-def build_names_new(platform, arch, id_):
+def build_names(platform, arch, name):
     """
     Apply new worker naming convension, it will replace build_names
     in the future.
@@ -21,33 +13,46 @@ def build_names_new(platform, arch, id_):
     >>> build_names_new('freebsd', ['amd64'], ['foo', 'bar'])
     ['freebsd-amd64-foo', 'freebsd-amd64-bar']
     """
-    return map(lambda x: '-'.join(x), itertools.product([platform], arch, id_))
+    return map(lambda x: '-'.join(x), itertools.product([platform], arch, name))
 
+# Our windows machines are on openstack, and we double them up because they are slooooow
+win_names       = build_names("win", ["x86_64", "i686"], ["openstack_1", "openstack_2"])
 
-win_names       = build_names("win", ["10_0"], ["x64", "x86"])
-ubuntu_names    = build_names("ubuntu", ["16_04"], ["x64", "x86"])
-osx_names       = build_names("osx", ["10_10", "10_11", "10_12"], ["x64"])
-centos_names    = build_names("centos", ["6_9"], ["x64", "x86"])
-centos_names   += build_names("centos", ["7_3"], ["x64", "ppc64le", "aarch64"])
-debian_names    = ["debian7_11-armv7l", "debian8_9-x86"]
-freebsd_names   = ["freebsd11_1-x64"]
+# Our linux (packaging) machines are typically centos, but we just call them `linux`,
+# to fit in with the other builders.  Some run on nanosoldier2 at MIT, some run at OSU,
+# some run on scaleway, etc...
+linux_names     = build_names("linux", ["x86_64", "i686"], ["nanosoldier2_1", "nanosoldier2_2"])
+linux_names    += build_names("linux", ["ppc64le"], ["osu"])
+linux_names    += build_names("linux", ["aarch64"], ["scaleway"])
+linux_names    += build_names("linux", ["armv7l"], ["davinci"])
+
+# Our mac builder runs on macmini2
+macos_names     = build_names("macos", ["x86_64"], ["macmini2"])
+
+# Our FreeBSD builder runs on hardware maintained by Iblis
+freebsd_names   = build_names("freebsd", ["x86_64"], ["iblis"])
+
+all_names       = (win_names + linux_names + macos_names + freebsd_names)
+
+# TODO: Fold these into the freebsd_names eventually
 freebsdci_names = {
-    'main': build_names_new("freebsd", ["amd64"], ['abeing']),
-    'test': build_names_new("freebsd", ["amd64"],
-                            ['csisw3', 'fragarach', 'caladbolg', 'rhongomyniad',
-                             'hrunting', 'balmung']),
+    'main': build_names("freebsd", ["amd64"], ['abeing']),
+    'test': build_names("freebsd", ["amd64"],
+            ['csisw3', 'fragarach', 'caladbolg', 'rhongomyniad', 'hrunting', 'balmung']),
 }
-all_names       = (ubuntu_names + osx_names + centos_names + win_names +
-                   debian_names + freebsd_names)
 
 # Define all the attributes we'll use in our buildsteps
 c['workers'] = []
 for name in all_names:
-    # Initialize march to None, as some buildbots (power8) don't set it
+    # Initialize `march` to `None`, as some buildbots (power8) don't set it
     march = None
 
-    # Initialize llvm_cmake to None, as no buildbots need it except armv7l
+    # Initialize `llvm_cmake` to `None`, as no buildbots need it except armv7l
     llvm_cmake = None
+
+    # Initialize `make_cmd` to `make`, as that's what it is on all platforms
+    # except for FreeBSD, on which it is `gmake`
+    make_cmd = "make"
 
     # Everything should be VERBOSE
     flags = 'VERBOSE=1 '
@@ -55,17 +60,35 @@ for name in all_names:
     # Add on the tagged release banner
     flags += 'TAGGED_RELEASE_BANNER="Official https://julialang.org/ release" '
 
+    # By default, we use 6 threads
+    nthreads = 6
+
     # First, set OS-dependent stuff
     if name[:3] == "win":
         os_name = "winnt"
         os_pkg_ext = "exe"
+
+        # OpenBLAS can't deal with avx512 on windows for some reason.
         flags += "OPENBLAS_NO_AVX512=1 "
-    elif name[:3] == "osx":
+
+        # Add our cross-host values
+        if name[-3:] == 'x86':
+            flags += 'XC_HOST=i686-w64-mingw32 '
+        else:
+            flags += 'XC_HOST=x86_64-w64-mingw32 '
+    elif name[:3] == "macos":
         os_name = "mac"
         os_pkg_ext = "dmg"
+
+        # core2 is the minimum MARCH we support
+        march = "core2"
+
+        # Our macmini has fewer cores than we'd like
+        nthreads = 3
     elif name[:7] == "freebsd":
         os_name = "freebsd"
         os_pkg_ext = "tar.gz"
+        make_cmd = "gmake"
     else:
         os_name = "linux"
         os_pkg_ext = "tar.gz"
@@ -74,28 +97,32 @@ for name in all_names:
     flags += 'USECCACHE=1 '
 
 
-    if name[-3:] == 'x86':
+    if '-i686-' in name:
         tar_arch = 'i686'
         march = 'pentium4'
         up_arch = 'x86'
         bits = '32'
 
-        # Sysimg multi-versioning
-        flags += 'JULIA_CPU_TARGET="pentium4;sandybridge,-xsaveopt,clone_all" '
+        cpu_targets = [
+            'pentium4',
+            'sandybridge,-xsaveopt,clone_all',
+        ]
+        flags += 'JULIA_CPU_TARGET="%s" '%(';'.join(cpu_targets))
 
-    if name[-3:] == 'x64':
+    if '-x86_64-' in name or '-amd64-' in name:
         tar_arch = 'x86_64'
         march = 'x86-64'
         up_arch = 'x64'
         bits = '64'
 
-        # Sysimg multi-versioning!
-        cpu_target  = 'generic;'
-        cpu_target += 'sandybridge,-xsaveopt,clone_all;'
-        cpu_target += 'haswell,-rdrnd,base(1)'
-        flags += 'JULIA_CPU_TARGET="%s" '%(cpu_target)
+        cpu_targets = [
+            'generic',
+            'sandybridge,-xsaveopt,clone_all',
+            'haswell,-rdrnd,base(1)',
+        ]
+        flags += 'JULIA_CPU_TARGET="%s" '%(';'.join(cpu_targets))
 
-    if name[-6:] == 'armv7l':
+    if '-armv7l-' in name:
         tar_arch = 'armv7l'
         march = 'armv7-a'
         up_arch = 'armv7l'
@@ -107,53 +134,33 @@ for name in all_names:
         # This might not be an actual issue since we are not building clang, but BSTS
         llvm_cmake = '-DLLVM_HOST_TRIPLE=armv7l-unknown-linux-gnueabihf -DLLVM_DEFAULT_TARGET_TRIPLE=armv7l-unknown-linux-gnueabihf'
 
-    if name[-7:] == 'ppc64le':
+    if '-ppc64le-' in name:
         tar_arch = 'powerpc64le'
         up_arch = 'ppc64le'
         bits = 'ppc64'
         flags += 'JULIA_CPU_TARGET=pwr8 '
 
-    if name[-7:] == 'aarch64':
+    if '-aarch64-' in name:
         tar_arch = 'aarch64'
         up_arch = 'aarch64'
         bits = 'aarch64'
         march = 'armv8-a'
         flags += 'JULIA_CPU_TARGET=generic '
 
-    # On windows, disable running doc/genstdlib.jl due to julia issue #11727
-    # and add XC_HOST dependent on the architecture
-    if name[:3] == 'win':
-        flags += 'JULIA_ENABLE_DOCBUILD=0 '
-        if march == 'x86-64':
-            flags += 'XC_HOST=x86_64-w64-mingw32 '
-        else:
-            flags += 'XC_HOST=i686-w64-mingw32 '
-
-
-    if name[:3] == "osx":
-        # On OSX, core2 is the minimum MARCH we support
-        march = "core2"
-
-        # Our OSX builder only devotes 2 cores to each VM
-        flags += 'JULIA_CPU_THREADS=2 '
-        nthreads = 3
-    else:
-        flags += 'JULIA_CPU_THREADS=6 '
-        nthreads = 6
 
     # tests are hitting memory issues, so restart workers when memory consumption gets too high
     flags += 'JULIA_TEST_MAXRSS_MB=1000 '
+
+    # Lock the tests to this many threads (usually 6)
+    flags += 'JULIA_CPU_THREADS=%d '%(nthreads)
 
     # Add MARCH to flags
     if not march is None:
         flags += "MARCH=%s "%(march)
 
-    if os_name == "freebsd":
-        make_cmd = "gmake"
-    else:
-        make_cmd = "make"
 
-    # Construct the actual BuildSlave object
+    # Construct the actual BuildSlave object, and also double up for the tabularasa
+    # builders; we add one for each actual builder.
     for worker_name in [name, "tabularasa_"+name]:
         c['workers'] += [worker.Worker(worker_name, 'julialang42', max_builds=1,
             properties={
@@ -171,7 +178,7 @@ for name in all_names:
         )]
 
 # temp handler for freebsd ci workers,
-# this should be merging into previous code block if possible.
+# this should be merged into the previous code block if possible.
 c['workers'] += [worker.Worker(name, 'julialang42', max_builds=1)
                  for name in freebsdci_names['main'] + freebsdci_names['test']]
 
@@ -180,16 +187,16 @@ c['workers'] += [worker.Worker(name, 'julialang42', max_builds=1)
 all_names += ["tabularasa_" + x for x in all_names]
 
 # Build a nicer mapping for us.  This is how we know things like "package_linux64"
-# runs on "centos6_9-x64"
+# runs on "linux-x86_64-nanosoldier2_1", for instance.
+namefilt = lambda arch, names: [n for n in names if arch in n]
 builder_mapping = {
-    "osx64": "osx10_10-x64",
-    "win32": "win10_0-x86",
-    "win64": "win10_0-x64",
-    #"linux32": "centos6_9-x86",
-    "linux32": "debian8_9-x86",
-    "linux64": "centos6_9-x64",
-    "linuxarmv7l": "debian7_11-armv7l",
-    "linuxppc64le": "centos7_3-ppc64le",
-    "linuxaarch64": "centos7_3-aarch64",
-    "freebsd64": "freebsd11_1-x64",
+    "macos64": namefilt("x86_64", macos_names),
+    "win32": namefilt("i686", win_names),
+    "win64": namefilt("x86_64", win_names),
+    "linux32": namefilt("i686", linux_names),
+    "linux64": namefilt("x86_64", linux_names),
+    "linuxarmv7l": namefilt("armv7l", linux_names),
+    "linuxppc64le": namefilt("ppc64le", linux_names),
+    "linuxaarch64": namefilt("aarch64", linux_names),
+    "freebsd64": namefilt("x86_64", freebsd_names),
 }

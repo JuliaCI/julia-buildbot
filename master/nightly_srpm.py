@@ -158,7 +158,7 @@ c['schedulers'].append(srpm_package_scheduler)
 # Add SRPM packager
 c['builders'].append(util.BuilderConfig(
     name="nightly_srpm",
-    workernames=["centos7_3-x64"],
+    workernames=builder_mapping["linux64"],
     tags=["Nightlies"],
     factory=julia_srpm_package_factory,
 ))
