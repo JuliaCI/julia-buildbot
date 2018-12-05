@@ -2,6 +2,13 @@
 # Define everything needed to do per-commit coverage testing on Linux
 ###############################################################################
 
+symlink_fix_cmd = """
+# Ugly workaround until we fix https://github.com/JuliaLang/julia/issues/26314
+rm -rf ../package_linux64/build/usr/share
+mkdir -p ../package_linux64/build/usr/share
+ln -s ../../../../package_linux64/build/usr/share/julia julia-*/share/julia/
+"""
+
 run_coverage_cmd = """
 using CoverageBase, Compat, Compat.Test
 CoverageBase.runtests(CoverageBase.testnames())
@@ -67,6 +74,12 @@ julia_coverage_factory.addSteps([
     steps.ShellCommand(
         name="download/extract tarball",
         command=["/bin/sh", "-c", util.Interpolate("curl -L %(prop:download_url)s | tar zx")],
+    ),
+
+    # Ugly symlink fix until https://github.com/JuliaLang/julia/issues/26314 is fixed
+    steps.ShellCommand(
+        name="Ugly symlink workaround",
+        command=["/bin/sh", "-c", symlink_fix_cmd],
     ),
 
     # Find Julia directory (so we don't have to know the shortcommit)
