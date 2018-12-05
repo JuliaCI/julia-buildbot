@@ -21,6 +21,7 @@ using Pkg
 Pkg.activate("CoverageBase")
 using Coverage, CoverageBase
 
+# Process code-coverage files
 cd(joinpath(CoverageBase.julia_top()))
 results = Coverage.process_folder("base")
 if isdefined(CoverageBase.BaseTestRunner, :STDLIBS)
@@ -59,9 +60,7 @@ git_info = Dict(
 )
 
 # Submit to Coveralls
-ENV["REPO_TOKEN"] = ENV["COVERALLS_REPO_TOKEN"]
-Coveralls.submit_token(results, git_info)
-delete!(ENV, "REPO_TOKEN")
+Coveralls.submit_local(results, git_info)
 """
 
 # Steps to download a linux tarball, extract it, run coverage on it, and upload coverage stats
@@ -131,7 +130,7 @@ julia_coverage_factory.addSteps([
     steps.ShellCommand(
         name="Gather test results and Submit",
         command=[util.Interpolate("%(prop:juliadir)s/bin/julia"), "-e", util.Interpolate(analyse_and_submit_cov_cmd)],
-        env={'COVERALLS_REPO_TOKEN':COVERALLS_REPO_TOKEN, 'CODECOV_REPO_TOKEN':CODECOV_REPO_TOKEN},
+        env={'COVERALLS_TOKEN':COVERALLS_REPO_TOKEN, 'CODECOV_REPO_TOKEN':CODECOV_REPO_TOKEN},
         logEnviron=False,
     ),
 ])
