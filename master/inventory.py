@@ -23,16 +23,15 @@ win_names       = build_names("win", ["x86_64", "i686"], ["openstack_1", "openst
 # some run on scaleway, etc...
 linux_names     = build_names("linux", ["x86_64", "i686"], ["nanosoldier2_1", "nanosoldier2_2"])
 linux_names    += build_names("linux", ["ppc64le"], ["osu"])
-linux_names    += build_names("linux", ["aarch64"], ["scaleway"])
-linux_names    += build_names("linux", ["armv7l"], ["davinci"])
+linux_names    += build_names("linux", ["aarch64"], ["scaleway_1", "scaleway_2"])
+linux_names    += build_names("linux", ["armv7l"], ["firefly", "rock64"])
 
-# Our mac builder runs on macmini2
-macos_names     = build_names("macos", ["x86_64"], ["macmini2"])
+# Our mac builders on macmini2 and akatsuki
+macos_names     = build_names("macos", ["x86_64"], ["macmini2", "akatsuki"])
 
 # Our FreeBSD builder runs on hardware maintained by Iblis
 freebsd_names   = build_names("freebsd", ["x86_64"], ["iblis"])
-
-all_names       = (win_names + linux_names + macos_names + freebsd_names)
+all_names       = win_names + linux_names + macos_names + freebsd_names
 
 # TODO: Fold these into the freebsd_names eventually
 freebsdci_names = {
