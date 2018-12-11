@@ -4,9 +4,9 @@
 
 symlink_fix_cmd = """
 # Ugly workaround until we fix https://github.com/JuliaLang/julia/issues/26314
-rm -rf ../package_linux64/build/usr/share
-mkdir -p ../package_linux64/build/usr/share
-ln -s `cd julia-*/share/julia && pwd` ../package_linux64/build/usr/share/julia 
+rm -rfv ../package_linux64/build/usr/share
+mkdir -pv ../package_linux64/build/usr/share
+ln -sv `cd julia-*/share/julia && pwd` ../package_linux64/build/usr/share/julia 
 """
 
 run_coverage_cmd = """
