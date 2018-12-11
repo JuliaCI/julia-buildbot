@@ -89,7 +89,7 @@ def gen_upload_path(props_obj, namespace=None, latest=False):
     up_arch = props_obj.getProperty("up_arch")
     majmin = props_obj.getProperty("majmin")
     upload_filename = props_obj.getProperty("upload_filename")
-    assertions = props_obj.getProperty("assertions")
+    assert_build = props_obj.getProperty("assert_build")
 
     # If we're asking for the latest information, 
     if latest and upload_filename[:6] == "julia-":
@@ -113,7 +113,7 @@ def gen_upload_path(props_obj, namespace=None, latest=False):
     return url
 
 def gen_latest_upload_path(props_obj, namespace=None):
-    assertions = props_obj.getProperty("assertions")
+    assert_build = props_obj.getProperty("assert_build")
 
     up_arch = props_obj.getProperty("up_arch")
     upload_filename = props_obj.getProperty("upload_filename")

@@ -25,7 +25,7 @@ julia_package_factory.addSteps([
         name="Set assertion make flags",
         property="flags",
         value=util.Interpolate("%(prop:flags)s LLVM_ASSERTIONS=1 FORCE_ASSERTIONS=1"),
-        doStepIf=lambda step: step.getProperty('assertions'),
+        doStepIf=lambda step: step.getProperty('assert_build'),
         hideStepIf=lambda results, s: results==SKIPPED,
     ),
 
@@ -167,7 +167,7 @@ julia_package_factory.addSteps([
         set_properties={
             'download_url': render_pretesting_download_url,
             'majmin': util.Property('majmin'),
-            'assertions': util.Property('assertions'),
+            'assert_build': util.Property('assert_build'),
             'upload_filename': util.Property('upload_filename'),
             'commitmessage': util.Property('commitmessage'),
             'commitname': util.Property('commitname'),
@@ -192,7 +192,7 @@ for name in ("Julia Binary Packaging", "Julia Binary Packaging (assertions enabl
 
     # If this is an assert build, store that in properties
     if "assertions" in name:
-        props["assertions"] = True
+        props["assert_build"] = True
     else:
         # non-assert builds only build against `master` and `release-*`
         branch_fn=lambda b: b == "master" or b.startswith("release-")
