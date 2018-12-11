@@ -62,17 +62,11 @@ julia_package_factory.addSteps([
         env=julia_package_env,
     ),
 
-    # Make, forcing some degree of parallelism to cut down compile times
+    # Make release and debug simultaneously.  Once upon a time this caused
+    # problems on Windows, let's try it again.
     steps.ShellCommand(
-        name="make release",
-        command=["/bin/sh", "-c", util.Interpolate("%(prop:make_cmd)s -j%(prop:nthreads)s %(prop:flags)s %(prop:extra_make_flags)s release")],
-        haltOnFailure = True,
-        timeout=3600,
-        env=julia_package_env,
-    ),
-    steps.ShellCommand(
-        name="make debug",
-        command=["/bin/sh", "-c", util.Interpolate("%(prop:make_cmd)s -j%(prop:nthreads)s %(prop:flags)s %(prop:extra_make_flags)s debug")],
+        name="make release/debug",
+        command=["/bin/sh", "-c", util.Interpolate("%(prop:make_cmd)s -j%(prop:nthreads)s %(prop:flags)s %(prop:extra_make_flags)s release debug")],
         haltOnFailure = True,
         timeout=3600,
         env=julia_package_env,
