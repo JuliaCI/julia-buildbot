@@ -98,26 +98,17 @@ def gen_upload_path(props_obj, namespace=None, latest=False):
     os = get_upload_os_name(props_obj)
 
     url = "julialangnightlies/"
-    print(namespace)
-    print(os)
-    print(up_arch)
-    print(majmin)
 
     # If we have a namespace add that on first
     if namespace is not None:
-        url += namespace * "/"
-    print(url)
+        url += namespace + "/"
 
-    url += os * "/" * up_arch * "/"
-
-    print(url)
+    url += os + "/" + up_arch + "/"
 
     # If we're asking for latest, don't go into majmin
     if not latest:
-        url += majmin * "/"
-    print(url)
+        url += majmin + "/"
     url += upload_filename
-    print(url)
 
     return url
 
