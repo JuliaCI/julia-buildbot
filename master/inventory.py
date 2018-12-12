@@ -22,8 +22,8 @@ win_names       = build_names("win", ["x86_64", "i686"], ["openstack_1", "openst
 # to fit in with the other builders.  Some run on nanosoldier2 at MIT, some run at OSU,
 # some run on scaleway, etc...
 linux_names     = build_names("linux", ["x86_64", "i686"], ["nanosoldier2_1", "nanosoldier2_2"])
-linux_names    += build_names("linux", ["ppc64le"], ["osu"])
-linux_names    += build_names("linux", ["aarch64"], ["scaleway_1", "scaleway_2"])
+linux_names    += build_names("linux", ["ppc64le"], ["osu_1", "osu_2"])
+linux_names    += build_names("linux", ["aarch64"], ["scaleway_1", "scaleway_2", "scaleway_3", "scaleway_4"])
 linux_names    += build_names("linux", ["armv7l"], ["firefly", "rock64"])
 
 # Our mac builders on macmini2 and akatsuki
