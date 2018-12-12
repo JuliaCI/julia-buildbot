@@ -20,10 +20,10 @@ win_names       = build_names("win", ["x86_64", "i686"], ["openstack_%d"%(idx) f
 
 # Our linux (packaging) machines are typically centos, but we just call them `linux`,
 # to fit in with the other builders.  Some run on nanosoldier2 at MIT, some run at OSU,
-# some run on scaleway, etc...
+# some run on packet, etc...
 linux_names     = build_names("linux", ["x86_64", "i686"], ["nanosoldier2_%d"%(idx) for idx in range(1,3)])
 linux_names    += build_names("linux", ["ppc64le"], ["osu_%d"%(idx) for idx in range(1,3)])
-linux_names    += build_names("linux", ["aarch64"], ["scaleway_%d"%(idx) for idx in range(1,9)])
+linux_names    += build_names("linux", ["aarch64"], ["packet_%d"%(idx) for idx in range(1,9)])
 linux_names    += build_names("linux", ["armv7l"], ["firefly", "rock64"])
 
 # Our mac builders on macmini2 and akatsuki
