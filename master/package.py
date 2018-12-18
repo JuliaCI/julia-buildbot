@@ -192,25 +192,6 @@ ci_scheduler = schedulers.AnyBranchScheduler(
 )
 c['schedulers'].append(ci_scheduler)
 
-# This is the deployment scheduler, where we build nonassert builds
-cd_scheduler = schedulers.ForceScheduler(
-    name="force_deploy",
-    label="deploy build",
-    builderNames=packager_mapping.keys(),
-    reason=util.FixedParameter(name="reason", default=""),
-    codebases=[
-        util.CodebaseParameter(
-            "",
-            name="",
-            branch=util.FixedParameter(name="branch", default=""),
-            repository=util.FixedParameter(name="repository", default=""),
-            project=util.FixedParameter(name="project", default="Coverage"),
-        )
-    ],
-)
-c['schedulers'].append(cd_scheduler)
-
-
 # Add workers for these jobs
 for packager, workers in packager_mapping.iteritems():
     c['builders'].append(util.BuilderConfig(
