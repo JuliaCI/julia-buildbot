@@ -150,7 +150,9 @@ for name in all_names:
 
 
     # tests are hitting memory issues, so restart workers when memory consumption gets too high
-    flags += 'JULIA_TEST_MAXRSS_MB=1000 '
+    # We typically provision at least 1GB per core, so set the limit to 900MB per worker to leave
+    # some space for other things on the host
+    flags += 'JULIA_TEST_MAXRSS_MB=900 '
 
     # Lock the tests to this many threads (usually 6)
     flags += 'JULIA_CPU_THREADS=%d '%(nthreads)
