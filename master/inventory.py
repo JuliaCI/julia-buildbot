@@ -165,7 +165,18 @@ for name in all_names:
     # Construct the actual BuildSlave object, and also double up for the tabularasa
     # builders; we add one for each actual builder.
     for worker_name in [name, "tabularasa_"+name]:
-        c['workers'] += [worker.Worker(worker_name, 'julialang42', max_builds=1,
+        c['workers'] += [worker.Worker(
+            # Name and password, much secure (TM)
+            worker_name,
+            'julialang42',
+
+            # Don't let the same worker do multiple builds at once
+            max_builds=1,
+
+            # Set much lower keepalive interval in an attempt to avoid dropped connections
+            keepalive_interval=60,
+
+            # Our veritable portfolio of high-value properties
             properties={
                 'tar_arch':tar_arch,
                 'release':name,
