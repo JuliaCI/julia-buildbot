@@ -197,12 +197,12 @@ cd_scheduler = schedulers.ForceScheduler(
     name="force_deploy",
     label="deploy build",
     builderNames=packager_mapping.keys(),
+    reason=util.FixedParameter(name="reason", default=""),
     codebases=[
         util.CodebaseParameter(
             "",
             name="",
             branch=util.FixedParameter(name="branch", default=""),
-            revision=util.FixedParameter(name="revision", default=""),
             repository=util.FixedParameter(name="repository", default=""),
             project=util.FixedParameter(name="project", default="Coverage"),
         )
