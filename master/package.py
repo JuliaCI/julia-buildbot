@@ -172,36 +172,44 @@ julia_package_factory.addSteps([
             'scheduler': util.Property('scheduler'),
         },
         waitForFinish=False,
-    )
+    ),
 ])
 
 # Build a builder-worker mapping based off of the parent mapping in inventory.py
 packager_mapping = {("package_" + k): v for k, v in builder_mapping.iteritems()}
 
-# This is the official binary packaging scheduler, we do two builds, one with assertions,
-# one without any assertions.
-for name in ("Julia Binary Packaging", "Julia Binary Packaging (assertions enabled)"):
-    props = {}
-    branch_fn = None
+# This is the CI scheduler, where we build an assert build and test it
+ci_scheduler = schedulers.AnyBranchScheduler(
+    name="Julia testing build",
+    change_filter=util.ChangeFilter(
+        project=['JuliaLang/julia','staticfloat/julia'],
+    ),
+    builderNames=packager_mapping.keys(),
+    treeStableTimer=1,
+    properties={
+        "assert_build": True,
+    },
+)
+c['schedulers'].append(ci_scheduler)
 
-    # If this is an assert build, store that in properties
-    if "assertions" in name:
-        props["assert_build"] = True
-    else:
-        # non-assert builds only build against `master` and `release-*`
-        branch_fn=lambda b: b == "master" or b.startswith("release-")
+# This is the deployment scheduler, where we build nonassert builds
+cd_scheduler = schedulers.ForceScheduler(
+    name="force_deploy",
+    label="deploy build",
+    builderNames=packager_mapping.keys(),
+    codebases=[
+        util.CodebaseParameter(
+            "",
+            name="",
+            branch=util.FixedParameter(name="branch", default=""),
+            revision=util.FixedParameter(name="revision", default=""),
+            repository=util.FixedParameter(name="repository", default=""),
+            project=util.FixedParameter(name="project", default="Coverage"),
+        )
+    ],
+)
+c['schedulers'].append(cd_scheduler)
 
-    scheduler = schedulers.AnyBranchScheduler(
-        name=name,
-        change_filter=util.ChangeFilter(
-            project=['JuliaLang/julia','staticfloat/julia'],
-            branch_fn=branch_fn,
-        ),
-        builderNames=packager_mapping.keys(),
-        treeStableTimer=1,
-        properties=props
-    )
-    c['schedulers'].append(scheduler)
 
 # Add workers for these jobs
 for packager, workers in packager_mapping.iteritems():

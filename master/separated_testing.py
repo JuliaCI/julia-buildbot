@@ -71,8 +71,18 @@ julia_testing_factory.addSteps([
             'scheduler': util.Property('scheduler'),
         },
         waitForFinish=False,
-        doStepIf=should_run_coverage,
-    )
+        doStepIf=is_assert_nightly,
+    ),
+    
+    # Trigger a build of a non-assert version if the assert version finished properly
+    steps.Trigger(
+        schedulerNames=[cd_scheduler],
+        set_properties={
+            'assert_build': False,
+        },
+        waitForFinish=False,
+        doStepIf=is_assert_nightly,
+    ),
 ])
 
 for builder, workers in builder_mapping.iteritems():
