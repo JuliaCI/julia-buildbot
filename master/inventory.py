@@ -26,7 +26,7 @@ linux_names    += build_names("linux", ["x86_64"], ["nanosoldier1_1"] + ["nanoso
 linux_names    += build_names("linux", ["i686"], ["nanosoldier1_1"] + ["nanosoldier3_%d"%(idx) for idx in range(1,3)])
 linux_names    += build_names("linux", ["ppc64le"], ["osu_%d"%(idx) for idx in range(1,3)])
 linux_names    += build_names("linux", ["aarch64"], ["packet_%d"%(idx) for idx in range(1,9)])
-linux_names    += build_names("linux", ["armv7l"], ["firefly", "rock64"])
+linux_names    += build_names("linux", ["armv7l"], ["firefly_%d"%(idx) for idx in range(1,4)])
 
 # Our mac builders on macmini2 and akatsuki
 macos_names     = build_names("macos", ["x86_64"], ["macmini2", "akatsuki"])
