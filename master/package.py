@@ -11,7 +11,7 @@ julia_package_factory.addSteps([
     # Fetch first (allowing failure if no existing clone is present)
     steps.ShellCommand(
         name="git fetch",
-        command=["git", "fetch"],
+        command=["git", "fetch", "--tags", "--all", "--force"],
         flunkOnFailure=False
     ),
 
