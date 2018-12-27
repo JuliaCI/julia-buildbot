@@ -29,6 +29,22 @@ julia_package_factory.addSteps([
         hideStepIf=lambda results, s: results==SKIPPED,
     ),
 
+    steps.SetProperty(
+        name="Set BinaryBuilder LLVM flag",
+        property="flags",
+        value=util.Interpolate("%(prop:flags)s USE_BINARYBUILDER_LLVM=1"),
+        doStepIf=lambda step: step.getProperty('use_bb_llvm'),
+        hideStepIf=lambda results, s: results==SKIPPED,
+    ),
+    
+    steps.SetProperty(
+        name="Set BinaryBuilder OpenBLAS flag",
+        property="flags",
+        value=util.Interpolate("%(prop:flags)s USE_BINARYBUILDER_OPENBLAS=1"),
+        doStepIf=lambda step: step.getProperty('use_bb_openblas'),
+        hideStepIf=lambda results, s: results==SKIPPED,
+    ),
+
     # Recursive `git clean` on windows is very slow. It is faster to
     # wipe the dir and reset it. Important is that we don't delete our
     # `.git` folder
@@ -228,6 +244,16 @@ force_build_scheduler = schedulers.ForceScheduler(
             name="assert_build",
             label="Build with Assertions",
             default=False,
+        ),
+        util.BooleanParameter(
+            name="use_bb_llvm",
+            label="Use BinaryBuilder LLVM",
+            default=True,
+        ),
+        util.BooleanParameter(
+            name="use_bb_openblas",
+            label="Use BinaryBuilder OpenBLAS",
+            default=True,
         ),
     ],
 )
