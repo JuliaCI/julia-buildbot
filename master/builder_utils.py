@@ -258,4 +258,4 @@ def download_latest_julia(props_obj):
 @util.renderer
 def render_tester_name(props_obj):
     props = props_obj_to_dict(props_obj)
-    return "Julia %s Testing"%(props['buildername'].replace('package_', ''))
+    return "Julia CI (%s testing)"%(props['buildername'].replace('package_', ''))
