@@ -89,7 +89,7 @@ for builder, workers in builder_mapping.iteritems():
     tester_name = "tester_%s"%(builder)
     # Add a dependent scheduler for running tests after we build tarballs
     c['schedulers'].append(schedulers.Triggerable(
-        name="Julia %s Testing"%(builder),
+        name="Julia CI (%s testing)"%(builder),
         builderNames=[tester_name],
     ))
 

@@ -196,7 +196,7 @@ packager_mapping = {("package_" + k): v for k, v in builder_mapping.iteritems()}
 
 # This is the CI scheduler, where we build an assert build and test it
 ci_scheduler = schedulers.AnyBranchScheduler(
-    name="Julia testing build",
+    name="Julia CI (build)",
     change_filter=util.ChangeFilter(
         project=['JuliaLang/julia','staticfloat/julia'],
     ),
