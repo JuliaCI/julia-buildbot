@@ -77,7 +77,7 @@ for name in all_names:
             flags += 'XC_HOST=i686-w64-mingw32 '
         else:
             flags += 'XC_HOST=x86_64-w64-mingw32 '
-    elif name[:3] == "macos":
+    elif name[:5] == "macos":
         os_name = "mac"
         os_pkg_ext = "dmg"
 
