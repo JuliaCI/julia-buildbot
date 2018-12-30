@@ -61,6 +61,9 @@ for name in all_names:
     # Add on the tagged release banner
     flags += 'TAGGED_RELEASE_BANNER="Official https://julialang.org/ release" '
 
+    # Persist our source cache
+    flags += 'SRCCACHE=/tmp/srccache '
+
     # By default, we use 6 threads
     nthreads = 6
 
