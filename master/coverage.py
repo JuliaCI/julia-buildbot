@@ -1,13 +1,8 @@
 ###############################################################################
 # Define everything needed to do per-commit coverage testing on Linux
 ###############################################################################
-
-symlink_fix_cmd = """
-# Ugly workaround until we fix https://github.com/JuliaLang/julia/issues/26314
-rm -rfv ../package_linux64/build/usr/share
-mkdir -pv ../package_linux64/build/usr/share
-ln -sv `cd julia-*/share/julia && pwd` ../package_linux64/build/usr/share/julia 
-"""
+import os
+import tempfile
 
 run_coverage_cmd = """
 using Pkg
@@ -22,13 +17,16 @@ Pkg.activate("CoverageBase")
 using Coverage, CoverageBase
 
 # Process code-coverage files
-cd(joinpath(CoverageBase.julia_top()))
-results = Coverage.process_folder("base")
-if isdefined(CoverageBase.BaseTestRunner, :STDLIBS)
-    for stdlib in CoverageBase.BaseTestRunner.STDLIBS
-        append!(results, Coverage.process_folder("stdlib/v$(VERSION.major).$(VERSION.minor)/$stdlib/src"))
-    end
-end
+results = Coverage.LCOV.readfolder(r"%(kw:covdir)s")
+results = merge_coverage_counts(results, filter!(
+    let prefixes = (joinpath("base", ""),
+                    joinpath("stdlib", ""))
+        c -> any(p -> startswith(c.filename, p), prefixes)
+    end,
+    results))
+CoverageBase.fixpath!(results)
+CoverageBase.readsource!(results)
+#Coverage.amend_coverage_from_src!(results)
 
 # Create git_info for codecov
 git_info = Any[
@@ -51,11 +49,11 @@ git_info = Dict(
     ],
     "head" => Dict(
         "id" => Base.GIT_VERSION_INFO.commit,
-        "message" => "%(prop:commitmessage)s",
-        "committer_name" => "%(prop:commitname)s",
-        "committer_email" => "%(prop:commitemail)s",
-        "author_name" => "%(prop:authorname)s",
-        "author_email" => "%(prop:authoremail)s",
+        "message" => r"%(prop:commitmessage)s",
+        "committer_name" => r"%(prop:commitname)s",
+        "committer_email" => r"%(prop:commitemail)s",
+        "author_name" => r"%(prop:authorname)s",
+        "author_email" => r"%(prop:authoremail)s",
     )
 )
 
@@ -77,12 +75,6 @@ julia_coverage_factory.addSteps([
     steps.ShellCommand(
         name="download/extract tarball",
         command=["/bin/sh", "-c", util.Interpolate("curl -L %(prop:download_url)s | tar zx")],
-    ),
-
-    # Ugly symlink fix until https://github.com/JuliaLang/julia/issues/26314 is fixed
-    steps.ShellCommand(
-        name="Ugly symlink workaround",
-        command=["/bin/sh", "-c", symlink_fix_cmd],
     ),
 
     # Find Julia directory (so we don't have to know the shortcommit)
@@ -116,23 +108,29 @@ julia_coverage_factory.addSteps([
     ),
 
     # Run Julia, gathering coverage statistics
-    steps.ShellCommand(
-        name="Run inlined tests",
-        command=[util.Interpolate("%(prop:juliadir)s/bin/julia"), "--sysimage-native-code=no", "--code-coverage=all", "-e", run_coverage_cmd],
-        timeout=3600,
-    ),
-    steps.ShellCommand(
-        name="Run non-inlined tests",
-        command=[util.Interpolate("%(prop:juliadir)s/bin/julia"), "--sysimage-native-code=no", "--code-coverage=all", "--inline=no", "-e", run_coverage_cmd],
-        timeout=7200,
-    ),
-    #submit the results!
-    steps.ShellCommand(
-        name="Gather test results and Submit",
-        command=[util.Interpolate("%(prop:juliadir)s/bin/julia"), "-e", util.Interpolate(analyse_and_submit_cov_cmd)],
-        env={'COVERALLS_TOKEN':COVERALLS_REPO_TOKEN, 'CODECOV_REPO_TOKEN':CODECOV_REPO_TOKEN},
-        logEnviron=False,
-    ),
+    with tempfile.TemporaryDirectory() as covdir:
+        steps.ShellCommand(
+            name="Run tests",
+            command=[util.Interpolate("%(prop:juliadir)s/bin/julia"),
+                     "--sysimage-native-code=no", "--code-coverage=" + os.path.join(covdir, "cov-%p.info"),
+                     "-e", run_coverage_cmd],
+            timeout=3600,
+        ),
+        #steps.ShellCommand(
+        #    name="Run non-inlined tests",
+        #    command=[util.Interpolate("%(prop:juliadir)s/bin/julia"),
+        #             "--sysimage-native-code=no", "--code-coverage=" + os.path.join(covdir, "cov-%p.info"), "--inline=no",
+        #             "-e", run_coverage_cmd],
+        #    timeout=7200,
+        #),
+        #submit the results!
+        steps.ShellCommand(
+            name="Gather test results and Submit",
+            command=[util.Interpolate("%(prop:juliadir)s/bin/julia"),
+                     "-e", util.Interpolate(analyse_and_submit_cov_cmd, covdir=covdir)],
+            env={'COVERALLS_TOKEN':COVERALLS_REPO_TOKEN, 'CODECOV_REPO_TOKEN':CODECOV_REPO_TOKEN},
+            logEnviron=False,
+        ),
 ])
 
 
