@@ -156,7 +156,7 @@ julia_package_factory.addSteps([
 ])
 
 # Build a builder-worker mapping based off of the parent mapping in inventory.py
-packager_mapping = {("package_" + k): v for k, v in builder_mapping.iteritems()}
+packager_mapping = {("package_" + k): v for k, v in builder_mapping.items()}
 
 # Add a few builders that don't exist in the typical mapping
 #packager_mapping["build_ubuntu32"] = "ubuntu16_04-x86"
@@ -170,12 +170,12 @@ packager_scheduler = schedulers.AnyBranchScheduler(
         # Only build `master` or `release-*`
         branch_fn=lambda b: b == "master" or b.startswith("release-")
     ),
-    builderNames=packager_mapping.keys(),
+    builderNames=[k for k in packager_mapping.keys()],
     treeStableTimer=1
 )
 c['schedulers'].append(packager_scheduler)
 
-for packager, worker in packager_mapping.iteritems():
+for packager, worker in packager_mapping.items():
     c['builders'].append(util.BuilderConfig(
         name=packager,
         workernames=[worker],
@@ -189,7 +189,7 @@ for packager, worker in packager_mapping.iteritems():
 force_build_scheduler = schedulers.ForceScheduler(
     name="package",
     label="Force build/packaging",
-    builderNames=packager_mapping.keys(),
+    builderNames=[k for k in packager_mapping.keys()],
     reason=util.FixedParameter(name="reason", default=""),
     codebases=[
         util.CodebaseParameter(

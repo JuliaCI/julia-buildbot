@@ -21,7 +21,7 @@ def build_names_new(platform, arch, id_):
     >>> build_names_new('freebsd', ['amd64'], ['foo', 'bar'])
     ['freebsd-amd64-foo', 'freebsd-amd64-bar']
     """
-    return map(lambda x: '-'.join(x), itertools.product([platform], arch, id_))
+    return list(map(lambda x: '-'.join(x), itertools.product([platform], arch, id_)))
 
 
 win_names       = build_names("win", ["10_0"], ["x64", "x86"])

@@ -96,9 +96,9 @@ llvm_extras_factory.addSteps([
 ])
 
 # Build a builder-worker mapping based off of the parent mapping in inventory.py
-llvm_extras_mapping = {("llvm_extras_" + k): v for k, v in builder_mapping.iteritems()}
+llvm_extras_mapping = {("llvm_extras_" + k): v for k, v in builder_mapping.items()}
 
-for packager, worker in llvm_extras_mapping.iteritems():
+for packager, worker in llvm_extras_mapping.items():
     c['builders'].append(util.BuilderConfig(
         name=packager,
         workernames=[worker],
@@ -112,7 +112,7 @@ for packager, worker in llvm_extras_mapping.iteritems():
 force_llvm_extras_scheduler = schedulers.ForceScheduler(
     name="package_llvm_extras",
     label="Force llvm_extras build/packaging",
-    builderNames=llvm_extras_mapping.keys(),
+    builderNames=[k for k in llvm_extras_mapping.keys()],
     reason=util.FixedParameter(name="reason", default=""),
     codebases=[
         util.CodebaseParameter(

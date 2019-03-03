@@ -85,9 +85,9 @@ llvmjl_factory.addSteps([
 ])
 
 # Build a builder-worker mapping based off of the parent mapping in inventory.py
-llvmjl_mapping = {("llvmjl_" + k): v for k, v in builder_mapping.iteritems()}
+llvmjl_mapping = {("llvmjl_" + k): v for k, v in builder_mapping.items()}
 
-for packager, worker in llvmjl_mapping.iteritems():
+for packager, worker in llvmjl_mapping.items():
     c['builders'].append(util.BuilderConfig(
         name=packager,
         workernames=[worker],
@@ -102,7 +102,7 @@ tag_llvmjl_scheduler = schedulers.AnyBranchScheduler(
     change_filter=util.ChangeFilter(
         project=['maleadt/LLVM.jl', 'staticfloat/LLVM.jl'],
     ),
-    builderNames=llvmjl_mapping.keys(),
+    builderNames=[k for k in llvmjl_mapping.keys()],
     treeStableTimer=1,
     # Bake these properties in hard, we can always override with a force scheduler
     properties={
@@ -116,7 +116,7 @@ c['schedulers'].append(tag_llvmjl_scheduler)
 force_llvmjl_scheduler = schedulers.ForceScheduler(
     name="package_llvmjl",
     label="Force LLVM.jl deps packaging",
-    builderNames=llvmjl_mapping.keys(),
+    builderNames=[k for k in llvmjl_mapping.keys()],
     reason=util.FixedParameter(name="reason", default=""),
     codebases=[
         util.CodebaseParameter(

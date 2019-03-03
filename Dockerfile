@@ -1,4 +1,4 @@
-FROM python:2
+FROM python:3
 
 # Install necessary packages
 RUN pip install buildbot requests

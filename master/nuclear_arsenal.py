@@ -47,7 +47,7 @@ for name in nuclear_arsenal:
         ),
     ])
 
-    for builder, worker in builder_mapping.iteritems():
+    for builder, worker in builder_mapping.items():
         c['builders'].append(util.BuilderConfig(
             name=name + "_" + builder,
             workernames=[worker],

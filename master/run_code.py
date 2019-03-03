@@ -64,7 +64,7 @@ code_scheduler = schedulers.ForceScheduler(
 )
 c['schedulers'].append(code_scheduler)
 
-for builder, worker in builder_mapping.iteritems():
+for builder, worker in builder_mapping.items():
     c['builders'].append(util.BuilderConfig(
         name="runcode_" + builder,
         workernames=["tabularasa_"+worker],
