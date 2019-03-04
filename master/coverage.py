@@ -2,7 +2,6 @@
 # Define everything needed to do per-commit coverage testing on Linux
 ###############################################################################
 import os
-import tempfile
 
 run_coverage_cmd = """
 using Pkg
@@ -17,7 +16,7 @@ Pkg.activate("CoverageBase")
 using Coverage, CoverageBase
 
 # Process code-coverage files
-results = Coverage.LCOV.readfolder(r"%(kw:covdir)s")
+results = Coverage.LCOV.readfolder(r"%(prop:juliadir)s/LCOV")
 results = merge_coverage_counts(results, filter!(
     let prefixes = (joinpath("base", ""),
                     joinpath("stdlib", ""))
@@ -108,29 +107,28 @@ julia_coverage_factory.addSteps([
     ),
 
     # Run Julia, gathering coverage statistics
-    with tempfile.TemporaryDirectory() as covdir:
-        steps.ShellCommand(
-            name="Run tests",
-            command=[util.Interpolate("%(prop:juliadir)s/bin/julia"),
-                     "--sysimage-native-code=no", "--code-coverage=" + os.path.join(covdir, "cov-%p.info"),
-                     "-e", run_coverage_cmd],
-            timeout=3600,
-        ),
-        #steps.ShellCommand(
-        #    name="Run non-inlined tests",
-        #    command=[util.Interpolate("%(prop:juliadir)s/bin/julia"),
-        #             "--sysimage-native-code=no", "--code-coverage=" + os.path.join(covdir, "cov-%p.info"), "--inline=no",
-        #             "-e", run_coverage_cmd],
-        #    timeout=7200,
-        #),
-        #submit the results!
-        steps.ShellCommand(
-            name="Gather test results and Submit",
-            command=[util.Interpolate("%(prop:juliadir)s/bin/julia"),
-                     "-e", util.Interpolate(analyse_and_submit_cov_cmd, covdir=covdir)],
-            env={'COVERALLS_TOKEN':COVERALLS_REPO_TOKEN, 'CODECOV_REPO_TOKEN':CODECOV_REPO_TOKEN},
-            logEnviron=False,
-        ),
+    steps.MakeDirectory(dir=util.Interpolate("mkdir %(prop:juliadir)s/LCOV")),
+    steps.ShellCommand(
+        name="Run tests",
+        command=[util.Interpolate("%(prop:juliadir)s/bin/julia"),
+                 "--sysimage-native-code=no", util.Interpolate("--code-coverage=%(prop:juliadir)s/LCOV/cov-%%p.info"),
+                 "-e", run_coverage_cmd],
+        timeout=3600,
+    ),
+    #steps.ShellCommand(
+    #    name="Run non-inlined tests",
+    #    command=[util.Interpolate("%(prop:juliadir)s/bin/julia"),
+    #             "--sysimage-native-code=no", util.Interpolate("--code-coverage=%(prop:juliadir)s/LCOV/cov-%%p.info"), "--inline=no",
+    #             "-e", run_coverage_cmd],
+    #    timeout=7200,
+    #),
+    #submit the results!
+    steps.ShellCommand(
+        name="Gather test results and Submit",
+        command=[util.Interpolate("%(prop:juliadir)s/bin/julia"), "-e", util.Interpolate(analyse_and_submit_cov_cmd)],
+        env={'COVERALLS_TOKEN':COVERALLS_REPO_TOKEN, 'CODECOV_REPO_TOKEN':CODECOV_REPO_TOKEN},
+        logEnviron=False,
+    ),
 ])
 
 
