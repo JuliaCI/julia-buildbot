@@ -16,7 +16,7 @@ Pkg.activate("CoverageBase")
 using Coverage, CoverageBase
 
 # Process code-coverage files
-results = Coverage.LCOV.readfolder(r"%(prop:juliadir)s/LCOV")
+results = Coverage.LCOV.readfolder(raw"%(prop:juliadir)s/LCOV")
 results = merge_coverage_counts(results, filter!(
     let prefixes = (joinpath("base", ""),
                     joinpath("stdlib", ""))
@@ -48,11 +48,11 @@ git_info = Dict(
     ],
     "head" => Dict(
         "id" => Base.GIT_VERSION_INFO.commit,
-        "message" => r"%(prop:commitmessage)s",
-        "committer_name" => r"%(prop:commitname)s",
-        "committer_email" => r"%(prop:commitemail)s",
-        "author_name" => r"%(prop:authorname)s",
-        "author_email" => r"%(prop:authoremail)s",
+        "message" => raw"%(prop:commitmessage)s",
+        "committer_name" => raw"%(prop:commitname)s",
+        "committer_email" => raw"%(prop:commitemail)s",
+        "author_name" => raw"%(prop:authorname)s",
+        "author_email" => raw"%(prop:authoremail)s",
     )
 )
 
