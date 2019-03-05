@@ -32,10 +32,10 @@ centos_names   += build_names("centos", ["7_3"], ["x64", "ppc64le", "aarch64"])
 debian_names    = ["debian7_11-armv7l", "debian8_9-x86"]
 freebsd_names   = ["freebsd11_1-x64"]
 freebsdci_names = {
-    'main': build_names_new("freebsd", ["amd64"], ['gaebolg']),
+    'main': build_names_new("freebsd", ["amd64"], ['abeing', 'gaebolg']),
     'test': build_names_new("freebsd", ["amd64"],
                             ['csisw3', 'fragarach', 'caladbolg', 'rhongomyniad',
-                             'hrunting', 'balmung', 'abeing']),
+                             'hrunting', 'balmung']),
 }
 all_names       = (ubuntu_names + osx_names + centos_names + win_names +
                    debian_names + freebsd_names)
