@@ -156,7 +156,9 @@ freebsdci_builders = [
 freebsdci_schedulers = [
     schedulers.SingleBranchScheduler(
         name="freebsdci_master",
-        change_filter=util.ChangeFilter(branch='master'),
+        change_filter=util.ChangeFilter(
+            project=['JuliaLang/julia'],
+            branch='master'),
         treeStableTimer=60,
         builderNames=[freebsdci_builder_names['main']]),
 
