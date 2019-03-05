@@ -115,13 +115,6 @@ julia_coverage_factory.addSteps([
                  "-e", run_coverage_cmd],
         timeout=3600,
     ),
-    #steps.ShellCommand(
-    #    name="Run non-inlined tests",
-    #    command=[util.Interpolate("%(prop:juliadir)s/bin/julia"),
-    #             "--sysimage-native-code=no", util.Interpolate("--code-coverage=%(prop:juliadir)s/LCOV/cov-%%p.info"), "--inline=no",
-    #             "-e", run_coverage_cmd],
-    #    timeout=7200,
-    #),
     #submit the results!
     steps.ShellCommand(
         name="Gather test results and Submit",
