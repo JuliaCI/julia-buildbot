@@ -107,7 +107,7 @@ julia_coverage_factory.addSteps([
     ),
 
     # Run Julia, gathering coverage statistics
-    steps.MakeDirectory(dir=util.Interpolate("%(prop:juliadir)s/LCOV")),
+    steps.MakeDirectory(dir=util.Interpolate("build/%(prop:juliadir)s/LCOV")),
     steps.ShellCommand(
         name="Run tests",
         command=[util.Interpolate("%(prop:juliadir)s/bin/julia"),
