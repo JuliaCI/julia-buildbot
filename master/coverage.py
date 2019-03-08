@@ -17,13 +17,19 @@ using Coverage, CoverageBase
 
 # Process code-coverage files
 results = Coverage.LCOV.readfolder(raw"%(prop:juliadir)s/LCOV")
-results = merge_coverage_counts(results, filter!(
-    let prefixes = (joinpath("base", ""),
-                    joinpath("stdlib", ""))
-        c -> any(p -> startswith(c.filename, p), prefixes)
-    end,
-    results))
 CoverageBase.fixpath!(results)
+results = Coverage.merge_coverage_counts(results)
+sort!(results, by=c->c.filename)
+for r in results
+    cov, tot = get_summary(r)
+    @info "Got coverage data for $(r.filename): $cov/$tot"
+end
+let prefixes = (joinpath("base", ""),
+                joinpath("stdlib", ""))
+    filter!(results) do c
+        any(p -> startswith(c.filename, p), prefixes)
+    end
+end
 CoverageBase.readsource!(results)
 #Coverage.amend_coverage_from_src!(results)
 
