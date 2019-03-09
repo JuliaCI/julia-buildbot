@@ -17,20 +17,45 @@ using Coverage, CoverageBase
 
 # Process code-coverage files
 results = Coverage.LCOV.readfolder(raw"%(prop:juliadir)s/LCOV")
+  # remove test/ files
+filter!(results) do c
+    !occursin("test/", c.filename)
+end
+  # turn absolute paths into relative, and add base/ to relative paths
 CoverageBase.fixpath!(results)
 results = Coverage.merge_coverage_counts(results)
+  # pretty-print what we have got
 sort!(results, by=c->c.filename)
 for r in results
     cov, tot = get_summary(r)
     @info "Got coverage data for $(r.filename): $cov/$tot"
 end
+  # keep only files in stdlib/ and base/
 let prefixes = (joinpath("base", ""),
                 joinpath("stdlib", ""))
     filter!(results) do c
         any(p -> startswith(c.filename, p), prefixes)
     end
 end
+  # try to find these files, remove those that are not present
 CoverageBase.readsource!(results)
+filter!(results) do c
+    if isempty(c.source)
+        @info "File $(c.filename) not found"
+        false
+    else
+        true
+    end
+end
+  # add in any other files we discover
+  # todo: extend Glob.jl to support these patterns (base/**/*.jl and stdlib/*/src/**/*.jl (except test/))
+allfiles_base = sort!(split(readchomp(Cmd(`find base -name '*.jl'`, dir=CoverageBase.fixabspath(""))), '\n'))
+allfiles_stdlib = sort!(map(x -> "stdlib/" * x[3:end],
+    split(readchomp(Cmd(`find . -name '*.jl' ! -path '*/test/*' ! -path '*/docs/*'`, dir=CoverageBase.fixabspath("stdlib/"))), '\n')))
+allfiles = map(fn -> Coverage.FileCoverage(fn, read(CoverageBase.fixabspath(fn), String), Coverage.FileCoverage[]),
+    [allfiles_base; allfiles_stdlib])
+results = Coverage.merge_coverage_counts(results, allfiles)
+length(results) == length(allfiles) || @warn "Got coverage for an unexpected file:" symdiff=symdiff(map(x -> x.filename, allfiles), map(x -> x.filename, results))
 #Coverage.amend_coverage_from_src!(results)
 
 # Create git_info for codecov
