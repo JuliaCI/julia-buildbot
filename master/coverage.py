@@ -49,6 +49,7 @@ filter!(results) do c
 end
   # add in any other files we discover
   # todo: extend Glob.jl to support these patterns (base/**/*.jl and stdlib/*/src/**/*.jl (except test/))
+  # todo: consider also or instead looking at the Base._included_files list
 allfiles_base = sort!(split(readchomp(Cmd(`find base -name '*.jl'`, dir=CoverageBase.fixabspath(""))), '\n'))
 allfiles_stdlib = sort!(map(x -> "stdlib/" * x[3:end],
     split(readchomp(Cmd(`find . -name '*.jl' ! -path '*/test/*' ! -path '*/docs/*'`, dir=CoverageBase.fixabspath("stdlib/"))), '\n')))
@@ -56,7 +57,8 @@ allfiles = map(fn -> Coverage.FileCoverage(fn, read(CoverageBase.fixabspath(fn),
     [allfiles_base; allfiles_stdlib])
 results = Coverage.merge_coverage_counts(results, allfiles)
 length(results) == length(allfiles) || @warn "Got coverage for an unexpected file:" symdiff=symdiff(map(x -> x.filename, allfiles), map(x -> x.filename, results))
-#Coverage.amend_coverage_from_src!(results)
+  # attempt to improve accuracy of the results
+foreach(Coverage.amend_coverage_from_src!, results)
 
 # Create git_info for codecov
 git_info = Any[
