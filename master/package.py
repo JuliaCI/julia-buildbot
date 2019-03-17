@@ -261,7 +261,7 @@ c['schedulers'].append(force_build_scheduler)
 
 # Add status reporting
 package_report = reporters.GitHubStatusPush(
-    token=GITHUB_OAUTH_CLIENT_SECRET,
+    token=GITHUB_STATUS_OAUTH_TOKEN,
     context='Buildbot CI',
     startDescription='Build started',
     builders=[k for k in packager_mapping.keys()],
