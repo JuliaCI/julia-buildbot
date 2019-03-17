@@ -4,9 +4,6 @@
 
 freebsdci_factory = util.BuildFactory()
 freebsdci_factory.addSteps([
-    steps.BSDSysInfo(),
-    steps.BSDSetMakeVar(['make_jobs'], ['MAKE_JOBS_NUMBER']),
-
     steps.ShellCommand(
         name='cleanup stdlib',
         command=['rm', '-rvf', 'stdlib']

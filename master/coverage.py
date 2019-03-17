@@ -14,7 +14,6 @@ analyse_and_submit_cov_cmd = """
 using Pkg
 Pkg.activate("CoverageBase")
 using Coverage, CoverageBase
-
 # Process code-coverage files
 results = Coverage.LCOV.readfolder(raw"%(prop:juliadir)s/LCOV")
   # remove test/ files
@@ -59,17 +58,14 @@ results = Coverage.merge_coverage_counts(results, allfiles)
 length(results) == length(allfiles) || @warn "Got coverage for an unexpected file:" symdiff=symdiff(map(x -> x.filename, allfiles), map(x -> x.filename, results))
   # attempt to improve accuracy of the results
 foreach(Coverage.amend_coverage_from_src!, results)
-
 # Create git_info for codecov
 git_info = Any[
     :branch => Base.GIT_VERSION_INFO.branch,
     :commit => Base.GIT_VERSION_INFO.commit,
     :token => ENV["CODECOV_REPO_TOKEN"],
     ]
-
 # Submit to codecov
 Codecov.submit_generic(results; git_info...)
-
 # Create git_info for Coveralls
 git_info = Dict(
     "branch" => Base.GIT_VERSION_INFO.branch,
@@ -88,7 +84,6 @@ git_info = Dict(
         "author_email" => raw"%(prop:authoremail)s",
     )
 )
-
 # Submit to Coveralls
 Coveralls.submit_local(results, git_info)
 """
@@ -159,7 +154,7 @@ julia_coverage_factory.addSteps([
 
 
 # Add a dependent scheduler for running coverage after we build tarballs
-julia_coverage_builders = ["coverage_ubuntu16_04-x64"]
+julia_coverage_builders = ["coverage_linux64"]
 julia_coverage_scheduler = schedulers.Triggerable(name="Julia Coverage Testing", builderNames=julia_coverage_builders)
 c['schedulers'].append(julia_coverage_scheduler)
 
@@ -189,8 +184,8 @@ c['schedulers'].append(schedulers.ForceScheduler(
 
 # Add coverage builders
 c['builders'].append(util.BuilderConfig(
-    name="coverage_ubuntu16_04-x64",
-    workernames=["tabularasa_ubuntu16_04-x64"],
+    name="coverage_linux64",
+    workernames=["tabularasa_" + x for x in builder_mapping["linux64"]],
     tags=["Coverage"],
     factory=julia_coverage_factory
 ))

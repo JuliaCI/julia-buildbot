@@ -2,6 +2,11 @@ julia_package_env = {
     'CFLAGS': None,
     'CPPFLAGS': None,
     'LLVM_CMAKE': util.Property('llvm_cmake', default=None),
+
+    # On platforms that use jemalloc, we can ask it to fill all allocated and
+    # freed memory with junk, to ensure that we crash often if we attempt to
+    # use memory after freeing it.
+    'MALLOC_CONF': 'junk:true',
 }
 
 # Steps to build a `make binary-dist` tarball that should work on just about every linux ever
@@ -15,6 +20,31 @@ julia_package_factory.addSteps([
         flunkOnFailure=False
     ),
 
+    # Add LLVM and Julia assertion flags if we're doing an assert build
+    steps.SetProperty(
+        name="Set assertion make flags",
+        property="flags",
+        value=util.Interpolate("%(prop:flags)s LLVM_ASSERTIONS=1 FORCE_ASSERTIONS=1"),
+        doStepIf=lambda step: step.getProperty('assert_build'),
+        hideStepIf=lambda results, s: results==SKIPPED,
+    ),
+
+    steps.SetProperty(
+        name="Set BinaryBuilder LLVM flag",
+        property="flags",
+        value=util.Interpolate("%(prop:flags)s USE_BINARYBUILDER_LLVM=1"),
+        doStepIf=lambda step: step.getProperty('use_bb_llvm'),
+        hideStepIf=lambda results, s: results==SKIPPED,
+    ),
+    
+    steps.SetProperty(
+        name="Set BinaryBuilder OpenBLAS flag",
+        property="flags",
+        value=util.Interpolate("%(prop:flags)s USE_BINARYBUILDER_OPENBLAS=1"),
+        doStepIf=lambda step: step.getProperty('use_bb_openblas'),
+        hideStepIf=lambda results, s: results==SKIPPED,
+    ),
+
     # Recursive `git clean` on windows is very slow. It is faster to
     # wipe the dir and reset it. Important is that we don't delete our
     # `.git` folder
@@ -23,6 +53,7 @@ julia_package_factory.addSteps([
         command=["/bin/sh", "-c", "cmd /c del /s /q *"],
         flunkOnFailure = False,
         doStepIf=is_windows,
+        hideStepIf=lambda results, s: results==SKIPPED,
         env=julia_package_env,
     ),
 
@@ -43,20 +74,15 @@ julia_package_factory.addSteps([
         command=["/bin/sh", "-c", util.Interpolate("%(prop:make_cmd)s %(prop:flags)s %(prop:extra_make_flags)s win-extras")],
         haltOnFailure = True,
         doStepIf=is_windows,
+        hideStepIf=lambda results, s: results==SKIPPED,
         env=julia_package_env,
     ),
 
-    # Make, forcing some degree of parallelism to cut down compile times
+    # Make release and debug simultaneously.  Once upon a time this caused
+    # problems on Windows, let's try it again.
     steps.ShellCommand(
-        name="make release",
-        command=["/bin/sh", "-c", util.Interpolate("%(prop:make_cmd)s -j%(prop:nthreads)s %(prop:flags)s %(prop:extra_make_flags)s release")],
-        haltOnFailure = True,
-        timeout=3600,
-        env=julia_package_env,
-    ),
-    steps.ShellCommand(
-        name="make debug",
-        command=["/bin/sh", "-c", util.Interpolate("%(prop:make_cmd)s -j%(prop:nthreads)s %(prop:flags)s %(prop:extra_make_flags)s debug")],
+        name="make release/debug",
+        command=["/bin/sh", "-c", util.Interpolate("%(prop:make_cmd)s -j%(prop:nthreads)s %(prop:flags)s %(prop:extra_make_flags)s release debug")],
         haltOnFailure = True,
         timeout=3600,
         env=julia_package_env,
@@ -66,6 +92,14 @@ julia_package_factory.addSteps([
     steps.ShellCommand(
         name="ccache stats",
         command=["/bin/sh", "-c", "ccache -s"],
+        flunkOnFailure=False,
+        env=julia_package_env,
+    ),
+
+    # Get build stats
+    steps.ShellCommand(
+        name="build stats",
+        command=["/bin/sh", "-c", util.Interpolate("%(prop:make_cmd)s %(prop:flags)s %(prop:extra_make_flags)s build-stats")],
         flunkOnFailure=False,
         env=julia_package_env,
     ),
@@ -110,6 +144,7 @@ julia_package_factory.addSteps([
         command=render_make_app,
         haltOnFailure = True,
         doStepIf=is_mac,
+        hideStepIf=lambda results, s: results==SKIPPED,
         env=julia_package_env,
     ),
 
@@ -142,6 +177,7 @@ julia_package_factory.addSteps([
         set_properties={
             'download_url': render_pretesting_download_url,
             'majmin': util.Property('majmin'),
+            'assert_build': util.Property('assert_build'),
             'upload_filename': util.Property('upload_filename'),
             'commitmessage': util.Property('commitmessage'),
             'commitname': util.Property('commitname'),
@@ -152,38 +188,35 @@ julia_package_factory.addSteps([
             'scheduler': util.Property('scheduler'),
         },
         waitForFinish=False,
-    )
+    ),
 ])
 
 # Build a builder-worker mapping based off of the parent mapping in inventory.py
 packager_mapping = {("package_" + k): v for k, v in builder_mapping.items()}
 
-# Add a few builders that don't exist in the typical mapping
-#packager_mapping["build_ubuntu32"] = "ubuntu16_04-x86"
-#packager_mapping["build_ubuntu64"] = "ubuntu16_04-x64"
-#packager_mapping["build_centos64"] = "centos7_3-x64"
-
-packager_scheduler = schedulers.AnyBranchScheduler(
-    name="Julia Binary Packaging",
+# This is the CI scheduler, where we build an assert build and test it
+ci_scheduler = schedulers.AnyBranchScheduler(
+    name="Julia CI (build)",
     change_filter=util.ChangeFilter(
         project=['JuliaLang/julia','staticfloat/julia'],
-        # Only build `master` or `release-*`
-        branch_fn=lambda b: b == "master" or b.startswith("release-")
     ),
     builderNames=[k for k in packager_mapping.keys()],
-    treeStableTimer=1
+    treeStableTimer=1,
+    properties={
+        "assert_build": True,
+    },
 )
-c['schedulers'].append(packager_scheduler)
+c['schedulers'].append(ci_scheduler)
 
-for packager, worker in packager_mapping.items():
+# Add workers for these jobs
+for packager, workers in packager_mapping.items():
     c['builders'].append(util.BuilderConfig(
         name=packager,
-        workernames=[worker],
+        workernames=workers,
         collapseRequests=False,
         tags=["Packaging"],
-        factory=julia_package_factory
+        factory=julia_package_factory,
     ))
-
 
 # Add a scheduler for building release candidates/triggering builds manually
 force_build_scheduler = schedulers.ForceScheduler(
@@ -201,7 +234,27 @@ force_build_scheduler = schedulers.ForceScheduler(
         )
     ],
     properties=[
-        util.StringParameter(name="extra_make_flags", label="Extra Make Flags", size=30, default=""),
-    ]
+        util.StringParameter(
+            name="extra_make_flags",
+            label="Extra Make Flags",
+            size=30,
+            default="",
+        ),
+        util.BooleanParameter(
+            name="assert_build",
+            label="Build with Assertions",
+            default=False,
+        ),
+        util.BooleanParameter(
+            name="use_bb_llvm",
+            label="Use BinaryBuilder LLVM",
+            default=True,
+        ),
+        util.BooleanParameter(
+            name="use_bb_openblas",
+            label="Use BinaryBuilder OpenBLAS",
+            default=True,
+        ),
+    ],
 )
 c['schedulers'].append(force_build_scheduler)

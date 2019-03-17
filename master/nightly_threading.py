@@ -2,11 +2,11 @@
 # Define everything needed to build nightly Julia with threading enabled
 ###############################################################################
 
-for arch in ["x86", "x64"]:
+for arch in ["linux64", "linux32", "linuxaarch64"]:
     force_scheduler = schedulers.ForceScheduler(
         name="force_thread_%s"%(arch),
         label="Force Julia %s Threading building"%(arch),
-        builderNames=["nightly_threading-%s" % arch],
+        builderNames=["nightly_threading-%s"%(arch)],
         reason=util.FixedParameter(name="reason", default=""),
         codebases=[
             util.CodebaseParameter(
@@ -89,10 +89,13 @@ julia_threading_factory.addSteps([
     ),
 ])
 
-julia_threading_builders = ["nightly_threading-x86", "nightly_threading-x64"]
 threading_nightly_scheduler = schedulers.Nightly(
     name="Julia Threading package",
-    builderNames=julia_threading_builders,
+    builderNames=[
+        "nightly_threading-linux32",
+        "nightly_threading-linux64",
+        "nightly_threading-linuxaarch64",
+    ],
     hour=[1,13],
     change_filter=util.ChangeFilter(
         project=['JuliaLang/julia','staticfloat/julia'],
@@ -102,13 +105,10 @@ threading_nightly_scheduler = schedulers.Nightly(
 )
 c['schedulers'].append(threading_nightly_scheduler)
 
-
-
-
-for arch in ["x86", "x64"]:
+for arch in ["linux64", "linux32", "linuxaarch64"]:
     c['builders'].append(util.BuilderConfig(
         name="nightly_threading-%s"%(arch),
-        workernames=["ubuntu16_04-%s"%(arch)],
+        workernames=builder_mapping[arch],
         tags=["Nightlies"],
         factory=julia_threading_factory
     ))

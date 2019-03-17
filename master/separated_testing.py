@@ -58,35 +58,45 @@ julia_testing_factory.addSteps([
     ),
 
     # Trigger coverage build if everything goes well
-    #steps.Trigger(
-    #    schedulerNames=["Julia Coverage Testing"],
-    #    set_properties={
-    #        'download_url': render_download_url,
-    #        'commitmessage': util.Property('commitmessage'),
-    #        'commitname': util.Property('commitname'),
-    #        'commitemail': util.Property('commitemail'),
-    #        'authorname': util.Property('authorname'),
-    #        'authoremail': util.Property('authoremail'),
-    #        'shortcommit': util.Property('shortcommit'),
-    #        'scheduler': util.Property('scheduler'),
-    #    },
-    #    waitForFinish=False,
-    #    doStepIf=should_run_coverage,
-    #)
+    steps.Trigger(
+        schedulerNames=["Julia Coverage Testing"],
+        set_properties={
+            'download_url': render_download_url,
+            'commitmessage': util.Property('commitmessage'),
+            'commitname': util.Property('commitname'),
+            'commitemail': util.Property('commitemail'),
+            'authorname': util.Property('authorname'),
+            'authoremail': util.Property('authoremail'),
+            'shortcommit': util.Property('shortcommit'),
+            'scheduler': util.Property('scheduler'),
+        },
+        waitForFinish=False,
+        doStepIf=is_assert_nightly,
+    ),
+    
+    # Trigger a build of a non-assert version if the assert version finished properly
+    steps.Trigger(
+        schedulerNames=[force_build_scheduler],
+        set_properties={
+            'assert_build': False,
+        },
+        waitForFinish=False,
+        doStepIf=is_assert_nightly,
+    ),
 ])
 
-for builder, worker in builder_mapping.items():
+for builder, workers in builder_mapping.items():
     tester_name = "tester_%s"%(builder)
     # Add a dependent scheduler for running tests after we build tarballs
     c['schedulers'].append(schedulers.Triggerable(
-        name="Julia %s Testing"%(builder),
+        name="Julia CI (%s testing)"%(builder),
         builderNames=[tester_name],
     ))
 
     # Add testing builders
     c['builders'].append(util.BuilderConfig(
         name=tester_name,
-        workernames=["tabularasa_%s"%(worker)],
+        workernames=["tabularasa_"+w for w in workers],
         collapseRequests=False,
         tags=["Testing"],
         factory=julia_testing_factory,

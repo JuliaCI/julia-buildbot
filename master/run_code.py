@@ -36,7 +36,7 @@ run_code_factory.addSteps([
 ])
 
 # Add our runners on various platforms
-code_runners  = ["runcode_osx64", "runcode_win32", "runcode_win64"]
+code_runners  = ["runcode_macos64", "runcode_win32", "runcode_win64"]
 code_runners += ["runcode_linux%s"%(arch) for arch in ["32", "64", "armv7l", "ppc64le", "aarch64"]]
 code_runners += ["runcode_freebsd64"]
 
@@ -64,10 +64,10 @@ code_scheduler = schedulers.ForceScheduler(
 )
 c['schedulers'].append(code_scheduler)
 
-for builder, worker in builder_mapping.items():
+for builder, workers in builder_mapping.items():
     c['builders'].append(util.BuilderConfig(
         name="runcode_" + builder,
-        workernames=["tabularasa_"+worker],
+        workernames=["tabularasa_"+w for w in workers],
         tags=["Coderun"],
         collapseRequests=False,
         factory=run_code_factory
