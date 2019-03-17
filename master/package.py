@@ -267,3 +267,4 @@ package_report = reporters.GitHubStatusPush(
     builders=[k for k in packager_mapping.keys()],
     endDescription='Build done'
 )
+c['services'].append(package_report)
