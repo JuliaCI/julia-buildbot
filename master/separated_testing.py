@@ -58,21 +58,21 @@ julia_testing_factory.addSteps([
     ),
 
     # Trigger coverage build if everything goes well
-    #steps.Trigger(
-    #    schedulerNames=["Julia Coverage Testing"],
-    #    set_properties={
-    #        'download_url': render_download_url,
-    #        'commitmessage': util.Property('commitmessage'),
-    #        'commitname': util.Property('commitname'),
-    #        'commitemail': util.Property('commitemail'),
-    #        'authorname': util.Property('authorname'),
-    #        'authoremail': util.Property('authoremail'),
-    #        'shortcommit': util.Property('shortcommit'),
-    #        'scheduler': util.Property('scheduler'),
-    #    },
-    #    waitForFinish=False,
-    #    doStepIf=should_run_coverage,
-    #)
+    steps.Trigger(
+        schedulerNames=["Julia Coverage Testing"],
+        set_properties={
+            'download_url': render_download_url,
+            'commitmessage': util.Property('commitmessage'),
+            'commitname': util.Property('commitname'),
+            'commitemail': util.Property('commitemail'),
+            'authorname': util.Property('authorname'),
+            'authoremail': util.Property('authoremail'),
+            'shortcommit': util.Property('shortcommit'),
+            'scheduler': util.Property('scheduler'),
+        },
+        waitForFinish=False,
+        doStepIf=should_run_coverage,
+    )
 ])
 
 for builder, worker in builder_mapping.items():
