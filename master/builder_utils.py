@@ -107,11 +107,11 @@ def gen_upload_path(props_obj, namespace=None, latest=False):
 
     # If we're running on the buildog or some other branch, prepend all our namespaces:
     if BUILDBOT_BRANCH != "master":
-        namespace = none_prepend(BUILDBOT_BRANCH, namespace)
+        namespace = none_prepend(namespace, BUILDBOT_BRANCH)
 
     # If we're running an assert build, put it into an "assert" bucket:
     if assert_build:
-        namespace = none_prepend("assert", namespace)
+        namespace = none_prepend(namespace, "assert")
 
     # If we have a namespace, add that on to our URL first
     url = "julialangnightlies/"
