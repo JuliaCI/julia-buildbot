@@ -32,15 +32,8 @@ linux_names    += build_names("linux", ["armv7l"], ["firefly_%d"%(idx) for idx i
 macos_names     = build_names("macos", ["x86_64"], ["macmini2", "akatsuki"])
 
 # Our FreeBSD builder runs on hardware maintained by Iblis
-freebsd_names   = build_names("freebsd", ["x86_64"], ["iblis"])
+freebsd_names   = build_names("freebsd", ["x86_64"], ["abeing", "gaebolg"])
 all_names       = win_names + linux_names + macos_names + freebsd_names
-
-# TODO: Fold these into the freebsd_names eventually
-freebsdci_names = {
-    'main': build_names("freebsd", ["amd64"], ['abeing']),
-    'test': build_names("freebsd", ["amd64"],
-            ['csisw3', 'fragarach', 'caladbolg', 'rhongomyniad', 'hrunting', 'balmung']),
-}
 
 # Define all the attributes we'll use in our buildsteps
 c['workers'] = []
@@ -188,11 +181,6 @@ for name in all_names:
                 'make_cmd':make_cmd,
             }
         )]
-
-# temp handler for freebsd ci workers,
-# this should be merged into the previous code block if possible.
-c['workers'] += [worker.Worker(name, 'julialang42', max_builds=1)
-                 for name in freebsdci_names['main'] + freebsdci_names['test']]
 
 # Add in tabularasa workers to all_names so that they volunteer for things like
 # the auto_reload builders and whatnot.
