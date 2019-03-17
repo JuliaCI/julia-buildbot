@@ -97,19 +97,28 @@ def gen_upload_path(props_obj, namespace=None, latest=False):
         upload_filename = "julia-latest-%s"%(split_name[2])
     os = get_upload_os_name(props_obj)
 
-    url = "julialangnightlies/"
+    # Helper function to prepend things to a value that might be `None`.
+    def none_prepend(p, x):
+        if x is None:
+            return p
+        else:
+            return x + "_" + p
+
 
     # If we're running on the buildog or some other branch, prepend all our namespaces:
     if BUILDBOT_BRANCH != "master":
-        if namespace is None:
-            namespace = BUILDBOT_BRANCH
-        else:
-            namespace = BUILDBOT_BRANCH + "_" + namespace
+        namespace = none_prepend(BUILDBOT_BRANCH, namespace)
 
-    # If we have a namespace add that on first
+    # If we're running an assert build, put it into an "assert" bucket:
+    if assert_build:
+        namespace = none_prepend("assert", namespace)
+
+    # If we have a namespace, add that on to our URL first
+    url = "julialangnightlies/"
     if namespace is not None:
         url += namespace + "/"
 
+    # Next up, OS and Arch.
     url += os + "/" + up_arch + "/"
 
     # If we're asking for latest, don't go into majmin
