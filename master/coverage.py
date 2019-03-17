@@ -3,21 +3,68 @@
 ###############################################################################
 
 run_coverage_cmd = """
-using CoverageBase, Compat, Compat.Test
+using Pkg
+Pkg.activate("CoverageBase")
+using CoverageBase
 CoverageBase.runtests(CoverageBase.testnames())
 """
 
 analyse_and_submit_cov_cmd = """
-using Coverage, CoverageBase, Compat
-
-cd(joinpath(CoverageBase.julia_top()))
-results = Coverage.process_folder("base")
-if isdefined(CoverageBase.BaseTestRunner, :STDLIBS)
-    for stdlib in CoverageBase.BaseTestRunner.STDLIBS
-        append!(results, Coverage.process_folder("site/v$(VERSION.major).$(VERSION.minor)/$stdlib/src"))
+using Pkg
+Pkg.activate("CoverageBase")
+using Coverage, CoverageBase
+# Process code-coverage files
+results = Coverage.LCOV.readfolder(raw"%(prop:juliadir)s/LCOV")
+  # remove test/ files
+filter!(results) do c
+    !occursin("test/", c.filename)
+end
+  # turn absolute paths into relative, and add base/ to relative paths
+CoverageBase.fixpath!(results)
+results = Coverage.merge_coverage_counts(results)
+  # pretty-print what we have got
+sort!(results, by=c->c.filename)
+for r in results
+    cov, tot = get_summary(r)
+    @info "Got coverage data for $(r.filename): $cov/$tot"
+end
+  # keep only files in stdlib/ and base/
+let prefixes = (joinpath("base", ""),
+                joinpath("stdlib", ""))
+    filter!(results) do c
+        any(p -> startswith(c.filename, p), prefixes)
     end
 end
-
+  # try to find these files, remove those that are not present
+CoverageBase.readsource!(results)
+filter!(results) do c
+    if isempty(c.source)
+        @info "File $(c.filename) not found"
+        false
+    else
+        true
+    end
+end
+  # add in any other files we discover
+  # todo: extend Glob.jl to support these patterns (base/**/*.jl and stdlib/*/src/**/*.jl (except test/))
+  # todo: consider also or instead looking at the Base._included_files list
+allfiles_base = sort!(split(readchomp(Cmd(`find base -name '*.jl'`, dir=CoverageBase.fixabspath(""))), '\n'))
+allfiles_stdlib = sort!(map(x -> "stdlib/" * x[3:end],
+    split(readchomp(Cmd(`find . -name '*.jl' ! -path '*/test/*' ! -path '*/docs/*'`, dir=CoverageBase.fixabspath("stdlib/"))), '\n')))
+allfiles = map(fn -> Coverage.FileCoverage(fn, read(CoverageBase.fixabspath(fn), String), Coverage.FileCoverage[]),
+    [allfiles_base; allfiles_stdlib])
+results = Coverage.merge_coverage_counts(results, allfiles)
+length(results) == length(allfiles) || @warn "Got coverage for an unexpected file:" symdiff=symdiff(map(x -> x.filename, allfiles), map(x -> x.filename, results))
+  # attempt to improve accuracy of the results
+foreach(Coverage.amend_coverage_from_src!, results)
+# Create git_info for codecov
+git_info = Any[
+    :branch => Base.GIT_VERSION_INFO.branch,
+    :commit => Base.GIT_VERSION_INFO.commit,
+    :token => ENV["CODECOV_REPO_TOKEN"],
+    ]
+# Submit to codecov
+Codecov.submit_generic(results; git_info...)
 # Create git_info for Coveralls
 git_info = Dict(
     "branch" => Base.GIT_VERSION_INFO.branch,
@@ -29,28 +76,15 @@ git_info = Dict(
     ],
     "head" => Dict(
         "id" => Base.GIT_VERSION_INFO.commit,
-        "message" => "%(prop:commitmessage)s",
-        "committer_name" => "%(prop:commitname)s",
-        "committer_email" => "%(prop:commitemail)s",
-        "author_name" => "%(prop:authorname)s",
-        "author_email" => "%(prop:authoremail)s",
+        "message" => raw"%(prop:commitmessage)s",
+        "committer_name" => raw"%(prop:commitname)s",
+        "committer_email" => raw"%(prop:commitemail)s",
+        "author_name" => raw"%(prop:authorname)s",
+        "author_email" => raw"%(prop:authoremail)s",
     )
 )
-
 # Submit to Coveralls
-ENV["REPO_TOKEN"] = ENV["COVERALLS_REPO_TOKEN"]
-Coveralls.submit_token(results, git_info)
-delete!(ENV, "REPO_TOKEN")
-
-# Create git_info for codecov
-git_info = Any[
-    :branch => Base.GIT_VERSION_INFO.branch,
-    :commit => Base.GIT_VERSION_INFO.commit,
-    :token => ENV["CODECOV_REPO_TOKEN"],
-    ]
-
-# Submit to codecov
-Codecov.submit_generic(results; git_info...)
+Coveralls.submit_local(results, git_info)
 """
 
 # Steps to download a linux tarball, extract it, run coverage on it, and upload coverage stats
@@ -100,21 +134,20 @@ julia_coverage_factory.addSteps([
     ),
 
     # Run Julia, gathering coverage statistics
+    steps.MakeDirectory(dir=util.Interpolate("build/%(prop:juliadir)s/LCOV")),
     steps.ShellCommand(
-        name="Run inlined tests",
-        command=[util.Interpolate("%(prop:juliadir)s/bin/julia"), "--sysimage-native-code=no", "--code-coverage=all", "-e", run_coverage_cmd],
+        name="Run tests",
+        name="Run tests",
+        command=[util.Interpolate("%(prop:juliadir)s/bin/julia"),
+                 "--sysimage-native-code=no", util.Interpolate("--code-coverage=%(prop:juliadir)s/LCOV/cov-%%p.info"),
+                 "-e", run_coverage_cmd],
         timeout=3600,
-    ),
-    steps.ShellCommand(
-        name="Run non-inlined tests",
-        command=[util.Interpolate("%(prop:juliadir)s/bin/julia"), "--sysimage-native-code=no", "--code-coverage=all", "--inline=no", "-e", run_coverage_cmd],
-        timeout=7200,
     ),
     #submit the results!
     steps.ShellCommand(
         name="Gather test results and Submit",
         command=[util.Interpolate("%(prop:juliadir)s/bin/julia"), "-e", util.Interpolate(analyse_and_submit_cov_cmd)],
-        env={'COVERALLS_REPO_TOKEN':COVERALLS_REPO_TOKEN, 'CODECOV_REPO_TOKEN':CODECOV_REPO_TOKEN},
+        env={'COVERALLS_TOKEN':COVERALLS_REPO_TOKEN, 'CODECOV_REPO_TOKEN':CODECOV_REPO_TOKEN},
         logEnviron=False,
     ),
 ])
