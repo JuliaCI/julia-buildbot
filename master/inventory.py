@@ -75,11 +75,6 @@ for name in all_names:
         # OpenBLAS can't deal with avx512 on windows for some reason.
         flags += "OPENBLAS_NO_AVX512=1 "
 
-        # Add our cross-host values (Someday, my boy.  Someday.)
-        #if name[-3:] == 'x86':
-        #    flags += 'XC_HOST=i686-w64-mingw32 '
-        #else:
-        #    flags += 'XC_HOST=x86_64-w64-mingw32 '
     elif name[:5] == "macos":
         os_name = "mac"
         os_pkg_ext = "dmg"
