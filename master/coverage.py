@@ -137,7 +137,6 @@ julia_coverage_factory.addSteps([
     steps.MakeDirectory(dir=util.Interpolate("build/%(prop:juliadir)s/LCOV")),
     steps.ShellCommand(
         name="Run tests",
-        name="Run tests",
         command=[util.Interpolate("%(prop:juliadir)s/bin/julia"),
                  "--sysimage-native-code=no", util.Interpolate("--code-coverage=%(prop:juliadir)s/LCOV/cov-%%p.info"),
                  "-e", run_coverage_cmd],

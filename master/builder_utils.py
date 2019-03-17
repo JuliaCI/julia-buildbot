@@ -99,6 +99,13 @@ def gen_upload_path(props_obj, namespace=None, latest=False):
 
     url = "julialangnightlies/"
 
+    # If we're running on the buildog or some other branch, prepend all our namespaces:
+    if BUILDBOT_BRANCH != "master":
+        if namespace is None:
+            namespace = BUILDBOT_BRANCH
+        else:
+            namespace = BUILDBOT_BRANCH + "_" + namespace
+
     # If we have a namespace add that on first
     if namespace is not None:
         url += namespace + "/"
@@ -112,31 +119,9 @@ def gen_upload_path(props_obj, namespace=None, latest=False):
 
     return url
 
-def gen_latest_upload_path(props_obj, namespace=None):
-    assert_build = props_obj.getProperty("assert_build")
-
-    up_arch = props_obj.getProperty("up_arch")
-    upload_filename = props_obj.getProperty("upload_filename")
-    if upload_filename[:6] == "julia-":
-        split_name = upload_filename.split("-")
-        upload_filename = "julia-latest-%s"%(split_name[2])
-    os = get_upload_os_name(props_obj)
-    
-    if namespace is None:
-        return "julialangnightlies/bin/%s/%s/%s"%(os, up_arch, upload_filename)
-    else:
-        return "julialangnightlies/%s/bin/%s/%s/%s"%(namespace, os, up_arch, upload_filename)
-
-
-
-def gen_download_url(props_obj, namespace=None):
+def gen_download_url(props_obj, namespace=None, latest=False):
     base = 'https://s3.amazonaws.com'
-    return '%s/%s'%(base, gen_upload_path(props_obj, namespace=namespace))
-
-def gen_latest_download_url(props_obj):
-    base = 'https://s3.amazonaws.com'
-    return '%s/%s'%(base, gen_latest_upload_path(props_obj))
-
+    return '%s/%s'%(base, gen_upload_path(props_obj, namespace=namespace, latest=latest))
 
 
 # This is a weird buildbot hack where we really want to parse the output of our
@@ -159,25 +144,25 @@ def munge_artifact_filename(props_obj):
 
 @util.renderer
 def render_upload_command(props_obj):
-    upload_path = gen_upload_path(props_obj, namespace="buildog_pretesting")
+    upload_path = gen_upload_path(props_obj, namespace="pretesting")
     upload_filename = props_obj.getProperty("upload_filename")
     return ["/bin/sh", "-c", "aws s3 cp --acl public-read /tmp/julia_package/%s s3://%s"%(upload_filename, upload_path)]
 
 @util.renderer
 def render_promotion_command(props_obj):
-    src_path = gen_upload_path(props_obj, namespace="buildog_pretesting")
-    dst_path = gen_upload_path(props_obj, namespace="buildog")
+    src_path = gen_upload_path(props_obj, namespace="pretesting")
+    dst_path = gen_upload_path(props_obj)
     return ["/bin/sh", "-c", "aws s3 cp --acl public-read s3://%s s3://%s"%(src_path, dst_path)]
 
 @util.renderer
 def render_latest_promotion_command(props_obj):
-    src_path = gen_upload_path(props_obj, namespace="buildog_pretesting")
-    dst_path = gen_latest_upload_path(props_obj, namespace="buildog")
+    src_path = gen_upload_path(props_obj, namespace="pretesting")
+    dst_path = gen_upload_path(props_obj, latest=True)
     return ["/bin/sh", "-c", "aws s3 cp --acl public-read s3://%s s3://%s"%(src_path, dst_path)]
 
 @util.renderer
 def render_cleanup_pretesting_command(props_obj):
-    del_path = gen_upload_path(props_obj, namespace="buildog_pretesting")
+    del_path = gen_upload_path(props_obj, namespace="pretesting")
     return ["/bin/sh", "-c", "aws s3 rm s3://%s"%(del_path)]
 
 @util.renderer
@@ -186,7 +171,7 @@ def render_download_url(props_obj):
 
 @util.renderer
 def render_pretesting_download_url(props_obj):
-    return gen_download_url(props_obj, namespace="buildog_pretesting")
+    return gen_download_url(props_obj, namespace="pretesting")
 
 @util.renderer
 def render_make_app(props_obj):
@@ -250,7 +235,7 @@ def download_latest_julia(props_obj):
     )
     props_obj.setProperty(
         "download_url",
-        gen_latest_download_url(props_obj),
+        gen_download_url(props_obj, latest=True),
         "download_latest_julia",
     )
     return build_download_julia_cmd(props_obj)
