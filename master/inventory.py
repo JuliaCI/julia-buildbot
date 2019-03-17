@@ -13,7 +13,7 @@ def build_names(platform, arch, name):
     >>> build_names_new('freebsd', ['amd64'], ['foo', 'bar'])
     ['freebsd-amd64-foo', 'freebsd-amd64-bar']
     """
-    return map(lambda x: '-'.join(x), itertools.product([platform], arch, name))
+    return list(map(lambda x: '-'.join(x), itertools.product([platform], arch, name)))
 
 # Our windows machines are on openstack, and we double them up because they are slooooow
 win_names       = build_names("win", ["x86_64", "i686"], ["openstack_%d"%(idx) for idx in range(1,3)])

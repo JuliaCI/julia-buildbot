@@ -192,7 +192,7 @@ julia_package_factory.addSteps([
 ])
 
 # Build a builder-worker mapping based off of the parent mapping in inventory.py
-packager_mapping = {("package_" + k): v for k, v in builder_mapping.iteritems()}
+packager_mapping = {("package_" + k): v for k, v in builder_mapping.items()}
 
 # This is the CI scheduler, where we build an assert build and test it
 ci_scheduler = schedulers.AnyBranchScheduler(
@@ -200,7 +200,7 @@ ci_scheduler = schedulers.AnyBranchScheduler(
     change_filter=util.ChangeFilter(
         project=['JuliaLang/julia','staticfloat/julia'],
     ),
-    builderNames=packager_mapping.keys(),
+    builderNames=[k for k in packager_mapping.keys()],
     treeStableTimer=1,
     properties={
         "assert_build": True,
@@ -209,7 +209,7 @@ ci_scheduler = schedulers.AnyBranchScheduler(
 c['schedulers'].append(ci_scheduler)
 
 # Add workers for these jobs
-for packager, workers in packager_mapping.iteritems():
+for packager, workers in packager_mapping.items():
     c['builders'].append(util.BuilderConfig(
         name=packager,
         workernames=workers,
@@ -222,7 +222,7 @@ for packager, workers in packager_mapping.iteritems():
 force_build_scheduler = schedulers.ForceScheduler(
     name="package",
     label="Force build/packaging",
-    builderNames=packager_mapping.keys(),
+    builderNames=[k for k in packager_mapping.keys()],
     reason=util.FixedParameter(name="reason", default=""),
     codebases=[
         util.CodebaseParameter(

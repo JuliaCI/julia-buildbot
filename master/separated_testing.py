@@ -85,7 +85,7 @@ julia_testing_factory.addSteps([
     ),
 ])
 
-for builder, workers in builder_mapping.iteritems():
+for builder, workers in builder_mapping.items():
     tester_name = "tester_%s"%(builder)
     # Add a dependent scheduler for running tests after we build tarballs
     c['schedulers'].append(schedulers.Triggerable(
