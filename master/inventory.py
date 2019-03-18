@@ -24,7 +24,7 @@ win_names       = build_names("win", ["x86_64", "i686"], ["openstack_%d"%(idx) f
 linux_names     = []
 linux_names    += build_names("linux", ["x86_64"], ["nanosoldier1_1"] + ["nanosoldier2_%d"%(idx) for idx in range(1,3)])
 linux_names    += build_names("linux", ["i686"], ["nanosoldier1_1"] + ["nanosoldier3_%d"%(idx) for idx in range(1,3)])
-linux_names    += build_names("linux", ["ppc64le"], ["osu_%d"%(idx) for idx in range(1,3)])
+linux_names    += build_names("linux", ["ppc64le"], ["osu_%d"%(idx) for idx in range(1,5)])
 linux_names    += build_names("linux", ["aarch64"], ["packet_%d"%(idx) for idx in range(1,9)])
 linux_names    += build_names("linux", ["armv7l"], ["firefly_%d"%(idx) for idx in range(1,4)])
 
