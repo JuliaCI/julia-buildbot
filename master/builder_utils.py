@@ -98,20 +98,19 @@ def gen_upload_path(props_obj, namespace=None, latest=False):
     os = get_upload_os_name(props_obj)
 
     # Helper function to prepend things to a value that might be `None`.
-    def none_prepend(p, x):
+    def none_prepend(x, p):
         if x is None:
             return p
         else:
-            return x + "_" + p
-
-
-    # If we're running on the buildog or some other branch, prepend all our namespaces:
-    if BUILDBOT_BRANCH != "master":
-        namespace = none_prepend(namespace, BUILDBOT_BRANCH)
+            return p + "_" + x
 
     # If we're running an assert build, put it into an "assert" bucket:
     if assert_build:
         namespace = none_prepend(namespace, "assert")
+
+    # If we're running on the buildog or some other branch, prepend all our namespaces:
+    if BUILDBOT_BRANCH != "master":
+        namespace = none_prepend(namespace, BUILDBOT_BRANCH)
 
     # If we have a namespace, add that on to our URL first
     url = "julialangnightlies/"
