@@ -137,11 +137,10 @@ julia_package_factory.addSteps([
         env=julia_package_env,
     ),
 
-    # On OSX, deal with non-sf/consistent_distnames makefile nonsense by wrapping up all
-    # the complexity into `render_make_app`.
+    # Build .app on macOS
     steps.ShellCommand(
         name="make .app",
-        command=render_make_app,
+        command=["/bin/sh", "-c", util.Interpolate("~/unlock_keychain.sh && make %(prop:flags)s %(prop:extra_make_flags)s app")],
         haltOnFailure = True,
         doStepIf=is_mac,
         hideStepIf=lambda results, s: results==SKIPPED,

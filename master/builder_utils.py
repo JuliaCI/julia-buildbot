@@ -1,14 +1,3 @@
-## A note on unneecssary complexity
-# We have gone through a few different standards on naming Julia's build artifacts.
-# The latest, as of this writing, is the `sf/consistent_distnames` branch on github,
-# and simplifies things relative to earlier versions.  However, this buildbot needs
-# to be able to build/upload Julia versions of all reasonably recent versions.
-# `sf/consistent_distnames` should be merged before the 0.6 release, which means
-# that once the release _after_ 0.6 is out in the wild and 0.5 is put to rest,
-# we can safely remove anything that talks about non-`sf/consistent_distnames`
-# compatibility/workarounds.
-
-
 # Helper function to generate the necessary julia invocation to get metadata
 # about this build such as major/minor versions
 @util.renderer
@@ -47,23 +36,7 @@ def gen_local_filename(props_obj):
 
     # Get the output of the `make print-JULIA_BINARYDIST_FILENAME` step
     artifact = "{artifact_filename}".format(**props).strip()
-
-    # First, see if we got a JULIA_BINARYDIST_FILENAME output
-    if artifact[:26] == "JULIA_BINARYDIST_FILENAME=" and len(artifact) > 26:
-        return artifact[26:] + ".{os_pkg_ext}".format(**props)
-    else:
-        # If not, use non-sf/consistent_distnames naming
-        if is_mac(props_obj):
-            return "contrib/mac/app/Julia-{version}-{shortcommit}.{os_pkg_ext}".format(**props)
-        elif is_windows(props_obj):
-            return "julia-{version}-{tar_arch}.{os_pkg_ext}".format(**props)
-        elif is_freebsd(props_obj):
-            return "julia-{shortcommit}-FreeBSD-{tar_arch}.{os_pkg_ext}".format(**props)
-        else:
-            # We made bad decisions in the past
-            if props['tar_arch'] == "armv7l":
-                return "julia-{shortcommit}-Linux-arm.{os_pkg_ext}".format(**props)
-            return "julia-{shortcommit}-Linux-{tar_arch}.{os_pkg_ext}".format(**props)
+    return artifact[26:] + ".{os_pkg_ext}".format(**props)
 
 # Map from property to upload OS name on the JuliaLang S3 bucket
 def get_upload_os_name(props):
@@ -180,16 +153,6 @@ def render_download_url(props_obj):
 @util.renderer
 def render_pretesting_download_url(props_obj):
     return gen_download_url(props_obj, namespace="pretesting")
-
-@util.renderer
-def render_make_app(props_obj):
-    props = props_obj_to_dict(props_obj)
-
-    return [
-        "/bin/sh",
-        "-c",
-        "~/unlock_keychain.sh && make {flags} app".format(**props)
-    ]
 
 def build_download_julia_cmd(props_obj):
     download_url = props_obj.getProperty("download_url")
