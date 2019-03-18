@@ -179,6 +179,10 @@ for name in all_names:
                 'os_name':os_name,
                 'os_pkg_ext':os_pkg_ext,
                 'make_cmd':make_cmd,
+
+                # Default to using BB when we can.
+                'use_bb_llvm': True,
+                'use_bb_openblas': True,
             }
         )]
 

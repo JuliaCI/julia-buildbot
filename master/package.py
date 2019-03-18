@@ -65,7 +65,9 @@ julia_package_factory.addSteps([
         method='fresh',
         submodules=True,
         clobberOnFailure=True,
-        progress=True
+        progress=True,
+        retryFetch=True,
+        getDescription=True,
     ),
 
     # Get win-extras files ready on windows
