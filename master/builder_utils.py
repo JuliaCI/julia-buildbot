@@ -91,7 +91,7 @@ def gen_upload_path(props_obj, namespace="bin", latest=False):
 
     return url
 
-def gen_download_url(props_obj, namespace=None, latest=False):
+def gen_download_url(props_obj, namespace="bin", latest=False):
     base = 'https://s3.amazonaws.com'
     return '%s/%s'%(base, gen_upload_path(props_obj, namespace=namespace, latest=latest))
 
@@ -176,7 +176,7 @@ def build_download_julia_cmd(props_obj):
 
 
 @util.renderer
-def download_julia(props_obj, namespace=None):
+def download_julia(props_obj, namespace="bin"):
     # If we already have an "url", use that, otherwise try to generate it:
     if not props_obj.hasProperty('download_url'):
         # Calculate upload_filename, add to properties, then get download url
