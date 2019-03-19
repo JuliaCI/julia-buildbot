@@ -98,7 +98,7 @@ threading_nightly_scheduler = schedulers.Nightly(
     ],
     hour=[1,13],
     change_filter=util.ChangeFilter(
-        project=['JuliaLang/julia','staticfloat/julia'],
+        project=['JuliaLang/julia'],
         branch='master'
     ),
     onlyIfChanged=True

@@ -58,7 +58,7 @@ gc_debug_nightly_scheduler = schedulers.Nightly(
     ],
     hour=[3],
     change_filter=util.ChangeFilter(
-        project=['JuliaLang/julia','staticfloat/julia'],
+        project=['JuliaLang/julia'],
         branch='master',
     ),
     onlyIfChanged=True,

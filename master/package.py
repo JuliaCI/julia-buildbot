@@ -199,7 +199,7 @@ packager_mapping = {("package_" + k): v for k, v in builder_mapping.items()}
 ci_scheduler = schedulers.AnyBranchScheduler(
     name="Julia CI (build)",
     change_filter=util.ChangeFilter(
-        project=['JuliaLang/julia','staticfloat/julia'],
+        project=['JuliaLang/julia'],
     ),
     builderNames=[k for k in packager_mapping.keys()],
     treeStableTimer=1,
