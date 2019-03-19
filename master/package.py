@@ -80,11 +80,10 @@ julia_package_factory.addSteps([
         env=julia_package_env,
     ),
 
-    # Make release and debug simultaneously.  Once upon a time this caused
-    # problems on Windows, let's try it again.
+    # Make release (we don't automatically build debug)
     steps.ShellCommand(
-        name="make release/debug",
-        command=["/bin/sh", "-c", util.Interpolate("%(prop:make_cmd)s -j%(prop:nthreads)s %(prop:flags)s %(prop:extra_make_flags)s release debug")],
+        name="make release",
+        command=["/bin/sh", "-c", util.Interpolate("%(prop:make_cmd)s -j%(prop:nthreads)s %(prop:flags)s %(prop:extra_make_flags)s release")],
         haltOnFailure = True,
         timeout=3600,
         env=julia_package_env,
