@@ -76,7 +76,7 @@ julia_testing_factory.addSteps([
     
     # Trigger a build of a non-assert version if the assert version finished properly
     steps.Trigger(
-        schedulerNames=["Julia CI (build)"],
+        schedulerNames=["package"],
         set_properties={
             'assert_build': False,
         },
