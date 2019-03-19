@@ -183,10 +183,6 @@ for name in all_names:
                 'os_name':os_name,
                 'os_pkg_ext':os_pkg_ext,
                 'make_cmd':make_cmd,
-
-                # Default to not using BB, for now
-                'use_bb_llvm': False,
-                'use_bb_openblas': False,
             }
         )]
 

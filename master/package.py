@@ -205,6 +205,10 @@ ci_scheduler = schedulers.AnyBranchScheduler(
     treeStableTimer=1,
     properties={
         "assert_build": True,
+
+        # Default to not using BB, for now
+        'use_bb_llvm': False,
+        'use_bb_openblas': False,
     },
 )
 c['schedulers'].append(ci_scheduler)
