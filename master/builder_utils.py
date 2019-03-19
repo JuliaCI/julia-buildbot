@@ -57,7 +57,7 @@ def gen_upload_filename(props_obj):
         props["os_name_file"] = "win"
     return "julia-{shortcommit}-{os_name_file}{bits}.{os_pkg_ext}".format(**props)
 
-def gen_upload_path(props_obj, namespace=None, latest=False):
+def gen_upload_path(props_obj, namespace="bin", latest=False):
     # First, pull information out of props_obj
     up_arch = props_obj.getProperty("up_arch")
     majmin = props_obj.getProperty("majmin")
@@ -70,25 +70,16 @@ def gen_upload_path(props_obj, namespace=None, latest=False):
         upload_filename = "julia-latest-%s"%(split_name[2])
     os = get_upload_os_name(props_obj)
 
-    # Helper function to prepend things to a value that might be `None`.
-    def none_prepend(x, p):
-        if x is None:
-            return p
-        else:
-            return p + "_" + x
-
     # If we're running an assert build, put it into an "assert" bucket:
     if assert_build:
-        namespace = none_prepend(namespace, "assert")
+        namespace = "assert_" + namespace
 
     # If we're running on the buildog or some other branch, prepend all our namespaces:
     if BUILDBOT_BRANCH != "master":
-        namespace = none_prepend(namespace, BUILDBOT_BRANCH)
+        namespace = BUILDBOT_BRANCH + "_" + namespace
 
     # If we have a namespace, add that on to our URL first
-    url = "julialangnightlies/"
-    if namespace is not None:
-        url += namespace + "/"
+    url = "julialangnightlies/" + namespace + "/"
 
     # Next up, OS and Arch.
     url += os + "/" + up_arch + "/"
