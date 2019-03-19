@@ -185,8 +185,8 @@ for name in all_names:
                 'make_cmd':make_cmd,
 
                 # Default to using BB when we can.
-                'use_bb_llvm': True,
-                'use_bb_openblas': True,
+                #'use_bb_llvm': True,
+                #'use_bb_openblas': True,
             }
         )]
 
