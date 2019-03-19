@@ -68,6 +68,10 @@ for name in all_names:
         # OpenBLAS can't deal with avx512 on windows for some reason.
         flags += "OPENBLAS_NO_AVX512=1 "
 
+        # We actually have a lot of cores here, so make use of them.  Maybe
+        # that will balance out the INCREDIBLY SLOW I/O SPEEDS.  :sobbing:
+        nthreads = 9
+
     elif name[:5] == "macos":
         os_name = "mac"
         os_pkg_ext = "dmg"
@@ -76,7 +80,7 @@ for name in all_names:
         march = "core2"
 
         # Our macmini has fewer cores than we'd like
-        nthreads = 3
+        nthreads = 5
     elif name[:7] == "freebsd":
         os_name = "freebsd"
         os_pkg_ext = "tar.gz"
