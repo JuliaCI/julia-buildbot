@@ -6,3 +6,5 @@ master/*
 master/buildbot_secret.py
 GITHUB_SECRET.sh
 github_buildbot.log
+
+.vscode/*
