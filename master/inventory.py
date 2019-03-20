@@ -27,12 +27,8 @@ linux_names    += build_names("linux", ["i686"], ["nanosoldier1_1"] + ["nanosold
 linux_names    += build_names("linux", ["ppc64le"], ["osu_%d"%(idx) for idx in range(1,5)])
 linux_names    += build_names("linux", ["aarch64"], ["packet_%d"%(idx) for idx in range(1,9)])
 linux_names    += build_names("linux", ["armv7l"], ["firefly_%d"%(idx) for idx in range(1,4)])
-
-# Our mac builders on macmini2 and akatsuki
 macos_names     = build_names("macos", ["x86_64"], ["macmini", "macmini2", "akatsuki"])
-
-# Our FreeBSD builder runs on hardware maintained by Iblis
-freebsd_names   = build_names("freebsd", ["x86_64"], ["abeing", "gaebolg"])
+freebsd_names   = build_names("freebsd", ["x86_64"], ["openstack_1"])
 all_names       = win_names + linux_names + macos_names + freebsd_names
 
 # Define all the attributes we'll use in our buildsteps
