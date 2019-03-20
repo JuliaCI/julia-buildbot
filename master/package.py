@@ -205,9 +205,9 @@ c['schedulers'].append(schedulers.AnyBranchScheduler(
     properties={
         "assert_build": True,
 
-        # Default to not using BB, for now
-        'use_bb_llvm': False,
-        'use_bb_openblas': False,
+        # Default to using BB
+        'use_bb_llvm': True,
+        'use_bb_openblas': True,
     },
 ))
 
@@ -217,6 +217,10 @@ c['schedulers'].append(schedulers.Triggerable(
     builderNames=[k for k in packager_mapping.keys()],
     properties={
         "assert_build": False,
+
+        # Default to using BB
+        'use_bb_llvm': True,
+        'use_bb_openblas': True,
     }
 ))
 
