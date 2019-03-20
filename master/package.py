@@ -195,8 +195,8 @@ julia_package_factory.addSteps([
 packager_mapping = {("package_" + k): v for k, v in builder_mapping.items()}
 
 # This is the CI scheduler, where we build an assert build and test it
-ci_scheduler = schedulers.AnyBranchScheduler(
-    name="Julia CI (build)",
+c['schedulers'].append(schedulers.AnyBranchScheduler(
+    name="Julia CI (assert build)",
     change_filter=util.ChangeFilter(
         project=['JuliaLang/julia'],
     ),
@@ -209,8 +209,17 @@ ci_scheduler = schedulers.AnyBranchScheduler(
         'use_bb_llvm': False,
         'use_bb_openblas': False,
     },
-)
-c['schedulers'].append(ci_scheduler)
+))
+
+# Add a dependent scheduler for non-assert after we build tarballs
+c['schedulers'].append(schedulers.Triggerable(
+    name="Julia CI (non-assert build)",
+    builderNames=[k for k in packager_mapping.keys()],
+    properties={
+        "assert_build": False,
+    }
+))
+
 
 # Add workers for these jobs
 for packager, workers in packager_mapping.items():
@@ -223,7 +232,7 @@ for packager, workers in packager_mapping.items():
     ))
 
 # Add a scheduler for building release candidates/triggering builds manually
-force_build_scheduler = schedulers.ForceScheduler(
+c['schedulers'].append(schedulers.ForceScheduler(
     name="package",
     label="Force build/packaging",
     builderNames=[k for k in packager_mapping.keys()],
@@ -260,5 +269,4 @@ force_build_scheduler = schedulers.ForceScheduler(
             default=True,
         ),
     ],
-)
-c['schedulers'].append(force_build_scheduler)
+))
