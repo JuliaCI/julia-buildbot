@@ -26,7 +26,8 @@ nuke_factory.addSteps([
     ),
 ])
 
-for worker in all_names:
+all_buildworkers = [n for n in all_names if not "tabularasa" in n]
+for worker in all_buildworkers:
     c['schedulers'].append(schedulers.Triggerable(
         name="nuke_%s"%(worker),
         builderNames=["nuke_%s"%(worker)],
@@ -43,7 +44,7 @@ for worker in all_names:
 nuke_all_factory = util.BuildFactory()
 nuke_all_factory.useProgress = True
 nuke_all_steps = []
-for worker in all_names:
+for worker in all_buildworkers:
     nuke_all_steps += [
         steps.Trigger(
             schedulerNames=["nuke_%s"%(worker)],
@@ -52,7 +53,7 @@ for worker in all_names:
     ]
 c['builders'].append(util.BuilderConfig(
     name="nuke_all",
-    workernames=all_names,
+    workernames=all_buildworkers,
     collapseRequests=True,
     tags=["Cleaning"],
     factory=nuke_all_factory,
