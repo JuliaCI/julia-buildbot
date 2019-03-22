@@ -49,6 +49,7 @@ for worker in all_buildworkers:
         steps.Trigger(
             schedulerNames=["nuke_%s"%(worker)],
             waitForFinish=False,
+            set_properties={k : util.Property(k) for k in ["clear_srccache", "clear_ccache", "clear_julia_package_repo"]},
         ),
     ]
 c['builders'].append(util.BuilderConfig(
