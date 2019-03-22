@@ -30,7 +30,7 @@ julia_package_factory.addSteps([
     ),
 
     steps.SetProperty(
-        name="Set BinaryBuilder LLVM flag",
+        name="Set BinaryBuilder flag",
         property="flags",
         value=util.Interpolate("%(prop:flags)s USE_BINARYBUILDER=%(prop:use_bb:#?:1:0)s"),
     ),
