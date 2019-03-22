@@ -32,17 +32,7 @@ julia_package_factory.addSteps([
     steps.SetProperty(
         name="Set BinaryBuilder LLVM flag",
         property="flags",
-        value=util.Interpolate("%(prop:flags)s USE_BINARYBUILDER_LLVM=1"),
-        doStepIf=lambda step: step.getProperty('use_bb_llvm'),
-        hideStepIf=lambda results, s: results==SKIPPED,
-    ),
-    
-    steps.SetProperty(
-        name="Set BinaryBuilder OpenBLAS flag",
-        property="flags",
-        value=util.Interpolate("%(prop:flags)s USE_BINARYBUILDER_OPENBLAS=1"),
-        doStepIf=lambda step: step.getProperty('use_bb_openblas'),
-        hideStepIf=lambda results, s: results==SKIPPED,
+        value=util.Interpolate("%(prop:flags)s USE_BINARYBUILDER=%(prop:use_bb:#?:1:0)s"),
     ),
 
     # Recursive `git clean` on windows is very slow. It is faster to
@@ -206,8 +196,7 @@ c['schedulers'].append(schedulers.AnyBranchScheduler(
         "assert_build": True,
 
         # Default to using BB
-        'use_bb_llvm': True,
-        'use_bb_openblas': True,
+        'use_bb': True,
     },
 ))
 
@@ -219,8 +208,7 @@ c['schedulers'].append(schedulers.Triggerable(
         "assert_build": False,
 
         # Default to using BB
-        'use_bb_llvm': True,
-        'use_bb_openblas': True,
+        'use_bb': True,
     }
 ))
 
@@ -263,13 +251,8 @@ c['schedulers'].append(schedulers.ForceScheduler(
             default=False,
         ),
         util.BooleanParameter(
-            name="use_bb_llvm",
-            label="Use BinaryBuilder LLVM",
-            default=True,
-        ),
-        util.BooleanParameter(
-            name="use_bb_openblas",
-            label="Use BinaryBuilder OpenBLAS",
+            name="use_bb",
+            label="Use BinaryBuilder dependencies",
             default=True,
         ),
     ],
