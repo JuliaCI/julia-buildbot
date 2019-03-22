@@ -26,10 +26,43 @@ nuke_factory.addSteps([
     ),
 ])
 
+for worker in all_names:
+    c['schedulers'].append(schedulers.Triggerable(
+        name="nuke_%s"%(worker),
+        builderNames=["nuke_%s"%(worker)],
+    ))
+
+    c['builders'].append(util.BuilderConfig(
+        name="nuke_%s"%(worker),
+        workernames=[worker],
+        collapseRequests=False,
+        tags=["Cleaning"],
+        factory=nuke_factory,
+    ))
+
+nuke_all_factory = util.BuildFactory()
+nuke_all_factory.useProgress = True
+nuke_all_steps = []
+for worker in all_names:
+    nuke_all_steps += [
+        steps.Trigger(
+            schedulerNames=["nuke_%s"%(worker)],
+            waitForFinish=False,
+        ),
+    ]
+c['builders'].append(util.BuilderConfig(
+    name="nuke_all",
+    workernames=all_names,
+    collapseRequests=True,
+    tags=["Cleaning"],
+    factory=nuke_all_factory,
+))
+nuke_all_factory.addSteps(nuke_all_steps)
+
 c['schedulers'].append(schedulers.ForceScheduler(
-    name = "clear_cache",
-    label = "Clear caches",
-    builderNames = ["nuke_" + k for k in builder_mapping.keys()],
+    name = "nuke",
+    label = "Clear all caches",
+    builderNames = ["nuke_all"],
     reason=util.FixedParameter(name="reason", default=""),
     codebases=[
         util.CodebaseParameter(
@@ -59,13 +92,3 @@ c['schedulers'].append(schedulers.ForceScheduler(
         ),
     ]
 ))
-
-# Add workers for these jobs
-for builder, workers in builder_mapping.items():
-    c['builders'].append(util.BuilderConfig(
-        name="nuke_" + builder,
-        workernames=workers,
-        collapseRequests=False,
-        tags=["Cleaning"],
-        factory=nuke_factory,
-    ))
