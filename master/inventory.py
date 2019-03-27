@@ -81,6 +81,9 @@ for name in all_names:
         os_name = "freebsd"
         os_pkg_ext = "tar.gz"
         make_cmd = "gmake"
+
+        # For some reason, the FreeBSD build segfaults with this enabled
+        flags += "USE_BINARYBUILDER_LIBUV=0 "
     else:
         os_name = "linux"
         os_pkg_ext = "tar.gz"
