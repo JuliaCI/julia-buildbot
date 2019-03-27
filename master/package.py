@@ -184,12 +184,15 @@ julia_package_factory.addSteps([
 # Build a builder-worker mapping based off of the parent mapping in inventory.py
 packager_mapping = {("package_" + k): v for k, v in builder_mapping.items()}
 
+def julia_ci_filter(c):
+    # Build pull requests and pushes to `master`
+    return (c.project in ['JuliaLang/julia']) and
+           (c.category == 'pull' || c.branch in ['master'])
+
 # This is the CI scheduler, where we build an assert build and test it
 c['schedulers'].append(schedulers.AnyBranchScheduler(
     name="Julia CI (assert build)",
-    change_filter=util.ChangeFilter(
-        project=['JuliaLang/julia'],
-    ),
+    change_filter=util.ChangeFilter(filter_fn=julia_ci_filter),
     builderNames=[k for k in packager_mapping.keys()],
     treeStableTimer=1,
     properties={
