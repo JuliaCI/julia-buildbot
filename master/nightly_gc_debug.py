@@ -9,11 +9,13 @@ julia_gc_debug_factory.addSteps([
     steps.Git(
         name="Julia checkout",
         repourl=util.Property('repository', default='git://github.com/JuliaLang/julia.git'),
-        mode='incremental',
-        method='clean',
+        mode='full',
+        method='fresh',
         submodules=True,
         clobberOnFailure=True,
-        progress=True
+        progress=True,
+        retryFetch=True,
+        getDescription=True,
     ),
     # Fetch so that remote branches get updated as well.
     steps.ShellCommand(
@@ -25,11 +27,11 @@ julia_gc_debug_factory.addSteps([
     # Add our particular configuration to flags
     steps.SetPropertyFromCommand(
         name="Add configuration to flags",
-        command=["echo", util.Interpolate("%(prop:flags)s WITH_GC_DEBUG_ENV=1")],
+        command=["echo", util.Interpolate("%(prop:flags)s WITH_GC_DEBUG_ENV=1 BUNDLE_DEBUG_LIBS=1")],
         property="flags"
     ),
 
-    # make clean first, and nuke llvm
+    # make clean first
     steps.ShellCommand(
         name="make cleanall",
         command=["/bin/sh", "-c", util.Interpolate("%(prop:make_cmd)s %(prop:flags)s cleanall")]
