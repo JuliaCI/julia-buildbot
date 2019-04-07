@@ -157,7 +157,7 @@ def build_download_julia_cmd(props_obj):
         # copy its `julia` folder contents here.
         cmd += "cp -Ra /Volumes/Julia-*/Julia-*.app/Contents/Resources/julia/* . && "
         # Unmount any and all Julia disk images
-        cmd += "for j in /Volumes/Julia-*; do hdiutil unmount \"$j\"; done && "
+        cmd += "for j in /Volumes/Julia-*; do hdiutil detach \"$j\"; done && "
         # Delete the .dmg
         cmd += "rm -f julia-installer.dmg"
     elif is_windows(props_obj):
