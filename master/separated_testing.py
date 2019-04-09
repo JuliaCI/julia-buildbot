@@ -34,6 +34,7 @@ julia_testing_factory.addSteps([
         name="Run tests",
         command=run_julia_tests,
         haltOnFailure=True,
+        timeout=3600,
     ),
 
     # Promote from pretesting to a nightly if it worked!
