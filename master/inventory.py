@@ -27,6 +27,7 @@ linux_names    += build_names("linux", ["i686"], ["nanosoldier1_1"] + ["nanosold
 linux_names    += build_names("linux", ["ppc64le"], ["osu_%d"%(idx) for idx in range(1,5)])
 linux_names    += build_names("linux", ["aarch64"], ["packet_%d"%(idx) for idx in range(1,9)])
 linux_names    += build_names("linux", ["armv7l"], ["firefly_%d"%(idx) for idx in range(1,4)])
+linux_names    += build_names("linux", ["armv7l"], ["rock64_%d"%(idx) for idx in range(1,2)])
 macos_names     = build_names("macos", ["x86_64"], ["macmini", "macmini2", "akatsuki"])
 freebsd_names   = build_names("freebsd", ["x86_64"], ["openstack_%d"%(idx) for idx in range(1,4)])
 all_names       = win_names + linux_names + macos_names + freebsd_names
