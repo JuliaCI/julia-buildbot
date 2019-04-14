@@ -185,8 +185,9 @@ julia_package_factory.addSteps([
 packager_mapping = {("package_" + k): v for k, v in builder_mapping.items()}
 
 def julia_ci_filter(c):
-    # Build pull requests and pushes to `master`
-    return (c.project in ['JuliaLang/julia']) and (c.category == 'pull' or c.branch in ['master'])
+    # Build pull requests and pushes to `master`/`release-*`
+    allow_branch = lambda b: b == 'master' or b.startswith('release-')
+    return (c.project in ['JuliaLang/julia']) and (c.category == 'pull' or allow_branch(c.branch))
 
 # This is the CI scheduler, where we build an assert build and test it
 c['schedulers'].append(schedulers.AnyBranchScheduler(
