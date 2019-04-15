@@ -34,7 +34,10 @@ julia_testing_factory.addSteps([
         name="Run tests",
         command=run_julia_tests,
         haltOnFailure=True,
-        timeout=3600,
+        # Fail out if 45 minutes have gone by with nothing printed to stdout
+        timeout=45*60,
+        # Kill everything if the overall job has taken more than 10 hours
+        maxTime=60*60*10,
     ),
 
     # Promote from pretesting to a nightly if it worked!
