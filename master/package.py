@@ -2,11 +2,6 @@ julia_package_env = {
     'CFLAGS': None,
     'CPPFLAGS': None,
     'LLVM_CMAKE': util.Property('llvm_cmake', default=None),
-
-    # On platforms that use jemalloc, we can ask it to fill all allocated and
-    # freed memory with junk, to ensure that we crash often if we attempt to
-    # use memory after freeing it.
-    'MALLOC_CONF': 'junk:true',
 }
 
 # Steps to build a `make binary-dist` tarball that should work on just about every linux ever
