@@ -70,8 +70,8 @@ julia_package_factory.addSteps([
         name="make release",
         command=["/bin/sh", "-c", util.Interpolate("%(prop:make_cmd)s -j%(prop:nthreads)s %(prop:flags)s %(prop:extra_make_flags)s release")],
         haltOnFailure = True,
-        # Fail out if 45 minutes have gone by with nothing printed to stdout
-        timeout=45*60,
+        # Fail out if 60 minutes have gone by with nothing printed to stdout
+        timeout=60*60,
         # Kill everything if the overall job has taken more than 10 hours
         maxTime=60*60*10,
         env=julia_package_env,
@@ -122,7 +122,10 @@ julia_package_factory.addSteps([
         name="make binary-dist",
         command=["/bin/sh", "-c", util.Interpolate("%(prop:make_cmd)s %(prop:flags)s %(prop:extra_make_flags)s binary-dist")],
         haltOnFailure = True,
-        timeout=3600,
+        # Fail out if 60 minutes have gone by with nothing printed to stdout
+        timeout=60*60,
+        # Kill everything if the overall job has taken more than 10 hours
+        maxTime=60*60*10,
         env=julia_package_env,
     ),
 
