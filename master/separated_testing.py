@@ -6,7 +6,8 @@
 @util.renderer
 def run_julia_tests(props_obj):
     props = props_obj_to_dict(props_obj)
-    cmd = ["bin/julia", "-e", "Base.runtests([\"all\"]; ncores=min(Sys.CPU_THREADS, 8))"]
+    # We run all tests, even the ones that require internet connectivity
+    cmd = ["bin/julia", "-e", "Base.runtests([\"all\", \"LibGit2/online\", \"Pkg/pkg\", \"download\"]; ncores=min(Sys.CPU_THREADS, 8))"]
 
     if is_windows(props_obj):
         cmd[0] += ".exe"
