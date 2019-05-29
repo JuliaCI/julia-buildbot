@@ -24,7 +24,7 @@ julia_analyzegc_factory.addSteps([
     
     # Install necessary dependencies
     steps.ShellCommand(
-        name="install dependencies",
+        name="Run analysis",
         command=["/bin/sh", "-c", util.Interpolate("%(prop:make_cmd)s -j%(prop:nthreads)s %(prop:flags)s %(prop:extra_make_flags)s -C src analyzegc")],
         haltOnFailure = True,
     ),
