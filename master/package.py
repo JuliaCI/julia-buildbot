@@ -52,7 +52,7 @@ julia_package_factory.addSteps([
         clobberOnFailure=True,
         progress=True,
         retryFetch=True,
-        getDescription={'--tags': True},
+        getDescription={'tags': True},
     ),
 
     # Get win-extras files ready on windows
