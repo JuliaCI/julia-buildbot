@@ -54,7 +54,7 @@ for worker in all_buildworkers:
     ]
 c['builders'].append(util.BuilderConfig(
     name="nuke_all",
-    workernames=all_buildworkers,
+    workernames=[n for n in all_names],
     collapseRequests=True,
     tags=["Cleaning"],
     factory=nuke_all_factory,
