@@ -219,6 +219,10 @@ c['schedulers'].append(schedulers.Triggerable(
 
 # Add workers for these jobs
 for packager, workers in packager_mapping.items():
+    c['schedulers'].append(schedulers.Triggerable(
+        name=packager,
+        builderNames=[packager],
+    ))
     c['builders'].append(util.BuilderConfig(
         name=packager,
         workernames=workers,
