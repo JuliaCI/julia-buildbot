@@ -261,3 +261,64 @@ c['schedulers'].append(schedulers.ForceScheduler(
         ),
     ],
 ))
+
+
+
+
+## We're also going to add a force-only scheduler that just triggers package
+#  jobs on all our platforms:
+package_all_factory = util.BuildFactory()
+package_all_factory.useProgress = True
+package_all_steps = []
+for packager, workers in packager_mapping.items():
+    package_all_steps += [
+        steps.Trigger(
+            schedulerNames=[packager],
+            waitForFinish=False,
+            set_properties={k : util.Property(k) for k in ["extra_make_flags", "assert_build", "use_bb"]},
+        ),
+    ]
+c['builders'].append(util.BuilderConfig(
+    name="package_all",
+    workernames=[n for n in all_names],
+    collapseRequests=True,
+    tags=["Packaging"],
+    factory=package_all_factory,
+))
+package_all_factory.addSteps(package_all_steps)
+
+c['schedulers'].append(schedulers.ForceScheduler(
+    name = "package_all",
+    label = "Package on all buildbots",
+    builderNames = ["package_all"],
+    reason=util.FixedParameter(name="reason", default=""),
+    codebases=[
+        util.CodebaseParameter(
+            "",
+            name="",
+            branch=util.FixedParameter(name="branch", default=""),
+            revision=util.FixedParameter(name="revision", default=""),
+            repository=util.FixedParameter(name="repository", default=""),
+            project=util.FixedParameter(name="project", default="Cleaning"),
+        )
+    ],
+    properties=[
+        util.StringParameter(
+            name="extra_make_flags",
+            label="Extra Make Flags",
+            size=30,
+            default="",
+        ),
+        util.BooleanParameter(
+            name="assert_build",
+            label="Build with Assertions",
+            default=False,
+        ),
+        util.BooleanParameter(
+            name="use_bb",
+            label="Use BinaryBuilder dependencies",
+            default=True,
+        ),
+    ],
+))
+
