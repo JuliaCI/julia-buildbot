@@ -302,7 +302,7 @@ c['schedulers'].append(schedulers.ForceScheduler(
             name="",
             branch=util.FixedParameter(name="branch", default=""),
             repository=util.FixedParameter(name="repository", default=""),
-            project=util.FixedParameter(name="project", default="Cleaning"),
+            project=util.FixedParameter(name="project", default="Packaging"),
         )
     ],
     properties=[
