@@ -1,4 +1,3 @@
-# Steps to build a `make binary-dist` tarball that should work on just about every linux ever
 julia_doctest_factory = util.BuildFactory()
 julia_doctest_factory.useProgress = True
 julia_doctest_factory.addSteps([
@@ -15,10 +14,10 @@ julia_doctest_factory.addSteps([
         getDescription={'--tags': True},
     ),
 
-    # Make debug build
+    # Make Julia itself
     steps.ShellCommand(
-        name="make debug",
-        command=["/bin/sh", "-c", util.Interpolate("%(prop:make_cmd)s -j%(prop:nthreads)s %(prop:flags)s %(prop:extra_make_flags)s debug")],
+        name="make release",
+        command=["/bin/sh", "-c", util.Interpolate("%(prop:make_cmd)s -j%(prop:nthreads)s %(prop:flags)s %(prop:extra_make_flags)s release")],
         haltOnFailure = True,
         # Fail out if 60 minutes have gone by with nothing printed to stdout
         timeout=60*60,
