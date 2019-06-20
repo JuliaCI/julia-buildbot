@@ -7,7 +7,14 @@
 def run_julia_tests(props_obj):
     props = props_obj_to_dict(props_obj)
     # We run all tests, even the ones that require internet connectivity
-    cmd = ["bin/julia", "-e", "for test in (\"all\", \"LibGit2/online\", \"Pkg/pkg\", \"download\"); Base.runtests([test]; ncores=min(Sys.CPU_THREADS, 8)); end"]
+    cmd = [
+        "bin/julia",
+        "-e",
+        """
+        include(joinpath(Sys.BINDIR, Base.DATAROOTDIR, "julia", "test", "choosetests.jl"));
+        Base.runtests(append!(choosetests()[1], ["LibGit2/online", "Pkg/pkg", "download"]); ncores=min(Sys.CPU_THREADS, 8))
+        """,
+    ]
 
     if is_windows(props_obj):
         cmd[0] += ".exe"
