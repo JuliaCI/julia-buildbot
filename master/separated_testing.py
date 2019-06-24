@@ -12,7 +12,7 @@ def run_julia_tests(props_obj):
         "-e",
         """
         include(joinpath(Sys.BINDIR, Base.DATAROOTDIR, "julia", "test", "choosetests.jl"));
-        Base.runtests(append!(choosetests()[1], ["LibGit2/online", "Pkg/pkg", "download"]); ncores=min(Sys.CPU_THREADS, 8))
+        Base.runtests(append!(choosetests()[1], ["LibGit2/online", "download"]); ncores=min(Sys.CPU_THREADS, 8))
         """,
     ]
 
