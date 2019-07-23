@@ -133,10 +133,19 @@ julia_package_factory.addSteps([
     steps.ShellCommand(
         name="make .app",
         command=["/bin/sh", "-c", util.Interpolate("~/unlock_keychain.sh && make %(prop:flags)s %(prop:extra_make_flags)s app")],
-        haltOnFailure = True,
+        haltOnFailure=True,
         doStepIf=is_mac,
         hideStepIf=lambda results, s: results==SKIPPED,
         env=julia_package_env,
+    ),
+
+    # Sign windows .exe
+    steps.ShellCommand(
+        name="sign .exe",
+        command=["/bin/sh", "-c", util.Interpolate("~/sign.sh \"%(prop:local_filename)s\"")],
+        doStepIf=is_windows,
+        hideStepIf=lambda results, s: results==SKIPPED,
+        haltOnFailure=True,
     ),
 
     # Transfer the result to the buildmaster for uploading to AWS
