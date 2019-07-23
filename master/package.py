@@ -36,7 +36,7 @@ julia_package_factory.addSteps([
     steps.ShellCommand(
         name="[Win] wipe state",
         command=["/bin/sh", "-c", "cmd /c del /s /q *"],
-        flunkOnFailure = False,
+        flunkOnFailure=False,
         doStepIf=is_windows,
         hideStepIf=lambda results, s: results==SKIPPED,
         env=julia_package_env,
@@ -145,7 +145,8 @@ julia_package_factory.addSteps([
         command=["/bin/sh", "-c", util.Interpolate("~/sign.sh \"%(prop:local_filename)s\"")],
         doStepIf=is_windows,
         hideStepIf=lambda results, s: results==SKIPPED,
-        haltOnFailure=True,
+        haltOnFailure=False,
+        flunkOnFailure=False,
     ),
 
     # Transfer the result to the buildmaster for uploading to AWS
