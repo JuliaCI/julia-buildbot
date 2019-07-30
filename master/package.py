@@ -117,6 +117,16 @@ julia_package_factory.addSteps([
         property="dummy",
     ),
 
+    # Sign windows julia .exe
+    steps.ShellCommand(
+        name="sign .exe (julia)",
+        command=["/bin/sh", "-c", util.Interpolate("~/sign.sh usr/bin/julia.exe")],
+        doStepIf=is_windows,
+        hideStepIf=lambda results, s: results==SKIPPED,
+        haltOnFailure=False,
+        flunkOnFailure=False,
+    ),
+
     # Make binary-dist to package it up
     steps.ShellCommand(
         name="make binary-dist",
@@ -139,9 +149,9 @@ julia_package_factory.addSteps([
         env=julia_package_env,
     ),
 
-    # Sign windows .exe
+    # Sign windows installer .exe
     steps.ShellCommand(
-        name="sign .exe",
+        name="sign .exe (installer)",
         command=["/bin/sh", "-c", util.Interpolate("~/sign.sh \"%(prop:local_filename)s\"")],
         doStepIf=is_windows,
         hideStepIf=lambda results, s: results==SKIPPED,
