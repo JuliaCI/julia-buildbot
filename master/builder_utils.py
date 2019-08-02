@@ -144,7 +144,7 @@ def render_latest_promotion_command(props_obj):
 @util.renderer
 def render_cleanup_pretesting_command(props_obj):
     del_path = gen_upload_path(props_obj, namespace="pretesting")
-    return ["/bin/sh", "-c", "aws s3 rm s3://%s.asc ; aws s3 rm s://%s"%(del_path, del_path)]
+    return ["/bin/sh", "-c", "aws s3 rm s3://%s.asc ; aws s3 rm s3://%s"%(del_path, del_path)]
 
 @util.renderer
 def render_download_url(props_obj):
