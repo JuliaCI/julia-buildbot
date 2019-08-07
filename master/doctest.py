@@ -34,6 +34,17 @@ julia_doctest_factory.addSteps([
         # Kill everything if the overall job has taken more than 2 hours
         maxTime=60*60*2,
     ),
+
+    steps.ShellCommand(
+        name="make deploy",
+        command=["/bin/sh", "-c", util.Interpolate("%(prop:make_cmd)s -C doc deploy %(prop:flags)s %(prop:extra_make_flags)s")],
+        haltOnFailure=True,
+        env={
+            'DOCUMENTER_KEY': DOCUMENTER_KEY,
+            'TRAVIS_PULL_REQUEST': 'false',
+        },
+        doStepIf=is_protected_branch,
+    ),
 ])
 
 c['schedulers'].append(schedulers.AnyBranchScheduler(
