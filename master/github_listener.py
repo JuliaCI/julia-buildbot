@@ -18,6 +18,7 @@ class JuliaGithubListener(GitHubEventHandler):
             'revision': payload['ref'],
             'comments': 'tag-creation commit',
             'category': 'tag',
+            'branch': 'master',
         }
 
         # Do some magic here
@@ -39,6 +40,7 @@ class JuliaGithubListener(GitHubEventHandler):
             'revlink': payload['release']['html_url'],
             'category': 'release',
             'comments': payload['release']['body'],
+            'branch': 'master',
         }
 
         # Do some magic here
