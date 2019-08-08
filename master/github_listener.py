@@ -16,6 +16,7 @@ class JuliaGithubListener(GitHubEventHandler):
             'repository': payload['repository']['url'],
             'project': payload['repository']['full_name'],
             'revision': payload['ref'],
+            'comments': 'tag-creation commit',
             'category': 'tag',
         }
 
