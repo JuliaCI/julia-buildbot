@@ -165,11 +165,6 @@ julia_package_factory.addSteps([
         command=["mkdir", "-p", "/tmp/julia_package"],
     ),
 
-    steps.MasterShellCommand(
-        name="pre-cleanup Master",
-        command=["rm", "-f", util.Interpolate("/tmp/julia_package/%(prop:upload_filename)s*")],
-    ),
-
     steps.FileUpload(
         workersrc=util.Interpolate("%(prop:local_filename)s"),
         masterdest=util.Interpolate("/tmp/julia_package/%(prop:upload_filename)s"),
