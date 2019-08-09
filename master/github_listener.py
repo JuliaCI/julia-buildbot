@@ -13,7 +13,7 @@ class JuliaGithubListener(GitHubEventHandler):
         
         change = {
             'author': payload['sender']['login'],
-            'repository': payload['repository']['url'],
+            'repository': payload['repository']['clone_url'],
             'project': payload['repository']['full_name'],
             'branch': payload['ref'],
             'comments': 'tag-creation commit',
@@ -32,7 +32,7 @@ class JuliaGithubListener(GitHubEventHandler):
         
         change = {
             'author': payload['release']['author']['login'],
-            'repository': payload['repository']['url'],
+            'repository': payload['repository']['clone_url'],
             'project': payload['repository']['full_name'],
             'revision': payload['release']['tag_name'],
             'when_timestamp': dateparse(payload['release']['published_at']),
