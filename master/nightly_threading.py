@@ -23,6 +23,13 @@ for arch in ["linux64", "linux32", "linuxaarch64"]:
 julia_threading_factory = util.BuildFactory()
 julia_threading_factory.useProgress = True
 julia_threading_factory.addSteps([
+    # Fetch first (allowing failure if no existing clone is present)
+    steps.ShellCommand(
+        name="git fetch",
+        command=["git", "fetch", "--tags", "--all", "--force"],
+        flunkOnFailure=False
+    ),
+
     # Clone julia
     steps.Git(
         name="Julia checkout",

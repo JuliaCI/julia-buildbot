@@ -1,6 +1,13 @@
 julia_whitespace_factory = util.BuildFactory()
 julia_whitespace_factory.useProgress = True
 julia_whitespace_factory.addSteps([
+    # Fetch first (allowing failure if no existing clone is present)
+    steps.ShellCommand(
+        name="git fetch",
+        command=["git", "fetch", "--tags", "--all", "--force"],
+        flunkOnFailure=False
+    ),
+
     # Clone julia
     steps.Git(
         name="Julia checkout",
