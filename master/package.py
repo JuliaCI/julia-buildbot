@@ -69,6 +69,7 @@ julia_package_factory.addSteps([
         name="Temporary 7z fixup for Pkg",
         command=["/bin/sh", "-c", util.Interpolate("mkdir -p usr/bin; cp -v dist-extras/7z.* usr/bin/")],
         haltOnFailure = False,
+        flunkOnFailure = False,
         doStepIf=is_windows,
         hideStepIf=lambda results, s: results==SKIPPED,
         env=julia_package_env,
