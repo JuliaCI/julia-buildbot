@@ -2,6 +2,7 @@ julia_package_env = {
     'CFLAGS': None,
     'CPPFLAGS': None,
     'LLVM_CMAKE': util.Property('llvm_cmake', default=None),
+    'MACOS_CODESIGN_IDENTITY': MACOS_CODESIGN_IDENTITY,
 }
 
 # Steps to build a `make binary-dist` tarball that should work on just about every linux ever
@@ -133,8 +134,6 @@ julia_package_factory.addSteps([
         command=["/bin/sh", "-c", util.Interpolate("~/sign.sh usr/bin/julia.exe")],
         doStepIf=is_windows,
         hideStepIf=lambda results, s: results==SKIPPED,
-        haltOnFailure=False,
-        flunkOnFailure=False,
     ),
 
     # Make binary-dist to package it up
