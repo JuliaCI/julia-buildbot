@@ -175,7 +175,7 @@ def build_download_julia_cmd(props_obj):
         # Make it executable
         cmd += "chmod +x julia-installer.exe && "
         # Extract it into the current directory
-        cmd += "./julia-installer.exe /VERYSILENT /DIR=$(cygpath -w $(pwd)) && "
+        cmd += "(./julia-installer.exe /S /D=$(cygpath -w $(pwd)) || ./julia-installer.exe /VERYSILENT /DIR=$(cygpath -w $(pwd))) && "
         # Remove the .exe
         cmd += "rm -f julia-installer.exe"
     else:
