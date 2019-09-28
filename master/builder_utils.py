@@ -174,8 +174,12 @@ def build_download_julia_cmd(props_obj):
         cmd = "curl -L '%s' -o julia-installer.exe && "%(download_url)
         # Make it executable
         cmd += "chmod +x julia-installer.exe && "
-        # Extract it into the current directory
-        cmd += "(./julia-installer.exe /S /D=$(cygpath -w $(pwd)) || ./julia-installer.exe /VERYSILENT /DIR=$(cygpath -w $(pwd))) && "
+        # Extract it into the current directory.  Note that for 1.4, we switched to a different
+        # compression scheme, meaning we must polymorph here.
+        if props_obj.getProperty("majmin") == "1.4":
+            cmd += "./julia-installer.exe /VERYSILENT /DIR=$(cygpath -w $(pwd)) && "
+        else:
+            cmd += "./julia-installer.exe /S /D=$(cygpath -w $(pwd)) && " 
         # Remove the .exe
         cmd += "rm -f julia-installer.exe"
     else:
