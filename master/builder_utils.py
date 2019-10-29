@@ -159,8 +159,11 @@ def build_download_julia_cmd(props_obj):
 
     # Build commands to download/install julia
     if is_mac(props_obj):
+        # Unmount all Julia disk images first to avoid residual disk
+        # images mucking up future globbing
+        cmd =  "for j in /Volumes/Julia-*; do hdiutil detach \"$j\"; done && "
         # Download the .dmg
-        cmd  = "curl -L '%s' -o julia-installer.dmg && "%(download_url)
+        cmd += "curl -L '%s' -o julia-installer.dmg && "%(download_url)
         # Mount it
         cmd += "hdiutil mount julia-installer.dmg && "
         # copy its `julia` folder contents here.
