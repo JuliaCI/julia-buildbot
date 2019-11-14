@@ -127,6 +127,9 @@ for name in all_names:
         up_arch = 'armv7l'
         bits = 'armv7l'
 
+        # On arm, limit ourselves to 3 threads, since these are wimpy machines
+        nthreads = 3
+
         # Sysimg multi-versioning!
         flags += 'JULIA_CPU_TARGET="armv7-a;armv7-a,neon;armv7-a,neon,vfp4" '
         # Force LLVM cmake build to use the armv7 triple instead of armv8 from uname
