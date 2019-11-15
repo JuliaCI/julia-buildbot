@@ -141,7 +141,12 @@ julia_coverage_factory.addSteps([
         command=[util.Interpolate("%(prop:juliadir)s/bin/julia"),
                  "--sysimage-native-code=no", util.Interpolate("--code-coverage=%(prop:juliadir)s/LCOV/cov-%%p.info"),
                  "-e", run_coverage_cmd],
-        timeout=3600,
+        # Fail out if 60 minutes have gone by with nothing printed to stdout
+        timeout=60*60,
+        # Kill everything if the overall job has taken more than 10 hours
+        maxTime=60*60*10,
+        # Give the process 10 seconds to print out the current backtraces when being killed
+        sigtermTime=10,
     ),
     #submit the results!
     steps.ShellCommand(
