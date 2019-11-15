@@ -85,6 +85,8 @@ julia_package_factory.addSteps([
         timeout=60*60,
         # Kill everything if the overall job has taken more than 10 hours
         maxTime=60*60*10,
+        # Give the process 10 seconds to print out the current backtraces when being killed
+        sigtermTime=10,
         env=julia_package_env,
     ),
 
@@ -145,6 +147,8 @@ julia_package_factory.addSteps([
         timeout=60*60,
         # Kill everything if the overall job has taken more than 10 hours
         maxTime=60*60*10,
+        # Give the process 10 seconds to print out the current backtraces when being killed
+        sigtermTime=10,
         env=julia_package_env,
     ),
 
