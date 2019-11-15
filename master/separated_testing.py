@@ -46,6 +46,8 @@ julia_testing_factory.addSteps([
         timeout=45*60,
         # Kill everything if the overall job has taken more than 10 hours
         maxTime=60*60*10,
+        # Give the process 10 seconds to print out the current backtraces when being killed
+        sigtermTime=10,
     ),
 
     # Promote from pretesting to a nightly if it worked!
