@@ -56,6 +56,14 @@ allfiles = map(fn -> Coverage.FileCoverage(fn, read(CoverageBase.fixabspath(fn),
     [allfiles_base; allfiles_stdlib])
 results = Coverage.merge_coverage_counts(results, allfiles)
 length(results) == length(allfiles) || @warn "Got coverage for an unexpected file:" symdiff=symdiff(map(x -> x.filename, allfiles), map(x -> x.filename, results))
+  # drop vendored files
+  # todo: find a more general way to do this, as this may become hard to maintain
+let prefixes = (joinpath("stdlib", "Pkg", ""),
+                joinpath("stdlib", "Statistics", ""))
+    filter!(results) do c
+        all(p -> !startswith(c.filename, p), prefixes)
+    end
+end
   # attempt to improve accuracy of the results
 foreach(Coverage.amend_coverage_from_src!, results)
 # Create git_info for codecov
