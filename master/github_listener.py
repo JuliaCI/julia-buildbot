@@ -1,6 +1,6 @@
 from buildbot.www.hooks.github import GitHubEventHandler
 from dateutil.parser import parse as dateparse
-
+from twisted.internet import defer
 
 class JuliaGithubListener(GitHubEventHandler):
     def handle_create(self, payload, event):
