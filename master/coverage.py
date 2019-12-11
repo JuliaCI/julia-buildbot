@@ -10,7 +10,7 @@ using CoverageBase
 CoverageBase.runtests(CoverageBase.testnames())
 """
 
-analyse_and_submit_cov_cmd = """
+analyse_and_submit_cov_cmd = '''
 using Pkg
 Pkg.activate("CoverageBase")
 using Coverage, CoverageBase
@@ -85,16 +85,16 @@ git_info = Dict(
     ],
     "head" => Dict(
         "id" => Base.GIT_VERSION_INFO.commit,
-        "message" => raw"%(prop:commitmessage)s",
-        "committer_name" => raw"%(prop:commitname)s",
-        "committer_email" => raw"%(prop:commitemail)s",
-        "author_name" => raw"%(prop:authorname)s",
-        "author_email" => raw"%(prop:authoremail)s",
+        "message" => raw"""%(prop:commitmessage)s""",
+        "committer_name" => raw"""%(prop:commitname)s""",
+        "committer_email" => raw"""%(prop:commitemail)s""",
+        "author_name" => raw"""%(prop:authorname)s""",
+        "author_email" => raw"""%(prop:authoremail)s""",
     )
 )
 # Submit to Coveralls
 Coveralls.submit_local(results, git_info)
-"""
+'''
 
 # Steps to download a linux tarball, extract it, run coverage on it, and upload coverage stats
 julia_coverage_factory = util.BuildFactory()
