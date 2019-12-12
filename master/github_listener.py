@@ -80,9 +80,10 @@ class JuliaGithubListener(GitHubEventHandler):
         properties.update({'basename': basename})
 
         # Prefer the merge commit sha, if we can find it
-        revision = payload['pull_request']['merge_commit_sha']
-        if revision is None:
-            revision = payload['pull_request']['head']['sha']
+        #revision = payload['pull_request']['merge_commit_sha']
+        #if revision is None:
+        # REVERTED FOR NOW, it was randomly failing, and also broke status reporting
+        revision = payload['pull_request']['head']['sha']
         change = {
             'revision': revision,
             'when_timestamp': dateparse(payload['pull_request']['created_at']),
