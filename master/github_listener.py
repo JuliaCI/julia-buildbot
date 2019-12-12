@@ -77,11 +77,13 @@ class JuliaGithubListener(GitHubEventHandler):
         properties = self.extractProperties(payload['pull_request'])
         properties.update({'event': event})
         properties.update({'basename': basename})
+
+        # Prefer the merge commit sha, if we can find it
+        revision = payload['pull_request']['merge_commit_sha']
+        if revision is None:
+            revision = payload['pull_request']['head']['sha']
         change = {
-            ##################################################################
-            # THIS IS THE ONLY CHANGED LINE IN THE ENTIRE FUNCTION
-            'revision': payload['pull_request']['merge_commit_sha'],
-            ##################################################################
+            'revision': revision,
             'when_timestamp': dateparse(payload['pull_request']['created_at']),
             'branch': refname,
             'revlink': payload['pull_request']['_links']['html']['href'],
