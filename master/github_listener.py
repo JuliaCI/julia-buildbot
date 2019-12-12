@@ -2,12 +2,12 @@ from buildbot.www.hooks.github import GitHubEventHandler
 from dateutil.parser import parse as dateparse
 from twisted.internet import defer
 from twisted.python import log
+import logging, json
 
 
 class JuliaGithubListener(GitHubEventHandler):
     def handle_create(self, payload, event):
         if 'ref_type' not in payload:
-            import json
             payload = json.loads(payload['payload'][0])
 
         if payload['ref_type'] != 'tag':
@@ -29,7 +29,6 @@ class JuliaGithubListener(GitHubEventHandler):
     # (for things like LLVM.jl, Cxx.jl, etc...)
     def handle_release(self, payload, event):
         if 'release' not in payload:
-            import json
             payload = json.loads(payload['payload'][0])
         
         change = {
