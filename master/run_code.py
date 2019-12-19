@@ -37,7 +37,7 @@ run_code_factory.addSteps([
 
 # Add our runners on various platforms
 code_runners  = ["runcode_macos64", "runcode_win32", "runcode_win64"]
-code_runners += ["runcode_linux%s"%(arch) for arch in ["32", "64", "armv7l", "ppc64le", "aarch64"]]
+code_runners += ["runcode_linux%s"%(arch) for arch in ["32", "64", "armv7l", "ppc64le", "aarch64"]] + ["runcode_musl64"]
 code_runners += ["runcode_freebsd64"]
 
 # Add a manual scheduler for running code snippets

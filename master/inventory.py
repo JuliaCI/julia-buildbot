@@ -31,9 +31,10 @@ linux_names    += build_names("linux", ["ppc64le"], ["osu_%d"%(idx) for idx in r
 linux_names    += build_names("linux", ["aarch64"], ["packet_%d"%(idx) for idx in range(1,9)])
 linux_names    += build_names("linux", ["armv7l"], ["firefly_%d"%(idx) for idx in range(1,4)])
 linux_names    += build_names("linux", ["armv7l"], ["rock64_%d"%(idx) for idx in range(1,2)])
+musl_names      = build_names("musl", ["x86_64"], ["nureha_1"])
 macos_names     = build_names("macos", ["x86_64"], ["macmini", "macmini2", "macmini3"])
 freebsd_names   = build_names("freebsd", ["x86_64"], ["openstack_%d"%(idx) for idx in range(1,4)])
-all_names       = win_names + linux_names + macos_names + freebsd_names
+all_names       = win_names + linux_names + musl_names + macos_names + freebsd_names
 
 # Define all the attributes we'll use in our buildsteps
 c['workers'] = []
@@ -209,4 +210,5 @@ builder_mapping = {
     "linuxppc64le": namefilt("ppc64le", linux_names),
     "linuxaarch64": namefilt("aarch64", linux_names),
     "freebsd64": namefilt("x86_64", freebsd_names),
+    "musl64": namefilt("musl", musl_names),
 }

@@ -5,7 +5,7 @@ julia_package_env = {
     'MACOS_CODESIGN_IDENTITY': MACOS_CODESIGN_IDENTITY,
 }
 
-# Steps to build a `make binary-dist` tarball that should work on just about every linux ever
+# Steps to build a `make binary-dist` tarball that should work on every platform
 julia_package_factory = util.BuildFactory()
 julia_package_factory.useProgress = True
 julia_package_factory.addSteps([
