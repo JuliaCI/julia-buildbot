@@ -46,6 +46,8 @@ def get_upload_os_name(props):
         return "mac"
     elif is_freebsd(props):
         return "freebsd"
+    elif is_musl(props):
+        return "musl"
     else:
         return "linux"
 
