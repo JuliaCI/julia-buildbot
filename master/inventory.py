@@ -92,6 +92,9 @@ for name in all_names:
     elif name[:4] == "musl":
         os_name = "musl"
         os_pkg_ext = "tar.gz"
+
+        # This guy is a gutless wonder at the moment
+        nthreads = 3
     else:
         os_name = "linux"
         os_pkg_ext = "tar.gz"
