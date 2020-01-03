@@ -132,7 +132,7 @@ julia_coverage_factory.addSteps([
     ),
     steps.ShellCommand(
         name="Install CoverageBase and checkout latest master",
-        command=[util.Interpolate("%(prop:juliadir)s/bin/julia"), "-e", "import Pkg; Pkg.add(Pkg.PackageSpec(name=\"CoverageBase\", rev=\"master\"))"],
+        command=[util.Interpolate("%(prop:juliadir)s/bin/julia"), "-e", "import Pkg; Pkg.add(Pkg.PackageSpec(url=\"https://github.com/JuliaCI/CoverageBase.jl\", rev=\"master\"))"],
     ),
 
     # Test CoverageBase to make sure everything's on the up-and-up
