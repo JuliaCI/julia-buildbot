@@ -135,7 +135,7 @@ for name in all_names:
         bits = 'armv7l'
 
         # On arm, limit ourselves to 3 threads, since these are wimpy machines
-        nthreads = 3
+        nthreads = 2
 
         # Sysimg multi-versioning!
         flags += 'JULIA_CPU_TARGET="armv7-a;armv7-a,neon;armv7-a,neon,vfp4" '
