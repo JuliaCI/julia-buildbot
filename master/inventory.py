@@ -58,8 +58,9 @@ for name in all_names:
     # Persist our source cache
     flags += 'SRCCACHE=/tmp/srccache '
 
-    # By default, we use 6 threads
+    # By default, we use 6 threads, and do NOT set a maxrss limit
     nthreads = 6
+    maxrss = None
 
     # First, set OS-dependent stuff
     if name[:3] == "win":
@@ -134,8 +135,10 @@ for name in all_names:
         up_arch = 'armv7l'
         bits = 'armv7l'
 
-        # On arm, limit ourselves to 2 threads, since these are wimpy machines
-        nthreads = 2
+        # On arm, limit ourselves to 3 threads, since these are wimpy machines
+        # and furthermore set ourselves a MAXRSS limit of 900MB
+        nthreads = 3
+        maxrss = 900
 
         # Sysimg multi-versioning!
         flags += 'JULIA_CPU_TARGET="armv7-a;armv7-a,neon;armv7-a,neon,vfp4" '
@@ -155,15 +158,6 @@ for name in all_names:
         bits = 'aarch64'
         march = 'armv8-a'
         flags += 'JULIA_CPU_TARGET=generic '
-
-
-    # tests are hitting memory issues, so restart workers when memory consumption gets too high
-    # We typically provision at least 1GB per core, so set the limit to 900MB per worker to leave
-    # some space for other things on the host
-    flags += 'JULIA_TEST_MAXRSS_MB=900 '
-
-    # Lock the tests to this many threads (usually 6)
-    flags += 'JULIA_CPU_THREADS=%d '%(nthreads)
 
     # Add MARCH to flags
     if not march is None:
@@ -190,6 +184,7 @@ for name in all_names:
                 'release':name,
                 'flags':flags,
                 'nthreads':nthreads,
+                'maxrss':maxrss,
                 'up_arch':up_arch,
                 'bits':bits,
                 'llvm_cmake':llvm_cmake,
