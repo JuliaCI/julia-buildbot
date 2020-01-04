@@ -138,7 +138,7 @@ for name in all_names:
         # On arm, limit ourselves to 3 threads, since these are wimpy machines
         # and furthermore set ourselves a MAXRSS limit of 900MB
         nthreads = 3
-        maxrss = 900
+        maxrss = "900"
 
         # Sysimg multi-versioning!
         flags += 'JULIA_CPU_TARGET="armv7-a;armv7-a,neon;armv7-a,neon,vfp4" '
