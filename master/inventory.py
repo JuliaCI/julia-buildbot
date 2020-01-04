@@ -134,7 +134,7 @@ for name in all_names:
         up_arch = 'armv7l'
         bits = 'armv7l'
 
-        # On arm, limit ourselves to 3 threads, since these are wimpy machines
+        # On arm, limit ourselves to 2 threads, since these are wimpy machines
         nthreads = 2
 
         # Sysimg multi-versioning!
