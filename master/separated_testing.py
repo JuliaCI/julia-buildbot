@@ -3,19 +3,20 @@
 # testing" that @staticfloat has been going on about for so many years...
 ###############################################################################
 
+julia_testing_env = {
+    "JULIA_TEST_MAXRSS_MB": util.Property('maxrss', default=None),
+}
+
 @util.renderer
 def run_julia_tests(props_obj):
     props = props_obj_to_dict(props_obj)
     # We run all tests, even the ones that require internet connectivity
-    cmd = [
-        "bin/julia",
-        "-e",
-        """
-        include(joinpath(Sys.BINDIR, Base.DATAROOTDIR, "julia", "test", "choosetests.jl"));
-        Base.runtests(append!(choosetests()[1], ["LibGit2/online", "download"]); ncores=min(Sys.CPU_THREADS, 8))
-        """,
-    ]
+    test_cmd = """
+    include(joinpath(Sys.BINDIR, Base.DATAROOTDIR, "julia", "test", "choosetests.jl"));
+    Base.runtests(append!(choosetests()[1], ["LibGit2/online", "download"]); ncores=min(Sys.CPU_THREADS, 8, {nthreads}))
+    """.format(**props),
 
+    cmd = ["bin/julia", "-e", test_cmd]
     if is_windows(props_obj):
         cmd[0] += ".exe"
     return cmd
@@ -48,6 +49,7 @@ julia_testing_factory.addSteps([
         maxTime=60*60*10,
         # Give the process 10 seconds to print out the current backtraces when being killed
         sigtermTime=10,
+        env=julia_testing_env,
     ),
 
     # Promote from pretesting to a nightly if it worked!
