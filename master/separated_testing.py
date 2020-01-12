@@ -43,8 +43,8 @@ julia_testing_factory.addSteps([
         name="Run tests",
         command=run_julia_tests,
         haltOnFailure=True,
-        # Fail out if 45 minutes have gone by with nothing printed to stdout
-        timeout=45*60,
+        # Fail out if 90 minutes have gone by with nothing printed to stdout
+        timeout=90*60,
         # Kill everything if the overall job has taken more than 10 hours
         maxTime=60*60*10,
         # Give the process 10 seconds to print out the current backtraces when being killed
