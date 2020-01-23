@@ -154,6 +154,8 @@ for name in all_names:
         up_arch = 'aarch64'
         bits = 'aarch64'
         march = 'armv8-a'
+        # We have a lot of cores and a lot of RAM, use them.
+        nthreads = 8
         flags += 'JULIA_CPU_TARGET=generic '
 
     # Add MARCH to flags
