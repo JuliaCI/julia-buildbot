@@ -15,11 +15,8 @@ def build_names(platform, arch, name):
     """
     return list(map(lambda x: '-'.join(x), itertools.product([platform], arch, name)))
 
-# Our windows machines are on openstack, and we double them up because they are slooooow
-win_names       = build_names("win", ["x86_64", "i686"], ["openstack_%d"%(idx) for idx in range(1,4)])
-
-# Add AWS lackies as well
-win_names      += build_names("win", ["x86_64", "i686"], ["aws_%d"%(idx) for idx in range(1,4)])
+# Our windows machines are on AWS
+win_names      = build_names("win", ["x86_64", "i686"], ["aws_%d"%(idx) for idx in range(1,4)])
 
 # Our linux (packaging) machines are typically centos, but we just call them `linux`,
 # to fit in with the other builders.  Some run on nanosoldier2 at MIT, some run at OSU,
