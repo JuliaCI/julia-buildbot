@@ -23,6 +23,7 @@ def run_julia_tests(props_obj):
         cmd = ["bin/julia.exe", "D:\\autodump.jl", "bin/julia.exe", "-e", test_cmd]
     return cmd
 
+@util.renderer
 def render_upload_dmp_command(props_obj):
     props = props_obj_to_dict(props_obj)
     upload_script = """
