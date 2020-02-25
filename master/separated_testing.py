@@ -28,6 +28,7 @@ def render_upload_dmp_command(props_obj):
     props = props_obj_to_dict(props_obj)
     upload_script = """
     for f in /tmp/julia_dumps/win{bits}/{buildnumber}/*.dmp; do
+        [[ ! -f "$f" ]] && continue
         aws s3 cp "$f" "s3://julialang-dumps/win{bits}/{buildnumber}/$(basename "$f")" && rm -f "$f"
     done
     """.format(**props)
