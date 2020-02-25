@@ -20,7 +20,7 @@ def run_julia_tests(props_obj):
     if is_windows(props_obj):
         # On windows, we have a special autodump script stored at `D:\autodump.jl`, we invoke it
         # with the current julia version:
-        cmd = ["bin/julia.exe", "D:\\autodump.jl", "bin/julia.exe"]
+        cmd = ["bin/julia.exe", "D:\\autodump.jl", "bin/julia.exe", "-e", test_cmd]
     return cmd
 
 def render_upload_dmp_command(props_obj):
@@ -122,13 +122,14 @@ julia_testing_factory.addSteps([
         doStepIf=is_windows,
         alwaysRun=True,
     ),
+
     steps.MasterShellCommand(
         name="Upload .dmp files",
         command=render_upload_dmp_command,
-        doStepIf=is_windows,
         hideStepIf=lambda results, s: results==SKIPPED,
+        doStepIf=is_windows,
         alwaysRun=True,
-    )
+    ),
 ])
 
 for builder, workers in builder_mapping.items():
