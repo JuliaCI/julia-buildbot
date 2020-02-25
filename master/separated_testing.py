@@ -18,8 +18,19 @@ def run_julia_tests(props_obj):
 
     cmd = ["bin/julia", "-e", test_cmd]
     if is_windows(props_obj):
-        cmd[0] += ".exe"
+        # On windows, we have a special autodump script stored at `D:\autodump.jl`, we invoke it
+        # with the current julia version:
+        cmd = ["bin/julia.exe", "D:\\autodump.jl", "bin/julia.exe"]
     return cmd
+
+def render_upload_dmp_command(props_obj):
+    props = props_obj_to_dict(props_obj)
+    upload_script = """
+    for f in /tmp/julia_dumps/win{bits}/{buildnumber}/*.dmp; do
+        aws s3 cp ${f} s3://julialang-dumps/win{bits}/{buildnumber}/$(basename ${f}) && rm -f ${f}
+    done
+    """.format(**props)
+    return ["bash", "-c", upload_script]
 
 # Steps to download a linux tarball, extract it, run testing on it, and maybe trigger coverage
 julia_testing_factory = util.BuildFactory()
@@ -44,6 +55,8 @@ julia_testing_factory.addSteps([
         command=run_julia_tests,
         haltOnFailure=True,
         # Fail out if 90 minutes have gone by with nothing printed to stdout
+        # NOTE: Windows buildbots have a separate timeout of 2 hours total (regardless of stdout activity)
+        # enforced by the autodump script.  We should eventually move everything over to that.
         timeout=90*60,
         # Kill everything if the overall job has taken more than 10 hours
         maxTime=60*60*10,
@@ -99,6 +112,23 @@ julia_testing_factory.addSteps([
         waitForFinish=False,
         doStepIf=is_assert_nightly,
     ),
+
+    # Upload and delete `.dmp` if they exist!
+    steps.MultipleFileUpload(
+        workersrcs=["D:\\*.dmp"],
+        masterdest=util.Interpolate("/tmp/julia_dumps/win%(prop:bits)s/%(prop:buildnumber)s"),
+        glob=True,
+        hideStepIf=lambda results, s: results==SKIPPED,
+        doStepIf=is_windows,
+        alwaysRun=True,
+    ),
+    steps.MasterShellCommand(
+        name="Upload .dmp files",
+        command=render_upload_dmp_command,
+        doStepIf=is_windows,
+        hideStepIf=lambda results, s: results==SKIPPED,
+        alwaysRun=True,
+    )
 ])
 
 for builder, workers in builder_mapping.items():
