@@ -160,4 +160,4 @@ AssignProcessToJobObject(job, OpenProcess(getpid(proc), PROCESS_SET_QUOTA | PROC
 end
 
 wait(proc)
-exit(0)
+exit(proc.exitcode)
