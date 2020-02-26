@@ -111,8 +111,8 @@ function OpenProcess(id::Integer, rights = PROCESS_QUERY_INFORMATION | PROCESS_V
     proc
 end
 
-function CreateMinidump(id::UInt; filename = "D:\\dump-$id-$(Dates.format(now(), dateformat"yyyy-mm-dd_HH_MM_SS")).dmp", kind = MiniDumpWithProcessThreadData)
-    proc_handle = OpenProcess(id)
+function CreateMinidump(filename::String, proc_id::UInt; kind = MiniDumpWithProcessThreadData)
+    proc_handle = OpenProcess(proc_id)
     file_handle = Filesystem.open(filename, JL_O_CREAT | JL_O_WRONLY, 0666)
 
     Base.windowserror(:MiniDumpWriteDump, 0 ==
@@ -121,18 +121,20 @@ function CreateMinidump(id::UInt; filename = "D:\\dump-$id-$(Dates.format(now(),
                 Ptr{Cvoid},
                 Ptr{Cvoid},
                 Ptr{Cvoid}),
-            proc_handle, id, file_handle.handle, kind,
+            proc_handle, proc_id, file_handle.handle, kind,
             C_NULL, C_NULL, C_NULL))
 
     CloseHandle(file_handle)
     CloseHandle(proc_handle)
 end
 
-if isempty(ARGS)
-    println(stderr, "Usage: autodump.jl [command...]")
+if length(ARGS) < 3
+    println(stderr, "Usage: autodump.jl [buildnumber] [shortcommit] [command...]")
     exit(2)
 end
 
+run_id = popfirst!(ARGS)
+shortcommit = popfirst!(ARGS)
 proc = run(`$ARGS`, (stdin, stdout, stderr); wait=false)
 job = CreateJobObject()
 AssignProcessToJobObject(job, OpenProcess(getpid(proc), PROCESS_SET_QUOTA | PROCESS_TERMINATE))
@@ -142,13 +144,15 @@ AssignProcessToJobObject(job, OpenProcess(getpid(proc), PROCESS_SET_QUOTA | PROC
     try
         if isopen(proc)
             println(stderr, "\n\nProcess timed out. Creating core dump for each running process!")
+            datestr = Dates.format(now(), dateformat"yyyy-mm-dd_HH_MM_SS") 
             proc_ids = QueryJobObjectBasicProcessIdList(job)
-            foreach(proc_ids) do id
+            foreach(proc_ids) do proc_id
+                filename = "D:\\dumps\\$(run_id)\\dump-run$(run_id)-gitsha$(shortcommit)-pid$(proc_id)-$(datestr).dmp"
                 try
-                    CreateMinidump(id)
+                    CreateMinidump(run_id, proc_id)
                 catch e
                     bt = catch_backtrace()
-                    println(stderr, "Failed to create minidump for process $id")
+                    println(stderr, "Failed to create minidump for process $(proc_id)")
                     Base.display_error(stderr, e, bt)
                 end
             end

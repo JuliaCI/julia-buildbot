@@ -20,7 +20,7 @@ def run_julia_tests(props_obj):
     if is_windows(props_obj):
         # On windows, we have a special autodump script stored at `D:\autodump.jl`, we invoke it
         # with the current julia version:
-        cmd = ["bin/julia.exe", "D:\\autodump.jl", "bin/julia.exe", "-e", test_cmd]
+        cmd = ["bin/julia.exe", str(props["buildnumber"]), props["shortcommit"], "D:\\autodump.jl", "bin/julia.exe", "-e", test_cmd]
     return cmd
 
 @util.renderer
@@ -120,7 +120,7 @@ julia_testing_factory.addSteps([
 
     # Upload and delete `.dmp` if they exist!
     steps.MultipleFileUpload(
-        workersrcs=[util.Interpolate("/cygdrive/d/*.dmp")],
+        workersrcs=[util.Interpolate("/cygdrive/d/dumps/%(prop:buildnumber)s/*.dmp")],
         masterdest=util.Interpolate("/tmp/julia_dumps/win%(prop:bits)s/%(prop:buildnumber)s"),
         glob=True,
         doStepIf=is_windows,
