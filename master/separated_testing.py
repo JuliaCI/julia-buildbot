@@ -28,8 +28,11 @@ def render_upload_dmp_command(props_obj):
     props = props_obj_to_dict(props_obj)
     upload_script = """
     for f in /tmp/julia_dumps/win{bits}/{buildnumber}/*.dmp; do
+        # Skip files that are non-existent (e.g. if there ARE no `.dmp` files)
         [[ ! -f "$f" ]] && continue
-        aws s3 cp "$f" "s3://julialang-dumps/win{bits}/{buildnumber}/$(basename "$f")" && rm -f "$f"
+        path="win{bits}/{buildnumber}/$(basename "$f")"
+        echo "uploading $f to https://julialang-dumps.s3.amazonaws.com/${path}"
+        aws s3 cp "$f" "s3://julialang-dumps/${path}" && rm -f "$f"
     done
     """.format(**props)
     return ["bash", "-c", upload_script]
@@ -120,7 +123,6 @@ julia_testing_factory.addSteps([
         workersrcs=["D:\\*.dmp"],
         masterdest=util.Interpolate("/tmp/julia_dumps/win%(prop:bits)s/%(prop:buildnumber)s"),
         glob=True,
-        hideStepIf=lambda results, s: results==SKIPPED,
         doStepIf=is_windows,
         alwaysRun=True,
     ),
@@ -128,7 +130,6 @@ julia_testing_factory.addSteps([
     steps.MasterShellCommand(
         name="Upload .dmp files",
         command=render_upload_dmp_command,
-        hideStepIf=lambda results, s: results==SKIPPED,
         doStepIf=is_windows,
         alwaysRun=True,
     ),
