@@ -20,7 +20,7 @@ def run_julia_tests(props_obj):
     if is_windows(props_obj):
         # On windows, we have a special autodump script stored at `D:\autodump.jl`, we invoke it
         # with the current julia version:
-        cmd = ["bin/julia.exe", str(props["buildnumber"]), props["shortcommit"], "D:\\autodump.jl", "bin/julia.exe", "-e", test_cmd]
+        cmd = ["bin/julia.exe", "D:\\autodump.jl", str(props["buildnumber"]), props["shortcommit"], "bin/julia.exe", "-e", test_cmd]
     return cmd
 
 @util.renderer
