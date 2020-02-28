@@ -63,8 +63,8 @@ julia_testing_factory.addSteps([
         # NOTE: Windows buildbots have a separate timeout of 2 hours total (regardless of stdout activity)
         # enforced by the autodump script.  We should eventually move everything over to that.
         timeout=122*60,
-        # Kill everything if the overall job has taken more than 10 hours
-        maxTime=60*60*10,
+        # Kill everything if the overall job has taken more than 4 hours
+        maxTime=60*60*4,
         # Give the process 10 seconds to print out the current backtraces when being killed
         sigtermTime=10,
         env=julia_testing_env,
