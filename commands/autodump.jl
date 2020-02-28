@@ -152,7 +152,7 @@ AssignProcessToJobObject(job, OpenProcess(getpid(proc), PROCESS_SET_QUOTA | PROC
                 filename = "D:\\dumps\\$(run_id)\\dump-run$(run_id)-gitsha$(shortcommit)-pid$(proc_id)-$(datestr).dmp"
                 try
                     print(stderr, "Dumping $(proc_id) to $(filename)...")
-                    CreateMinidump(run_id, proc_id)
+                    CreateMinidump(filename, proc_id)
                     println(stderr, "Done!")
                 catch e
                     bt = catch_backtrace()
