@@ -146,12 +146,14 @@ AssignProcessToJobObject(job, OpenProcess(getpid(proc), PROCESS_SET_QUOTA | PROC
             println(stderr, "\n\nProcess timed out. Creating core dump for each running process!")
             datestr = Dates.format(now(), dateformat"yyyy-mm-dd_HH_MM_SS") 
             proc_ids = QueryJobObjectBasicProcessIdList(job)
-            println(stderr, "Process IDs: $(proc_ids)")
+            println(stderr, "Process IDs: $(Int.(proc_ids))")
             mkpath("D:\\dumps\\$(run_id)")
             foreach(proc_ids) do proc_id
                 filename = "D:\\dumps\\$(run_id)\\dump-run$(run_id)-gitsha$(shortcommit)-pid$(proc_id)-$(datestr).dmp"
                 try
+                    print(stderr, "Dumping $(proc_id) to $(filename)...")
                     CreateMinidump(run_id, proc_id)
+                    println(stderr, "Done!")
                 catch e
                     bt = catch_backtrace()
                     println(stderr, "Failed to create minidump for process $(proc_id)")
