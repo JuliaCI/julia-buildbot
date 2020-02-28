@@ -31,8 +31,8 @@ def render_upload_dmp_command(props_obj):
         # Skip files that are non-existent (e.g. if there ARE no `.dmp` files)
         [[ ! -f "$f" ]] && continue
         path="win{bits}/{buildnumber}/$(basename "$f")"
-        echo "uploading $f to https://julialang-dumps.s3.amazonaws.com/$path"
-        aws s3 cp "$f" "s3://julialang-dumps/$path" && rm -f "$f"
+        echo "uploading $(basename $f) to https://julialang-dumps.s3.amazonaws.com/$path"
+        aws s3 cp "$f" "s3://julialang-dumps/$path" --quiet --acl public-read && rm -f "$f"
     done
     """.format(**props)
     return ["bash", "-c", upload_script]
