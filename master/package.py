@@ -36,7 +36,7 @@ julia_package_factory.addSteps([
     # `.git` folder
     steps.ShellCommand(
         name="[Win] wipe state",
-        command=["/bin/sh", "-c", "cmd /c del /s /q *"],
+        command=["del", "/s", "/q", "*"],
         flunkOnFailure=False,
         doStepIf=is_windows,
         hideStepIf=lambda results, s: results==SKIPPED,
@@ -59,7 +59,7 @@ julia_package_factory.addSteps([
     # Get win-extras files ready on windows
     steps.ShellCommand(
         name="make win-extras",
-        command=["/bin/sh", "-c", util.Interpolate("%(prop:make_cmd)s %(prop:flags)s %(prop:extra_make_flags)s win-extras")],
+        command=["sh", "-c", util.Interpolate("%(prop:make_cmd)s %(prop:flags)s %(prop:extra_make_flags)s win-extras")],
         haltOnFailure = True,
         doStepIf=is_windows,
         hideStepIf=lambda results, s: results==SKIPPED,
@@ -68,7 +68,7 @@ julia_package_factory.addSteps([
     # Temporary work-around for https://github.com/JuliaLang/julia/pull/32918#issuecomment-522158829
     steps.ShellCommand(
         name="Temporary 7z fixup for Pkg",
-        command=["/bin/sh", "-c", util.Interpolate("mkdir -p usr/bin; cp -v dist-extras/7z.* usr/bin/")],
+        command=["sh", "-c", util.Interpolate("mkdir -p usr/bin; cp -v dist-extras/7z.* usr/bin/")],
         haltOnFailure = False,
         flunkOnFailure = False,
         doStepIf=is_windows,
@@ -79,7 +79,7 @@ julia_package_factory.addSteps([
     # Make release (we don't automatically build debug)
     steps.ShellCommand(
         name="make release",
-        command=["/bin/sh", "-c", util.Interpolate("%(prop:make_cmd)s -j%(prop:nthreads)s %(prop:flags)s %(prop:extra_make_flags)s release")],
+        command=["sh", "-c", util.Interpolate("%(prop:make_cmd)s -j%(prop:nthreads)s %(prop:flags)s %(prop:extra_make_flags)s release")],
         haltOnFailure = True,
         # Fail out if 60 minutes have gone by with nothing printed to stdout
         timeout=60*60,
@@ -93,7 +93,7 @@ julia_package_factory.addSteps([
     # Get info about ccache
     steps.ShellCommand(
         name="ccache stats",
-        command=["/bin/sh", "-c", "ccache -s"],
+        command=["sh", "-c", "ccache -s"],
         flunkOnFailure=False,
         env=julia_package_env,
     ),
@@ -101,7 +101,7 @@ julia_package_factory.addSteps([
     # Get build stats
     steps.ShellCommand(
         name="build stats",
-        command=["/bin/sh", "-c", util.Interpolate("%(prop:make_cmd)s %(prop:flags)s %(prop:extra_make_flags)s build-stats")],
+        command=["sh", "-c", util.Interpolate("%(prop:make_cmd)s %(prop:flags)s %(prop:extra_make_flags)s build-stats")],
         flunkOnFailure=False,
         env=julia_package_env,
     ),
@@ -133,7 +133,7 @@ julia_package_factory.addSteps([
     # Sign windows julia .exe
     steps.ShellCommand(
         name="sign .exe (julia)",
-        command=["/bin/sh", "-c", util.Interpolate("~/sign.sh usr/bin/julia.exe")],
+        command=["sh", "-c", util.Interpolate("~/sign.sh usr/bin/julia.exe")],
         doStepIf=is_windows,
         hideStepIf=lambda results, s: results==SKIPPED,
     ),
@@ -141,7 +141,7 @@ julia_package_factory.addSteps([
     # Make binary-dist to package it up
     steps.ShellCommand(
         name="make binary-dist",
-        command=["/bin/sh", "-c", util.Interpolate("%(prop:make_cmd)s %(prop:flags)s %(prop:extra_make_flags)s binary-dist")],
+        command=["sh", "-c", util.Interpolate("%(prop:make_cmd)s %(prop:flags)s %(prop:extra_make_flags)s binary-dist")],
         haltOnFailure = True,
         # Fail out if 60 minutes have gone by with nothing printed to stdout
         timeout=60*60,
@@ -155,7 +155,7 @@ julia_package_factory.addSteps([
     # Build .app on macOS
     steps.ShellCommand(
         name="make .app",
-        command=["/bin/sh", "-c", util.Interpolate("~/unlock_keychain.sh && make %(prop:flags)s %(prop:extra_make_flags)s app")],
+        command=["sh", "-c", util.Interpolate("~/unlock_keychain.sh && make %(prop:flags)s %(prop:extra_make_flags)s app")],
         haltOnFailure=True,
         doStepIf=is_mac,
         hideStepIf=lambda results, s: results==SKIPPED,
@@ -165,7 +165,7 @@ julia_package_factory.addSteps([
     # Sign windows installer .exe
     steps.ShellCommand(
         name="sign .exe (installer)",
-        command=["/bin/sh", "-c", util.Interpolate("~/sign.sh \"%(prop:local_filename)s\"")],
+        command=["sh", "-c", util.Interpolate("~/sign.sh \"%(prop:local_filename)s\"")],
         doStepIf=is_windows,
         hideStepIf=lambda results, s: results==SKIPPED,
         haltOnFailure=False,
@@ -185,7 +185,7 @@ julia_package_factory.addSteps([
 
     steps.MasterShellCommand(
         name="sign .tar.gz on master",
-        command=["/bin/sh", "-c", util.Interpolate("/root/sign_tarball.sh /tmp/julia_package/%(prop:upload_filename)s")],
+        command=["sh", "-c", util.Interpolate("/root/sign_tarball.sh /tmp/julia_package/%(prop:upload_filename)s")],
         doStepIf=lambda step: is_linux(step) or is_freebsd(step),
         hideStepIf=lambda results, s: results==SKIPPED,
     ),
@@ -199,7 +199,7 @@ julia_package_factory.addSteps([
 
     steps.MasterShellCommand(
         name="Cleanup Master",
-        command=["/bin/sh", "-c", util.Interpolate("rm -vf /tmp/julia_package/%(prop:upload_filename)s*")],
+        command=["sh", "-c", util.Interpolate("rm -vf /tmp/julia_package/%(prop:upload_filename)s*")],
     ),
 
     # Trigger a download of this file onto another worker for testing
