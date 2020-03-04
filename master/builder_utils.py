@@ -120,7 +120,7 @@ def munge_artifact_filename(props_obj):
 def render_upload_command(props_obj):
     upload_path = gen_upload_path(props_obj, namespace="pretesting")
     upload_filename = props_obj.getProperty("upload_filename")
-    return ["/bin/sh", "-c",
+    return ["sh", "-c",
         "aws s3 cp --acl public-read /tmp/julia_package/%s.asc s3://%s.asc ; "%(upload_filename, upload_path) +
         "aws s3 cp --acl public-read /tmp/julia_package/%s s3://%s"%(upload_filename, upload_path),
     ]
@@ -129,7 +129,7 @@ def render_upload_command(props_obj):
 def render_promotion_command(props_obj):
     src_path = gen_upload_path(props_obj, namespace="pretesting")
     dst_path = gen_upload_path(props_obj)
-    return ["/bin/sh", "-c",
+    return ["sh", "-c",
         "aws s3 cp --acl public-read s3://%s.asc s3://%s.asc ; "%(src_path, dst_path) +
         "aws s3 cp --acl public-read s3://%s s3://%s "%(src_path, dst_path),
     ]
@@ -138,7 +138,7 @@ def render_promotion_command(props_obj):
 def render_latest_promotion_command(props_obj):
     src_path = gen_upload_path(props_obj, namespace="pretesting")
     dst_path = gen_upload_path(props_obj, latest=True)
-    return ["/bin/sh", "-c",
+    return ["sh", "-c",
         "aws s3 cp --acl public-read s3://%s.asc s3://%s.asc ; "%(src_path, dst_path) +
         "aws s3 cp --acl public-read s3://%s s3://%s"%(src_path, dst_path),
     ]
@@ -146,7 +146,7 @@ def render_latest_promotion_command(props_obj):
 @util.renderer
 def render_cleanup_pretesting_command(props_obj):
     del_path = gen_upload_path(props_obj, namespace="pretesting")
-    return ["/bin/sh", "-c", "aws s3 rm s3://%s.asc ; aws s3 rm s3://%s"%(del_path, del_path)]
+    return ["sh", "-c", "aws s3 rm s3://%s.asc ; aws s3 rm s3://%s"%(del_path, del_path)]
 
 @util.renderer
 def render_download_url(props_obj):
@@ -190,7 +190,7 @@ def build_download_julia_cmd(props_obj):
     else:
         # Oh linux.  Your simplicity always gets me
         cmd = "curl -L '%s' | tar --strip-components=1 -zxf -"%(download_url)
-    return ["/bin/sh", "-c", cmd]
+    return ["sh", "-c", cmd]
 
 
 @util.renderer
