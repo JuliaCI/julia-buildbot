@@ -12,8 +12,7 @@ def run_julia_tests(props_obj):
     props = props_obj_to_dict(props_obj)
     # We run all tests, even the ones that require internet connectivity.  Note that
     # it appears the windows shell can't deal with newlines.  :/
-    test_cmd = """include(joinpath(Sys.BINDIR, Base.DATAROOTDIR, "julia", "test", "choosetests.jl")); Base.runtests(append!(choosetests()[1], ["LibGit2/online", "download"]); ncores=min(Sys.CPU_THREADS, 8, {nthreads}))
-    """.format(**props),
+    test_cmd = "include(joinpath(Sys.BINDIR, Base.DATAROOTDIR, "julia", "test", "choosetests.jl")); Base.runtests(append!(choosetests()[1], ["LibGit2/online", "download"]); ncores=min(Sys.CPU_THREADS, 8, {nthreads}))".format(**props)
 
     cmd = ["bin/julia", "-e", test_cmd]
     if is_windows(props_obj):
