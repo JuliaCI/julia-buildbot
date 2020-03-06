@@ -147,9 +147,9 @@ AssignProcessToJobObject(job, OpenProcess(getpid(proc), PROCESS_SET_QUOTA | PROC
             datestr = Dates.format(now(), dateformat"yyyy-mm-dd_HH_MM_SS") 
             proc_ids = QueryJobObjectBasicProcessIdList(job)
             println(stderr, "Process IDs: $(Int.(proc_ids))")
-            mkpath("D:\\dumps\\$(run_id)")
+            mkpath("dumps")
             foreach(proc_ids) do proc_id
-                filename = "D:\\dumps\\$(run_id)\\dump-run$(run_id)-gitsha$(shortcommit)-pid$(proc_id)-$(datestr).dmp"
+                filename = "dumps\\dump-run$(run_id)-gitsha$(shortcommit)-pid$(proc_id)-$(datestr).dmp"
                 try
                     print(stderr, "Dumping $(proc_id) to $(filename)...")
                     CreateMinidump(filename, proc_id)

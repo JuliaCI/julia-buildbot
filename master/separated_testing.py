@@ -118,7 +118,7 @@ julia_testing_factory.addSteps([
 
     # Upload and delete `.dmp` if they exist!
     steps.MultipleFileUpload(
-        workersrcs=[util.Interpolate("D:\\dumps\\%(prop:buildnumber)s\\*.dmp")],
+        workersrcs=["dumps/*.dmp"],
         masterdest=util.Interpolate("/tmp/julia_dumps/win%(prop:bits)s/%(prop:buildnumber)s"),
         glob=True,
         doStepIf=is_windows,
