@@ -162,6 +162,16 @@ julia_package_factory.addSteps([
         env=julia_package_env,
     ),
 
+    # Build exe installer on Windows
+    steps.ShellCommand(
+        name="make exe",
+        command=["sh", "-c", util.Interpolate("make %(prop:flags)s %(prop:extra_make_flags)s exe")],
+        haltOnFailure=True,
+        doStepIf=is_windows,
+        hideStepIf=lambda results, s: results==SKIPPED,
+        env=julia_package_env,
+    ),
+    
     # Sign windows installer .exe
     steps.ShellCommand(
         name="sign .exe (installer)",
