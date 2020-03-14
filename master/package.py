@@ -166,9 +166,10 @@ julia_package_factory.addSteps([
     steps.ShellCommand(
         name="make exe",
         command=["sh", "-c", util.Interpolate("make %(prop:flags)s %(prop:extra_make_flags)s exe")],
-        haltOnFailure=False,
         doStepIf=is_windows,
         hideStepIf=lambda results, s: results==SKIPPED,
+        haltOnFailure=False,
+        flunkOnFailure=False,
         env=julia_package_env,
     ),
     
