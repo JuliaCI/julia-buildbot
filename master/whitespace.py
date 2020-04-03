@@ -24,7 +24,7 @@ julia_whitespace_factory.addSteps([
     # Check whitespace
     steps.ShellCommand(
         name="make check-whitespace",
-        command=["/bin/sh", "-c", util.Interpolate("%(prop:make_cmd)s check-whitespace")],
+        command=["sh", "-c", util.Interpolate("%(prop:make_cmd)s check-whitespace")],
         haltOnFailure = True,
         # Fail out if 60 minutes have gone by with nothing printed to stdout
         timeout=60*60,

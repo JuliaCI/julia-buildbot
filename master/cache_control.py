@@ -3,7 +3,7 @@ nuke_factory.useProgress = True
 nuke_factory.addSteps([
     steps.ShellCommand(
         name="Clear SRCCACHE",
-        command=["/bin/sh", "-c", "rm -rf /tmp/srccache/*"],
+        command=["sh", "-c", "rm -rf /tmp/srccache/*"],
         flunkOnFailure=False,
         doStepIf=lambda step: step.getProperty('clear_srccache'),
         hideStepIf=lambda results, s: results==SKIPPED,
@@ -19,7 +19,7 @@ nuke_factory.addSteps([
 
     steps.ShellCommand(
         name="Clear Julia .git folder",
-        command=["/bin/sh", "-c", "rm -rf ../../package_*"],
+        command=["sh", "-c", "rm -rf ../../package_*"],
         flunkOnFailure=False,
         doStepIf=lambda step: step.getProperty('clear_julia_package_repo'),
         hideStepIf=lambda results, s: results==SKIPPED,
