@@ -85,8 +85,6 @@ for name in all_names:
         os_pkg_ext = "tar.gz"
         make_cmd = "gmake"
 
-        # For some reason, the FreeBSD build segfaults with this enabled
-        flags += "USE_BINARYBUILDER_LIBUV=0 "
     elif name[:4] == "musl":
         os_name = "musl"
         os_pkg_ext = "tar.gz"
