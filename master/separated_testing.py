@@ -138,7 +138,7 @@ julia_testing_factory.addSteps([
     # Upload and delete `.dmp` if they exist!
     steps.MultipleFileUpload(
         workersrcs=["dumps/*"],
-        masterdest=util.Interpolate("/tmp/julia_dumps/%(prop:osname)%(prop:bits)s/%(prop:buildnumber)s"),
+        masterdest=util.Interpolate("/tmp/julia_dumps/%(prop:osname)s%(prop:bits)s/%(prop:buildnumber)s"),
         glob=True,
         alwaysRun=True,
     ),
