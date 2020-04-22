@@ -16,19 +16,22 @@ def run_julia_tests(props_obj):
 
     cmd = ["bin/julia", "-e", test_cmd]
     if is_windows(props_obj):
-        # On windows, we have a special autodump script stored at `D:\autodump.jl`, we invoke it
-        # with the current julia version:
-        cmd = ["bin\\julia.exe", "D:\\autodump.jl", str(props["buildnumber"]), props["shortcommit"], "bin\\julia.exe", "-e", test_cmd]
+        # On windows, we have a special autodump script
+        cmd = ["bin\\julia.exe", "autodump.jl", str(props["buildnumber"]), props["shortcommit"], "bin\\julia.exe", "-e", test_cmd]
+    if is_linux(props_obj) and props_obj.getProperty('arch') in ('x86_64', 'i686') and props_obj.getProperty('use_rr', default=False):
+        # On x86_64 and i686 linux, we have a special rr capturing script
+        cmd = ["bin/julia", "rr_capture.jl", str(props["buildnumber"]), props["shortcommit"], "bin/julia", "-e", test_cmd]
+
     return cmd
 
 @util.renderer
-def render_upload_dmp_command(props_obj):
+def render_upload_debugging_files(props_obj):
     props = props_obj_to_dict(props_obj)
     upload_script = """
-    for f in /tmp/julia_dumps/win{bits}/{buildnumber}/*.dmp; do
-        # Skip files that are non-existent (e.g. if there ARE no `.dmp` files)
-        [[ ! -f "$f" ]] && continue
-        path="win{bits}/{buildnumber}/$(basename "$f")"
+    # Skip files that are non-existent (e.g. if there ARE no `.dmp` files)
+    shopt -s nullglob
+    for f in /tmp/julia_dumps/{osname}{bits}/{buildnumber}/*; do
+        path="{osname}{bits}/{buildnumber}/$(basename "$f")"
         echo "uploading $(basename $f) to https://julialang-dumps.s3.amazonaws.com/$path"
         aws s3 cp "$f" "s3://julialang-dumps/$path" --quiet --acl public-read && rm -f "$f"
     done
@@ -50,6 +53,22 @@ julia_testing_factory.addSteps([
     steps.ShellCommand(
         name="Download Julia",
         command=download_julia,
+    ),
+
+    # Deploy helper functions
+    steps.FileDownload(
+        name="Deploy autodump.jl",
+        mastersrc="../commands/autodump.jl",
+        workerdest="autodump.jl",
+        doStepIf=is_windows,
+        hideStepIf=lambda results, s: results==SKIPPED,
+    ),
+    steps.FileDownload(
+        name="Deploy rr_capture.jl",
+        mastersrc="../commands/rr_capture.jl",
+        workerdest="rr_capture.jl",
+        doStepIf=is_linux,
+        hideStepIf=lambda results, s: results==SKIPPED,
     ),
 
     # Run tests!
@@ -118,17 +137,15 @@ julia_testing_factory.addSteps([
 
     # Upload and delete `.dmp` if they exist!
     steps.MultipleFileUpload(
-        workersrcs=["dumps/*.dmp"],
-        masterdest=util.Interpolate("/tmp/julia_dumps/win%(prop:bits)s/%(prop:buildnumber)s"),
+        workersrcs=["dumps/*"],
+        masterdest=util.Interpolate("/tmp/julia_dumps/%(prop:osname)s%(prop:bits)s/%(prop:buildnumber)s"),
         glob=True,
-        doStepIf=is_windows,
         alwaysRun=True,
     ),
 
     steps.MasterShellCommand(
-        name="Upload .dmp files",
-        command=render_upload_dmp_command,
-        doStepIf=is_windows,
+        name="Upload debugging files",
+        command=render_upload_debugging_files,
         alwaysRun=True,
     ),
 ])
@@ -172,5 +189,6 @@ c['schedulers'].append(schedulers.ForceScheduler(
             size=60,
             default="https://julialangnightlies-s3.julialang.org/bin/linux/x64/julia-latest-linux64.tar.gz"
         ),
+        util.BooleanParameter(name="use_rr", label="Use RR on linux{32,64} when running", default=False),
     ]
 ))
