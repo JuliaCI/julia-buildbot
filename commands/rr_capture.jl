@@ -16,7 +16,8 @@ mktempdir() do dir
     Pkg.add("rr_jll")
 
     rr_jll = Base.require(Base.PkgId(Base.UUID((0xe86bdf43_55f7_5ea2_9fd0_e7daa2c0f2b4)), "rr_jll"))
-    rr_jll.rr() do rr_path
+    rr(func) = Base.invokelatest(rr_jll.rr, func)
+    rr() do rr_path
         new_env = copy(ENV)
         new_env["_RR_TRACE_DIR"] = joinpath(dir, "rr_traces")
         new_env["JULIA_RR"] = "$(rr_path) record --nested=detach"
