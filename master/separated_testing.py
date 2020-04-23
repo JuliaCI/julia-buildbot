@@ -30,8 +30,8 @@ def render_upload_debugging_files(props_obj):
     upload_script = """
     # Skip files that are non-existent (e.g. if there ARE no `.dmp` files)
     shopt -s nullglob
-    for f in /tmp/julia_dumps/{osname}{bits}/{buildnumber}/*; do
-        path="{osname}{bits}/{buildnumber}/$(basename "$f")"
+    for f in /tmp/julia_dumps/{os_name}{bits}/{buildnumber}/*; do
+        path="{os_name}{bits}/{buildnumber}/$(basename "$f")"
         echo "uploading $(basename $f) to https://julialang-dumps.s3.amazonaws.com/$path"
         aws s3 cp "$f" "s3://julialang-dumps/$path" --quiet --acl public-read && rm -f "$f"
     done
