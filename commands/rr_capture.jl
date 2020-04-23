@@ -15,13 +15,13 @@ mktempdir() do dir
     Pkg.activate(dir)
     Pkg.add("rr_jll")
 
-    using rr_jll
-    rr() do rr_path
+    rr_jll = Base.require(Base.PkgId(Base.UUID((0xe86bdf43_55f7_5ea2_9fd0_e7daa2c0f2b4)), "rr_jll"))
+    rr_jll.rr() do rr_path
         new_env = copy(ENV)
         new_env["_RR_TRACE_DIR"] = joinpath(dir, "rr_traces")
         new_env["JULIA_RR"] = "$(rr_path) record --nested=detach"
         t_start = time()
-        proc = run(setenv(`rr record $ARGS`, new_env), (stdin, stdout, stderr); wait=false)
+        proc = run(setenv(`$(rr_path) record $ARGS`, new_env), (stdin, stdout, stderr); wait=false)
 
         # Start asynchronous timer that will kill `rr`
         @async begin
