@@ -18,7 +18,7 @@ def run_julia_tests(props_obj):
     if is_windows(props_obj):
         # On windows, we have a special autodump script
         cmd = ["bin\\julia.exe", "autodump.jl", str(props["buildnumber"]), props["shortcommit"], "bin\\julia.exe", "-e", test_cmd]
-    if is_linux(props_obj) and props_obj.getProperty('arch') in ('x86_64', 'i686') and props_obj.getProperty('use_rr', default=False):
+    if is_linux(props_obj) and props_obj.getProperty('tar_arch') in ('x86_64', 'i686') and props_obj.getProperty('use_rr', default=False):
         # On x86_64 and i686 linux, we have a special rr capturing script
         cmd = ["bin/julia", "rr_capture.jl", str(props["buildnumber"]), props["shortcommit"], "bin/julia", "-e", test_cmd]
 
