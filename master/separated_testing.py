@@ -193,7 +193,11 @@ c['schedulers'].append(schedulers.ForceScheduler(
         util.StringParameter(
             name="shortcommit",
             size=10,
-            default="1a2b3c4d"
         ),
+        util.StringParameter(
+            name="majmin",
+            size=3,
+            default="1.4",
+        )
     ]
 ))
