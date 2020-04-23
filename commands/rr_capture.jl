@@ -1,4 +1,4 @@
-using Pkg
+using Pkg, Dates
 
 if length(ARGS) < 3
     println(stderr, "Usage: rr_capture.jl [buildnumber] [shortcommit] [command...]")
