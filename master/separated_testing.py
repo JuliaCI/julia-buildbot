@@ -185,7 +185,7 @@ c['schedulers'].append(schedulers.ForceScheduler(
     ],
     properties=[
         util.StringParameter(
-            name="url",
+            name="download_url",
             size=60,
             default="https://julialangnightlies-s3.julialang.org/bin/linux/x64/julia-latest-linux64.tar.gz"
         ),
