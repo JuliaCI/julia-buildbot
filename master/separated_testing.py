@@ -190,5 +190,10 @@ c['schedulers'].append(schedulers.ForceScheduler(
             default="https://julialangnightlies-s3.julialang.org/bin/linux/x64/julia-latest-linux64.tar.gz"
         ),
         util.BooleanParameter(name="use_rr", label="Use RR on linux{32,64} when running", default=False),
+        util.StringParameter(
+            name="shortcommit",
+            size=10,
+            default="1a2b3c4d"
+        ),
     ]
 ))
