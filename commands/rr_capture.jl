@@ -9,6 +9,7 @@ const TIMEOUT = 2*60*60 # seconds
 
 run_id = popfirst!(ARGS)
 shortcommit = popfirst!(ARGS)
+num_cores = min(Sys.CPU_THREADS, 8, parse(Int, get(ENV, "JULIA_TEST_NUM_CORES", "8")))
 
 new_env = copy(ENV)
 mktempdir() do dir
@@ -22,7 +23,7 @@ mktempdir() do dir
         new_env["_RR_TRACE_DIR"] = joinpath(dir, "rr_traces")
         new_env["JULIA_RR"] = "$(rr_path) record --nested=detach"
         t_start = time()
-        proc = run(setenv(`$(rr_path) record $ARGS`, new_env), (stdin, stdout, stderr); wait=false)
+        proc = run(setenv(`$(rr_path) --num-cores=$(num_cores + 1) record $ARGS`, new_env), (stdin, stdout, stderr); wait=false)
 
         # Start asynchronous timer that will kill `rr`
         @async begin
