@@ -23,7 +23,7 @@ mktempdir() do dir
         new_env["_RR_TRACE_DIR"] = joinpath(dir, "rr_traces")
         new_env["JULIA_RR"] = "$(rr_path) record --nested=detach"
         t_start = time()
-        proc = run(setenv(`$(rr_path) --num-cores=$(num_cores + 1) record $ARGS`, new_env), (stdin, stdout, stderr); wait=false)
+        proc = run(setenv(`$(rr_path) record --num-cores=$(num_cores + 1) $ARGS`, new_env), (stdin, stdout, stderr); wait=false)
 
         # Start asynchronous timer that will kill `rr`
         @async begin
@@ -52,6 +52,11 @@ mktempdir() do dir
         # On a non-zero exit code, upload the `rr` trace
         if proc.exitcode != 0
             println(stderr, "`rr` returned $(proc.exitcode), packing and uploading traces...")
+
+            if !isdir(joinpath(dir, "rr_traces"))
+                println(stderr, "No `rr_traces` directory!  Did `rr` itself fail?")
+                exit(1)
+            end
 
             # Pack all traces
             trace_dirs = [joinpath(dir, "rr_traces", f) for f in readdir(joinpath(dir, "rr_traces"))]
