@@ -3,9 +3,14 @@
 # testing" that @staticfloat has been going on about for so many years...
 ###############################################################################
 
+def nonestr(x):
+    if x is None:
+        return x
+    return str(x)
+
 julia_testing_env = {
-    "JULIA_TEST_MAXRSS_MB": util.Property('maxrss', default=None),
-    "JULIA_TEST_NUM_CORES": util.Property('nthreads', default=None),
+    "JULIA_TEST_MAXRSS_MB": nonestr(util.Property('maxrss', default=None)),
+    "JULIA_TEST_NUM_CORES": nonestr(util.Property('nthreads', default=None)),
 }
 
 @util.renderer
