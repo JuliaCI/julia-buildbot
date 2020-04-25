@@ -36,6 +36,7 @@ def render_upload_debugging_files(props_obj):
         echo "uploading $(basename $f) to https://julialang-dumps.s3.amazonaws.com/$path"
         aws s3 cp "$f" "s3://julialang-dumps/$path" --quiet --acl public-read && rm -f "$f"
     done
+    rm -rf /tmp/julia_dumps/{os_name}{bits}/{buildnumber}
     """.format(**props)
     return ["bash", "-c", upload_script]
 
