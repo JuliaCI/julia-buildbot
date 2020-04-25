@@ -69,7 +69,7 @@ mktempdir() do dir
             # Tar it up
             mkpath("dumps")
             datestr = Dates.format(now(), dateformat"yyyy-mm-dd_HH_MM_SS") 
-            Pkg.PlatformEngines.package(dir, "dumps/rr-run$(run_id)-gitsha$(shortcommit)-$(datestr).tar.gz")
+            Pkg.PlatformEngines.package(dir, "dumps/rr-run_$(run_id)-gitsha_$(shortcommit)-$(datestr).tar.gz")
         end
 
         # Pass the exit code back up to buildbot
