@@ -63,7 +63,7 @@ mktempdir() do dir
             filter!(isdir, trace_dirs)
             for trace_dir in trace_dirs
                 println(stderr, " -> packing $(basename(trace_dir))")
-                run(`$(rr_path) pack $(trace_dir)`)
+                run(ignorestatus(`$(rr_path) pack $(trace_dir)`))
             end
 
             # Tar it up
