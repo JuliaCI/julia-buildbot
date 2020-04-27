@@ -19,9 +19,19 @@ mktempdir() do dir
     rr_jll = Base.require(Base.PkgId(Base.UUID((0xe86bdf43_55f7_5ea2_9fd0_e7daa2c0f2b4)), "rr_jll"))
     rr(func) = Base.invokelatest(rr_jll.rr, func)
     rr() do rr_path
+        capture_script_path = joinpath(dir, "capture_output.sh")
+        open(capture_script_path, "w") do io
+            write(io, """
+            #!/bin/bash
+
+            $(rr_path) record --nested=detach "$*" > >(tee -a $(dir)/stdout.log) 2> >(tee -a $(dir)/stderr.log >&2)
+            """)
+        end
+        chmod(capture_script_path, 0o755)
+
         new_env = copy(ENV)
         new_env["_RR_TRACE_DIR"] = joinpath(dir, "rr_traces")
-        new_env["JULIA_RR"] = "$(rr_path) record --nested=detach"
+        new_env["JULIA_RR"] = capture_script_path
         t_start = time()
         proc = run(setenv(`$(rr_path) record --num-cores=$(num_cores + 1) $ARGS`, new_env), (stdin, stdout, stderr); wait=false)
 
