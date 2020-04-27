@@ -38,6 +38,9 @@ c['workers'] = []
 for name in all_names:
     # Initialize `march` to `None`, as some buildbots (power8) don't set it
     march = None
+    
+    # Initialize `mcpu` to `None`, as most buildbots don't set it (only ARM)
+    mcpu = None
 
     # Initialize `llvm_cmake` to `None`, as no buildbots need it except armv7l
     llvm_cmake = None
