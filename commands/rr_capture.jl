@@ -24,7 +24,7 @@ mktempdir() do dir
             write(io, """
             #!/bin/bash
 
-            $(rr_path) record --nested=detach "\$*" > >(tee -a $(dir)/stdout.log) 2> >(tee -a $(dir)/stderr.log >&2)
+            $(rr_path) record --nested=detach \$* > >(tee -a $(dir)/stdout.log) 2> >(tee -a $(dir)/stderr.log >&2)
             """)
         end
         chmod(capture_script_path, 0o755)
