@@ -129,7 +129,8 @@ for name in all_names:
 
     if '-armv7l-' in name:
         tar_arch = 'armv7l'
-        mcpu = 'armv7-a'     # Better to set mcpu on arm https://github.com/JuliaCI/julia-buildbot/issues/148
+        # Better to set mcpu than march on arm https://github.com/JuliaCI/julia-buildbot/issues/148
+        mcpu = 'armv7-a'
         up_arch = 'armv7l'
         bits = 'armv7l'
 
