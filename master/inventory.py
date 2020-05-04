@@ -130,7 +130,7 @@ for name in all_names:
     if '-armv7l-' in name:
         tar_arch = 'armv7l'
         # Better to set mcpu than march on arm https://github.com/JuliaCI/julia-buildbot/issues/148
-        mcpu = 'arm7'
+        march = 'armv7-a'
         up_arch = 'armv7l'
         bits = 'armv7l'
 
@@ -155,7 +155,7 @@ for name in all_names:
         tar_arch = 'aarch64'
         up_arch = 'aarch64'
         bits = 'aarch64'
-        mcpu = 'arm8'    # Better to set mcpu on arm https://github.com/JuliaCI/julia-buildbot/issues/148
+        march = 'armv8-a'
         # We have a lot of cores and a lot of RAM, use them.
         nthreads = 8
         flags += 'JULIA_CPU_TARGET=generic '
