@@ -36,7 +36,7 @@ julia_package_factory.addSteps([
     # `.git` folder
     steps.ShellCommand(
         name="[Win] wipe state",
-        command=["del", "/s", "/q", "*"],
+        command=["del", "/f", "/s", "/q", "*"],
         flunkOnFailure=False,
         doStepIf=is_windows,
         hideStepIf=lambda results, s: results==SKIPPED,
