@@ -155,7 +155,7 @@ for name in all_names:
         tar_arch = 'aarch64'
         up_arch = 'aarch64'
         bits = 'aarch64'
-        mcpu = 'armv8-a'    # Better to set mcpu on arm https://github.com/JuliaCI/julia-buildbot/issues/148
+        mcpu = 'armv8.0-a'    # Better to set mcpu on arm https://github.com/JuliaCI/julia-buildbot/issues/148
         # We have a lot of cores and a lot of RAM, use them.
         nthreads = 8
         flags += 'JULIA_CPU_TARGET=generic '
