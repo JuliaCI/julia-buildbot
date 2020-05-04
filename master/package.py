@@ -33,10 +33,11 @@ julia_package_factory.addSteps([
 
     # Recursive `git clean` on windows is very slow. It is faster to
     # wipe the dir and reset it. Important is that we don't delete our
-    # `.git` folder
+    # `.git` folder.
     steps.ShellCommand(
         name="[Win] wipe state",
-        command=["del", "/f", "/s", "/q", "*"],
+        #command=["del", "/f", "/s", "/q", "*"],
+        command=["sh", "-c", "rm -rf *"],
         flunkOnFailure=False,
         doStepIf=is_windows,
         hideStepIf=lambda results, s: results==SKIPPED,
