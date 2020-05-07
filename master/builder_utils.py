@@ -160,6 +160,7 @@ def build_download_julia_cmd(props_obj):
     download_url = props_obj.getProperty("download_url")
 
     # Build commands to download/install julia
+    cmd = ""
     if is_mac(props_obj):
         # Download the .dmg
         cmd += "curl -L '%s' -o julia-installer.dmg && "%(download_url)
@@ -173,7 +174,7 @@ def build_download_julia_cmd(props_obj):
         cmd += "rm -f julia-installer.dmg"
     elif is_windows(props_obj):
         # Download the .exe
-        cmd = "curl -L '%s' -o julia-installer.exe && "%(download_url)
+        cmd += "curl -L '%s' -o julia-installer.exe && "%(download_url)
         # Make it executable
         cmd += "chmod +x julia-installer.exe && "
         # Extract it into the current directory.  Note that for 1.4, we switched to a different
