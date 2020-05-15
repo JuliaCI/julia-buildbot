@@ -128,9 +128,10 @@ def render_upload_command(props_obj):
     upload_tarball_name = props_obj.getProperty("upload_tarball_name")
     upload_tarball_path = upload_path.replace(upload_filename, upload_tarball_name)
     return ["sh", "-c",
+        "[ '%s' != '%s' ] && aws s3 cp --acl public-read /tmp/julia_package/%s s3://%s ;"%(upload_filename, upload_tarball_name, upload_tarball_name, upload_tarball_path) +
         "aws s3 cp --acl public-read /tmp/julia_package/%s.asc s3://%s.asc ; "%(upload_filename, upload_path) +
-        "aws s3 cp --acl public-read /tmp/julia_package/%s s3://%s ;"%(upload_filename, upload_path) +
-        "[ '%s' != '%s' ] && aws s3 cp --acl public-read /tmp/julia_package/%s s3://%s"%(upload_filename, upload_tarball_name, upload_tarball_name, upload_tarball_path)
+        "aws s3 cp --acl public-read /tmp/julia_package/%s s3://%s ;"%(upload_filename, upload_path)
+        
     ]
 
 @util.renderer
