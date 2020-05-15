@@ -31,12 +31,12 @@ def parse_git_log(return_code, stdout, stderr):
         "authoremail": lines[4],
     }
 
-def gen_local_filename(props_obj):
+def gen_local_filename(props_obj, ext=".{os_pkg_ext}"):
     props = props_obj_to_dict(props_obj)
 
     # Get the output of the `make print-JULIA_BINARYDIST_FILENAME` step
     artifact = "{artifact_filename}".format(**props).strip()
-    return artifact[26:] + ".{os_pkg_ext}".format(**props)
+    return artifact[26:] + ext.format(**props)
 
 # Map from property to upload OS name on the JuliaLang S3 bucket
 def get_upload_os_name(props):
@@ -51,13 +51,14 @@ def get_upload_os_name(props):
     else:
         return "linux"
 
-def gen_upload_filename(props_obj):
+def gen_upload_filename(props_obj, ext=".{os_pkg_ext}"):
     props = props_obj_to_dict(props_obj)
     # We don't like "winnt" at the end of files, we use just "win" instead.
     props["os_name_file"] = props["os_name"]
     if props["os_name_file"] == "winnt":
         props["os_name_file"] = "win"
-    return "julia-{shortcommit}-{os_name_file}{bits}.{os_pkg_ext}".format(**props)
+    filename_format = "julia-{shortcommit}-{os_name_file}{bits}%s"%(ext)
+    return filename_format.format(**props)
 
 def gen_upload_path(props_obj, namespace="bin", latest=False):
     # First, pull information out of props_obj
@@ -110,19 +111,26 @@ def gen_download_url(props_obj, namespace="bin", latest=False):
 def munge_artifact_filename(props_obj):
     # Generate our local and upload filenames
     local_filename = gen_local_filename(props_obj)
+    local_tarball_name = gen_local_filename(props_obj, ".tar.gz")
     upload_filename = gen_upload_filename(props_obj)
+    upload_tarball_name = gen_upload_filename(props_obj, ".tar.gz")
 
+    props_obj.setProperty("local_tarball_name", local_tarball_name, "munge_artifact_filename")
     props_obj.setProperty("local_filename", local_filename, "munge_artifact_filename")
     props_obj.setProperty("upload_filename", upload_filename, "munge_artifact_filename")
+    props_obj.setProperty("upload_tarball_name", upload_tarball_name, "munge_artifact_filename")
     return ["true"]
 
 @util.renderer
 def render_upload_command(props_obj):
     upload_path = gen_upload_path(props_obj, namespace="pretesting")
     upload_filename = props_obj.getProperty("upload_filename")
+    upload_tarball_name = props_obj.getProperty("upload_tarball_name")
+    upload_tarball_path = upload_path.replace(upload_filename, upload_tarball_name)
     return ["sh", "-c",
         "aws s3 cp --acl public-read /tmp/julia_package/%s.asc s3://%s.asc ; "%(upload_filename, upload_path) +
-        "aws s3 cp --acl public-read /tmp/julia_package/%s s3://%s"%(upload_filename, upload_path),
+        "aws s3 cp --acl public-read /tmp/julia_package/%s s3://%s ;"%(upload_filename, upload_path) +
+        "[ '%s' != '%s' ] && aws s3 cp --acl public-read /tmp/julia_package/%s s3://%s"%(upload_filename, upload_tarball_name, upload_tarball_name, upload_tarball_path)
     ]
 
 @util.renderer
