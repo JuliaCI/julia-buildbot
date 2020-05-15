@@ -165,12 +165,11 @@ julia_package_factory.addSteps([
 
     # Build exe installer on Windows
     steps.ShellCommand(
-        name="make exe",
+        name="make .exe",
         command=["sh", "-c", util.Interpolate("make %(prop:flags)s %(prop:extra_make_flags)s exe")],
+        haltOnFailure=True,
         doStepIf=is_windows,
         hideStepIf=lambda results, s: results==SKIPPED,
-        haltOnFailure=False,
-        flunkOnFailure=False,
         env=julia_package_env,
     ),
     
@@ -190,9 +189,18 @@ julia_package_factory.addSteps([
         command=["mkdir", "-p", "/tmp/julia_package"],
     ),
 
+    # Upload the built binaries
     steps.FileUpload(
+        name="Upload binary distribution",
         workersrc=util.Interpolate("%(prop:local_filename)s"),
         masterdest=util.Interpolate("/tmp/julia_package/%(prop:upload_filename)s"),
+    ),
+    steps.FileUpload(
+        name="Upload tarball",
+        workersrc=util.Interpolate("%(prop:local_tarball_name)s"),
+        masterdest=util.Interpolate("/tmp/julia_package/%(prop:upload_tarball_name)s"),
+        doStepIf=lambda props_obj: props_obj.getProperty("local_filename") != props_obj.getProperty("local_tarball_name"),
+        hideStepIf=lambda results, s: results==SKIPPED,
     ),
 
     steps.MasterShellCommand(
