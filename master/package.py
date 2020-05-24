@@ -203,6 +203,8 @@ julia_package_factory.addSteps([
         masterdest=util.Interpolate("/tmp/julia_package/%(prop:upload_tarball_name)s"),
         doStepIf=lambda props_obj: props_obj.getProperty("local_filename") != props_obj.getProperty("local_tarball_name"),
         hideStepIf=lambda results, s: results==SKIPPED,
+        haltOnFailure=False,
+        flunkOnFailure=False,
     ),
 
     steps.MasterShellCommand(
