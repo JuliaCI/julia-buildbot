@@ -60,7 +60,7 @@ def gen_upload_filename(props_obj, ext=".{os_pkg_ext}"):
     filename_format = "julia-{shortcommit}-{os_name_file}{bits}%s"%(ext)
     return filename_format.format(**props)
 
-def gen_upload_path(props_obj, namespace="bin", latest=False):
+def gen_upload_path(props_obj, namespace="bin", store_majmin=True, latest=False):
     # First, pull information out of props_obj
     up_arch = props_obj.getProperty("up_arch")
     majmin = props_obj.getProperty("majmin")
@@ -88,15 +88,15 @@ def gen_upload_path(props_obj, namespace="bin", latest=False):
     url += os + "/" + up_arch + "/"
 
     # If we're asking for latest, don't go into majmin
-    if not latest:
+    if store_majmin:
         url += majmin + "/"
     url += upload_filename
 
     return url
 
-def gen_download_url(props_obj, namespace="bin", latest=False):
+def gen_download_url(props_obj, namespace="bin", store_majmin=True, latest=False):
     base = 'https://s3.amazonaws.com'
-    return '%s/%s'%(base, gen_upload_path(props_obj, namespace=namespace, latest=latest))
+    return '%s/%s'%(base, gen_upload_path(props_obj, namespace=namespace, store_majmin=store_majmin, latest=latest))
 
 
 # This is a weird buildbot hack where we really want to parse the output of our
@@ -146,10 +146,13 @@ def render_promotion_command(props_obj):
 @util.renderer
 def render_latest_promotion_command(props_obj):
     src_path = gen_upload_path(props_obj, namespace="pretesting")
-    dst_path = gen_upload_path(props_obj, latest=True)
+    dst_majmin_path = gen_upload_path(props_obj, latest=True) 
+    dst_path = gen_upload_path(props_obj, store_majmin=False, latest=True)
     return ["sh", "-c",
         "aws s3 cp --acl public-read s3://%s.asc s3://%s.asc ; "%(src_path, dst_path) +
         "aws s3 cp --acl public-read s3://%s s3://%s"%(src_path, dst_path),
+        "aws s3 cp --acl public-read s3://%s.asc s3://%s.asc ; "%(src_path, dst_majmin_path) +
+        "aws s3 cp --acl public-read s3://%s s3://%s"%(src_path, dst_majmin_path),
     ]
 
 @util.renderer
@@ -217,7 +220,7 @@ def download_latest_julia(props_obj):
     )
     props_obj.setProperty(
         "download_url",
-        gen_download_url(props_obj, latest=True),
+        gen_download_url(props_obj, store_majmin=False, latest=True),
         "download_latest_julia",
     )
     return build_download_julia_cmd(props_obj)
