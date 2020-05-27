@@ -208,10 +208,8 @@ julia_package_factory.addSteps([
     ),
 
     steps.MasterShellCommand(
-        name="sign .tar.gz on master",
-        command=["sh", "-c", util.Interpolate("/root/sign_tarball.sh /tmp/julia_package/%(prop:upload_filename)s")],
-        doStepIf=lambda step: is_linux(step) or is_freebsd(step),
-        hideStepIf=lambda results, s: results==SKIPPED,
+        name="gpg sign tarball on master",
+        command=["sh", "-c", util.Interpolate("/root/sign_tarball.sh /tmp/julia_package/%(prop:upload_tarball_name)s")],
     ),
 
     # Upload it to AWS and cleanup the master!
