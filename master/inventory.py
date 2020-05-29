@@ -140,7 +140,12 @@ for name in all_names:
         maxrss = "900"
 
         # Sysimg multi-versioning!
-        flags += 'JULIA_CPU_TARGET="armv7-a;armv7-a,neon;armv7-a,neon,vfp4" '
+        cpu_targets = [
+            'armv7-a',
+            'armv7-a,neon',
+            'armv7-a,neon,vfp4',
+        ]
+        flags += 'JULIA_CPU_TARGET="%s" '%(';'.join(cpu_targets))
         # Force LLVM cmake build to use the armv7 triple instead of armv8 from uname
         # This might not be an actual issue since we are not building clang, but BSTS
         llvm_cmake = '-DLLVM_HOST_TRIPLE=armv7l-unknown-linux-gnueabihf -DLLVM_DEFAULT_TARGET_TRIPLE=armv7l-unknown-linux-gnueabihf'
@@ -158,7 +163,22 @@ for name in all_names:
         march = 'armv8-a'
         # We have a lot of cores and a lot of RAM, use them.
         nthreads = 8
-        flags += 'JULIA_CPU_TARGET=generic '
+        cpu_targets = [
+            # Base target
+            'generic',
+            # Cortex A57, Example: NVIDIA Jetson TX1, Jetson Nano
+            'cortex-a57',
+            # Cavium ThunderX2T99, a common server architecture
+            'thunderx2t99',
+            # Until we're on LLVM 11, 'carmel' as a CPU type doesn't exist, but we can
+            # cobble something together that is more or less equivalent:
+            #   https://github.com/llvm/llvm-project/commit/0863e94ebd87f4dea7a457c8441979ec4151fedb#diff-e7c1b2c4e39c03a58a53c9ae8e162886R183
+            # Note that we only use features defined within Julia itself here:
+            #   https://github.com/JuliaLang/julia/blob/adf6d521afd125f2de12a3209b342148d78981c2/src/features_aarch64.h
+            # Additionally, yichao asserts that `crc` is not needed.
+            'armv8.2-a,crypto,fullfp16,lse,rdm',
+        ]
+        flags += 'JULIA_CPU_TARGET="%s" '%(';'.join(cpu_targets))
 
     # Add MARCH to flags
     if not march is None:
