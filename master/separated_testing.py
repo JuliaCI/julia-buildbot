@@ -97,10 +97,16 @@ julia_testing_factory.addSteps([
         doStepIf=should_promote,
     ),
     steps.MasterShellCommand(
+        name="Promote on AWS",
+        command=render_majmin_promotion_command,
+        haltOnFailure=True,
+        doStepIf=should_promote,
+    ),
+    steps.MasterShellCommand(
         name="Promote on AWS (latest)",
         command=render_latest_promotion_command,
         haltOnFailure=True,
-        doStepIf=should_promote,
+        doStepIf=should_promote_latest,
     ),
 
     # Trigger coverage build if everything goes well

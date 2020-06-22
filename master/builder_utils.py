@@ -144,15 +144,21 @@ def render_promotion_command(props_obj):
     ]
 
 @util.renderer
-def render_latest_promotion_command(props_obj):
+def render_majmin_promotion_command(props_obj):
     src_path = gen_upload_path(props_obj, namespace="pretesting")
     dst_majmin_path = gen_upload_path(props_obj, latest=True) 
+    return ["sh", "-c",
+        "aws s3 cp --acl public-read s3://%s.asc s3://%s.asc ; "%(src_path, dst_majmin_path) +
+        "aws s3 cp --acl public-read s3://%s s3://%s"%(src_path, dst_majmin_path),
+    ]
+
+@util.renderer
+def render_latest_promotion_command(props_obj):
+    src_path = gen_upload_path(props_obj, namespace="pretesting")
     dst_path = gen_upload_path(props_obj, store_majmin=False, latest=True)
     return ["sh", "-c",
         "aws s3 cp --acl public-read s3://%s.asc s3://%s.asc ; "%(src_path, dst_path) +
         "aws s3 cp --acl public-read s3://%s s3://%s"%(src_path, dst_path),
-        "aws s3 cp --acl public-read s3://%s.asc s3://%s.asc ; "%(src_path, dst_majmin_path) +
-        "aws s3 cp --acl public-read s3://%s s3://%s"%(src_path, dst_majmin_path),
     ]
 
 @util.renderer
