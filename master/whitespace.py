@@ -37,7 +37,7 @@ julia_whitespace_factory.addSteps([
 
 c['schedulers'].append(schedulers.AnyBranchScheduler(
     name="Julia check whitespace",
-    change_filter=util.ChangeFilter(filter_fn=julia_ci_filter),
+    change_filter=util.ChangeFilter(filter_fn=julia_branch_filter),
     builderNames=["whitespace_linux32"],
     treeStableTimer=1,
 ))

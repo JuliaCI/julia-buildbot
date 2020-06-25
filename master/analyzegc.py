@@ -40,7 +40,7 @@ julia_analyzegc_factory.addSteps([
 # This is the CI scheduler, where we build an assert build and test it
 c['schedulers'].append(schedulers.AnyBranchScheduler(
     name="Julia GC Analysis",
-    change_filter=util.ChangeFilter(filter_fn=julia_ci_filter),
+    change_filter=util.ChangeFilter(filter_fn=julia_branch_nonskip_filter),
     builderNames=["analyzegc_linux64"],
     treeStableTimer=1,
 ))

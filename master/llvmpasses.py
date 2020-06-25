@@ -49,7 +49,7 @@ julia_llvmpasses_factory.addSteps([
 
 c['schedulers'].append(schedulers.AnyBranchScheduler(
     name="Julia test llvmpasses",
-    change_filter=util.ChangeFilter(filter_fn=julia_ci_filter),
+    change_filter=util.ChangeFilter(filter_fn=julia_branch_nonskip_filter),
     builderNames=["llvmpasses_linux64"],
     treeStableTimer=1,
 ))
