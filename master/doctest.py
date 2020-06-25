@@ -60,7 +60,7 @@ julia_doctest_factory.addSteps([
 
 c['schedulers'].append(schedulers.AnyBranchScheduler(
     name="Julia Doctesting",
-    change_filter=util.ChangeFilter(filter_fn=julia_ci_filter),
+    change_filter=util.ChangeFilter(filter_fn=julia_branch_nonskip_filter),
     builderNames=["doctest_linux64"],
     treeStableTimer=1,
 ))

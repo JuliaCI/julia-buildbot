@@ -65,10 +65,6 @@ class JuliaGithubListener(GitHubEventHandler):
                 logLevel=logging.DEBUG)
 
         head_msg = yield self._get_commit_msg(repo_full_name, head_sha)
-        if self._has_skip(head_msg):
-            log.msg("GitHub PR #{}, Ignoring: "
-                    "head commit message contains skip pattern".format(number))
-            return ([], 'git')
 
         action = payload.get('action')
         if action not in ('opened', 'reopened', 'synchronize'):
@@ -78,6 +74,7 @@ class JuliaGithubListener(GitHubEventHandler):
         properties = self.extractProperties(payload['pull_request'])
         properties.update({'event': event})
         properties.update({'basename': basename})
+        properties.update({'has_skip': self._has_skip(head_msg)})
 
         # Prefer the merge commit sha, if we can find it
         #revision = payload['pull_request']['merge_commit_sha']
