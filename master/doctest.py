@@ -54,7 +54,7 @@ julia_doctest_factory.addSteps([
             'DOCUMENTER_KEY': DOCUMENTER_KEY,
             'TRAVIS_PULL_REQUEST': 'false',
         },
-        doStepIf=is_protected_branch,
+        doStepIf=is_protected_pr,
     ),
 ])
 
