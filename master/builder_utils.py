@@ -67,7 +67,7 @@ def gen_upload_path(props_obj, namespace="bin", store_majmin=True, latest=False)
     upload_filename = props_obj.getProperty("upload_filename")
     assert_build = props_obj.getProperty("assert_build")
 
-    # If we're asking for the latest information, 
+    # If we're asking for the latest information,
     if latest and upload_filename[:6] == "julia-":
         split_name = upload_filename.split("-")
         upload_filename = "julia-latest-%s"%(split_name[2])
@@ -127,11 +127,16 @@ def render_upload_command(props_obj):
     upload_filename = props_obj.getProperty("upload_filename")
     upload_tarball_name = props_obj.getProperty("upload_tarball_name")
     upload_tarball_path = upload_path.replace(upload_filename, upload_tarball_name)
+    upload_zip_name = "%(prop:upload_filename)s.zip"
+    upload_zip_path = upload_path.replace(upload_filename, upload_zip_name)
+    zip_upload_cmd = ""
+    if is_windows():
+        zip_upload_cmd = "aws s3 cp --acl public-read /tmp/julia_package/%s s3://%s ;"
     return ["sh", "-c",
         "[ '%s' != '%s' ] && aws s3 cp --acl public-read /tmp/julia_package/%s s3://%s ;"%(upload_filename, upload_tarball_name, upload_tarball_name, upload_tarball_path) +
+        zip_upload_cmd%(upload_zip_name, upload_zip_path) +
         "aws s3 cp --acl public-read /tmp/julia_package/%s.asc s3://%s.asc ; "%(upload_filename, upload_path) +
         "aws s3 cp --acl public-read /tmp/julia_package/%s s3://%s ;"%(upload_filename, upload_path)
-        
     ]
 
 @util.renderer
@@ -146,7 +151,7 @@ def render_promotion_command(props_obj):
 @util.renderer
 def render_majmin_promotion_command(props_obj):
     src_path = gen_upload_path(props_obj, namespace="pretesting")
-    dst_majmin_path = gen_upload_path(props_obj, latest=True) 
+    dst_majmin_path = gen_upload_path(props_obj, latest=True)
     return ["sh", "-c",
         "aws s3 cp --acl public-read s3://%s.asc s3://%s.asc ; "%(src_path, dst_majmin_path) +
         "aws s3 cp --acl public-read s3://%s s3://%s"%(src_path, dst_majmin_path),
@@ -193,7 +198,7 @@ def build_download_julia_cmd(props_obj):
         # Extract it into the current directory.  Note that for 1.4, we switched to a different
         # compression scheme, meaning we must polymorph here.
         if props_obj.getProperty("majmin") in ("1.0", "1.1", "1.2", "1.3"):
-            cmd += "./julia-installer.exe /S /D=$(cygpath -w $(pwd)) && " 
+            cmd += "./julia-installer.exe /S /D=$(cygpath -w $(pwd)) && "
         else:
             cmd += "./julia-installer.exe /VERYSILENT /DIR=$(cygpath -w $(pwd)) && "
         # Remove the .exe

@@ -163,6 +163,15 @@ julia_package_factory.addSteps([
         env=julia_package_env,
     ),
 
+    # Convert tarball to zip on Windows
+    steps.ShellCommand(
+        name="make .zip",
+        command=["python", "-m", "../commands/tar2zip.py", util.Interpolate("%(prop:local_tarball_name)s")],
+        doStepIf=is_windows,
+        hideStepIf=lambda results, s: results==SKIPPED,
+        env=julia_package_env,
+    ),
+
     # Build exe installer on Windows
     steps.ShellCommand(
         name="make .exe",
@@ -174,7 +183,7 @@ julia_package_factory.addSteps([
         hideStepIf=lambda results, s: results==SKIPPED,
         env=julia_package_env,
     ),
-    
+
     # Sign windows installer .exe
     steps.ShellCommand(
         name="sign .exe (installer)",
@@ -202,6 +211,15 @@ julia_package_factory.addSteps([
         workersrc=util.Interpolate("%(prop:local_tarball_name)s"),
         masterdest=util.Interpolate("/tmp/julia_package/%(prop:upload_tarball_name)s"),
         doStepIf=lambda props_obj: props_obj.getProperty("local_filename") != props_obj.getProperty("local_tarball_name"),
+        hideStepIf=lambda results, s: results==SKIPPED,
+        haltOnFailure=False,
+        flunkOnFailure=False,
+    ),
+    steps.FileUpload(
+        name="Upload zip",
+        workersrc=util.Interpolate("%(prop:local_filename)s.zip"),
+        masterdest=util.Interpolate("/tmp/julia_package/%(prop:upload_filename)s.zip"),
+        doStepIf=is_windows,
         hideStepIf=lambda results, s: results==SKIPPED,
         haltOnFailure=False,
         flunkOnFailure=False,
@@ -248,7 +266,7 @@ julia_package_factory.addSteps([
 packager_mapping = {("package_" + k): v for k, v in builder_mapping.items()}
 
 def julia_branch_filter(c):
-    return ((c.project in ['JuliaLang/julia']) and 
+    return ((c.project in ['JuliaLang/julia']) and
             (c.category in ('pull', 'tag') or is_protected_branch(c.branch)))
 
 
@@ -389,4 +407,3 @@ c['schedulers'].append(schedulers.ForceScheduler(
         ),
     ],
 ))
-
