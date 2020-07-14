@@ -30,6 +30,8 @@ linux_names    += build_names("linux", ["armv7l"], ["firefly_%d"%(idx) for idx i
 linux_names    += build_names("linux", ["armv7l"], ["rock64_%d"%(idx) for idx in range(1,2)])
 musl_names      = build_names("musl", ["x86_64"], ["nureha_1"])
 macos_names     = build_names("macos", ["x86_64"], ["macmini", "macmini2", "macmini3"])
+macos_names    += build_names("macos", ["x86_64"], ["macmini-x64-%d"%(idx) for idx in range(1,7)])
+macos_names    += build_names("macos", ["aarch64"], ["macmini-aarch64-%d"%(idx) for idx in range(1,3)])
 freebsd_names   = build_names("freebsd", ["x86_64"], ["openstack_%d"%(idx) for idx in range(1,4)])
 all_names       = win_names + linux_names + musl_names + macos_names + freebsd_names
 
@@ -77,9 +79,6 @@ for name in all_names:
     elif name[:5] == "macos":
         os_name = "mac"
         os_pkg_ext = "dmg"
-
-        # core2 is the minimum MARCH we support
-        march = "core2"
 
         # Our macmini has fewer cores than we'd like
         nthreads = 5
@@ -226,6 +225,7 @@ all_names += ["tabularasa_" + x for x in all_names]
 namefilt = lambda arch, names: [n for n in names if arch in n]
 builder_mapping = {
     "macos64": namefilt("x86_64", macos_names),
+    "macosaarch64": namefilt("aarch64", macos_names),
     "win32": namefilt("i686", win_names),
     "win64": namefilt("x86_64", win_names),
     "linux32": namefilt("i686", linux_names),
