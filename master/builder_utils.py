@@ -127,7 +127,7 @@ def render_upload_command(props_obj):
     upload_filename = props_obj.getProperty("upload_filename")
     upload_tarball_name = props_obj.getProperty("upload_tarball_name")
     upload_tarball_path = upload_path.replace(upload_filename, upload_tarball_name)
-    upload_zip_name = "%(prop:upload_filename)s.zip"
+    upload_zip_name = props_obj.getProperty("upload_filename") + ".zip"
     upload_zip_path = upload_path.replace(upload_filename, upload_zip_name)
     zip_upload_cmd = ""
     if is_windows():
