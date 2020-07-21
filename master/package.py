@@ -162,14 +162,25 @@ julia_package_factory.addSteps([
         hideStepIf=lambda results, s: results==SKIPPED,
         env=julia_package_env,
     ),
-
-    # Convert tarball to zip on Windows
-    steps.ShellCommand(
-        name="make .zip",
-        command=["python", "../commands/tar2zip.py", util.Interpolate("%(prop:local_tarball_name)s")],
+    
+    # Deploy tar2zip, convert tarball to zip and cleanup
+    steps.FileDownload(
+        name="Deploy tar2zip.py",
+        mastersrc="../commands/tar2zip.py",
+        workerdest="tar2zip.py",
         doStepIf=is_windows,
         hideStepIf=lambda results, s: results==SKIPPED,
-        env=julia_package_env,
+    ),
+    steps.ShellCommand(
+        name="make .zip",
+        command=["python", "tar2zip.py", util.Interpolate("%(prop:local_tarball_name)s")],
+        doStepIf=is_windows,
+        hideStepIf=lambda results, s: results==SKIPPED,
+    ),
+    steps.ShellCommand(
+        command=["sh", "-c", "rm -f tar2zip.py"],
+        doStepIf=is_windows,
+        hideStepIf=lambda results, s: results==SKIPPED,
     ),
 
     # Build exe installer on Windows
