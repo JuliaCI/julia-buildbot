@@ -166,7 +166,7 @@ julia_package_factory.addSteps([
     # Convert tarball to zip on Windows
     steps.ShellCommand(
         name="make .zip",
-        command=["python", "-m", "../commands/tar2zip.py", util.Interpolate("%(prop:local_tarball_name)s")],
+        command=["python", "../commands/tar2zip.py", util.Interpolate("%(prop:local_tarball_name)s")],
         doStepIf=is_windows,
         hideStepIf=lambda results, s: results==SKIPPED,
         env=julia_package_env,
