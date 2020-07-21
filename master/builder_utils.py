@@ -111,13 +111,17 @@ def gen_download_url(props_obj, namespace="bin", store_majmin=True, latest=False
 def munge_artifact_filename(props_obj):
     # Generate our local and upload filenames
     local_filename = gen_local_filename(props_obj)
+    local_zip_name = gen_local_filename(props_obj, ".zip")
     local_tarball_name = gen_local_filename(props_obj, ".tar.gz")
     upload_filename = gen_upload_filename(props_obj)
+    upload_zip_name = gen_upload_filename(props_obj, ".zip")
     upload_tarball_name = gen_upload_filename(props_obj, ".tar.gz")
 
     props_obj.setProperty("local_tarball_name", local_tarball_name, "munge_artifact_filename")
+    props_obj.setProperty("local_zip_name", local_zip_name, "munge_artifact_filename")
     props_obj.setProperty("local_filename", local_filename, "munge_artifact_filename")
     props_obj.setProperty("upload_filename", upload_filename, "munge_artifact_filename")
+    props_obj.setProperty("upload_zip_name", upload_zip_name, "munge_artifact_filename")
     props_obj.setProperty("upload_tarball_name", upload_tarball_name, "munge_artifact_filename")
     return ["true"]
 
@@ -127,14 +131,14 @@ def render_upload_command(props_obj):
     upload_filename = props_obj.getProperty("upload_filename")
     upload_tarball_name = props_obj.getProperty("upload_tarball_name")
     upload_tarball_path = upload_path.replace(upload_filename, upload_tarball_name)
-    upload_zip_name = props_obj.getProperty("upload_filename") + ".zip"
+    upload_zip_name = props_obj.getProperty("upload_zip_name")
     upload_zip_path = upload_path.replace(upload_filename, upload_zip_name)
     zip_upload_cmd = ""
     if is_windows(props_obj):
-        zip_upload_cmd = "aws s3 cp --acl public-read /tmp/julia_package/%s s3://%s ;"
+        zip_upload_cmd = "aws s3 cp --acl public-read /tmp/julia_package/%s s3://%s ;"%(upload_zip_name, upload_zip_path)
     return ["sh", "-c",
         "[ '%s' != '%s' ] && aws s3 cp --acl public-read /tmp/julia_package/%s s3://%s ;"%(upload_filename, upload_tarball_name, upload_tarball_name, upload_tarball_path) +
-        zip_upload_cmd%(upload_zip_name, upload_zip_path) +
+        zip_upload_cmd +
         "aws s3 cp --acl public-read /tmp/julia_package/%s.asc s3://%s.asc ; "%(upload_filename, upload_path) +
         "aws s3 cp --acl public-read /tmp/julia_package/%s s3://%s ;"%(upload_filename, upload_path)
     ]

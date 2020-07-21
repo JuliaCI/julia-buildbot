@@ -228,8 +228,8 @@ julia_package_factory.addSteps([
     ),
     steps.FileUpload(
         name="Upload zip",
-        workersrc=util.Interpolate("%(prop:local_filename)s.zip"),
-        masterdest=util.Interpolate("/tmp/julia_package/%(prop:upload_filename)s.zip"),
+        workersrc=util.Interpolate("%(prop:local_zip_name)s"),
+        masterdest=util.Interpolate("/tmp/julia_package/%(prop:upload_zip_name)s"),
         doStepIf=is_windows,
         hideStepIf=lambda results, s: results==SKIPPED,
         haltOnFailure=False,
