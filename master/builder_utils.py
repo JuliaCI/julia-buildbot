@@ -130,7 +130,7 @@ def render_upload_command(props_obj):
     upload_zip_name = props_obj.getProperty("upload_filename") + ".zip"
     upload_zip_path = upload_path.replace(upload_filename, upload_zip_name)
     zip_upload_cmd = ""
-    if is_windows():
+    if is_windows(props_obj):
         zip_upload_cmd = "aws s3 cp --acl public-read /tmp/julia_package/%s s3://%s ;"
     return ["sh", "-c",
         "[ '%s' != '%s' ] && aws s3 cp --acl public-read /tmp/julia_package/%s s3://%s ;"%(upload_filename, upload_tarball_name, upload_tarball_name, upload_tarball_path) +
