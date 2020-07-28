@@ -250,7 +250,7 @@ julia_package_factory.addSteps([
 
     steps.MasterShellCommand(
         name="Cleanup Master",
-        command=["sh", "-c", util.Interpolate("rm -vf /tmp/julia_package/%(prop:upload_filename)s* ; rm -vf /tmp/julia_package/%(prop:upload_tarball_name)s*")],
+        command=["sh", "-c", util.Interpolate("rm -vf /tmp/julia_package/%(prop:upload_filename)s* ; rm -vf /tmp/julia_package/%(prop:upload_tarball_name)s* ; rm -vf /tmp/julia_package/%(prop:upload_zip_name)s*")],
     ),
 
     # Trigger a download of this file onto another worker for testing
