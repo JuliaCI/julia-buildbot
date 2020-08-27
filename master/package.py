@@ -3,6 +3,7 @@ julia_package_env = {
     'CPPFLAGS': None,
     'LLVM_CMAKE': util.Property('llvm_cmake', default=None),
     'MACOS_CODESIGN_IDENTITY': MACOS_CODESIGN_IDENTITY,
+    'INNO_ARGS': '/Dsign=true "/Smysigntool=\$$q`cygpath -w /bin/sh`\$$q -c ~/sign.sh \$$f"',
 }
 
 # Steps to build a `make binary-dist` tarball that should work on every platform
@@ -193,16 +194,6 @@ julia_package_factory.addSteps([
         doStepIf=is_windows,
         hideStepIf=lambda results, s: results==SKIPPED,
         env=julia_package_env,
-    ),
-
-    # Sign windows installer .exe
-    steps.ShellCommand(
-        name="sign .exe (installer)",
-        command=["sh", "-c", util.Interpolate("~/sign.sh \"%(prop:local_filename)s\"")],
-        doStepIf=is_windows,
-        hideStepIf=lambda results, s: results==SKIPPED,
-        haltOnFailure=False,
-        flunkOnFailure=False,
     ),
 
     # Transfer the result to the buildmaster for uploading to AWS
