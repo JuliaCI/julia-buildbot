@@ -3,7 +3,7 @@ julia_package_env = {
     'CPPFLAGS': None,
     'LLVM_CMAKE': util.Property('llvm_cmake', default=None),
     'MACOS_CODESIGN_IDENTITY': MACOS_CODESIGN_IDENTITY,
-    'INNO_ARGS': '/Dsign=true "/Smysigntool=\$$q`cygpath -w /bin/sh` -c ~/sign.sh \$$f\$$q"',
+    'INNO_ARGS': '/Dsign=true "/Smysigntool=powershell -NoProfile ~/sign.ps1 \$$f"',
 }
 
 # Steps to build a `make binary-dist` tarball that should work on every platform
