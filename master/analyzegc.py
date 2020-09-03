@@ -28,8 +28,15 @@ julia_analyzegc_factory.addSteps([
         command=["/bin/sh", "-c", util.Interpolate("%(prop:make_cmd)s -j%(prop:nthreads)s %(prop:flags)s %(prop:extra_make_flags)s -C deps install-llvm install-libuv install-utf8proc install-unwind")],
         haltOnFailure = True,
     ),
+
+    # Run clangsa
+    steps.ShellCommand(
+        name="Run analysis",
+        command=["/bin/sh", "-c", util.Interpolate("%(prop:make_cmd)s -j%(prop:nthreads)s %(prop:flags)s %(prop:extra_make_flags)s -C test/clangsa")],
+        haltOnFailure = True,
+    ),
     
-    # Install necessary dependencies
+    # Run analyzegc
     steps.ShellCommand(
         name="Run analysis",
         command=["/bin/sh", "-c", util.Interpolate("%(prop:make_cmd)s -j%(prop:nthreads)s %(prop:flags)s %(prop:extra_make_flags)s -C src analyzegc")],
