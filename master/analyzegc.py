@@ -31,14 +31,14 @@ julia_analyzegc_factory.addSteps([
 
     # Run clangsa
     steps.ShellCommand(
-        name="Run analysis",
+        name="Run clangsa",
         command=["/bin/sh", "-c", util.Interpolate("%(prop:make_cmd)s -j%(prop:nthreads)s %(prop:flags)s %(prop:extra_make_flags)s -C test/clangsa")],
         haltOnFailure = True,
     ),
     
     # Run analyzegc
     steps.ShellCommand(
-        name="Run analysis",
+        name="Run analyzegc",
         command=["/bin/sh", "-c", util.Interpolate("%(prop:make_cmd)s -j%(prop:nthreads)s %(prop:flags)s %(prop:extra_make_flags)s -C src analyzegc")],
         haltOnFailure = True,
     ),
