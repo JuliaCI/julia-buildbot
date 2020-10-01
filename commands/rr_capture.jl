@@ -24,8 +24,7 @@ mktempdir() do dir
             write(io, """
             #!/bin/bash
 
-            DIR="\$( cd "\$( dirname "\${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
-            /lib/ld-linux.so.2 --library-path "\${DIR}/lib/julia" $(rr_path) record --nested=detach \$* > >(tee -a $(dir)/stdout.log) 2> >(tee -a $(dir)/stderr.log >&2)
+            /lib/ld-linux.so.2 --library-path "$(rr_jll.LIBPATH)" $(rr_path) record --nested=detach \$* > >(tee -a $(dir)/stdout.log) 2> >(tee -a $(dir)/stderr.log >&2)
             """)
         end
         chmod(capture_script_path, 0o755)
@@ -34,7 +33,7 @@ mktempdir() do dir
         new_env["_RR_TRACE_DIR"] = joinpath(dir, "rr_traces")
         new_env["JULIA_RR"] = capture_script_path
         t_start = time()
-        proc = run(setenv(`$(rr_path) record --num-cores=$(num_cores + 1) $ARGS`, new_env), (stdin, stdout, stderr); wait=false)
+        proc = run(setenv(`/lib/ld-linux.so.2 --library-path "$(rr_jll.LIBPATH)" $(rr_path) record --num-cores=$(num_cores + 1) $ARGS`, new_env), (stdin, stdout, stderr); wait=false)
 
         # Start asynchronous timer that will kill `rr`
         @async begin
