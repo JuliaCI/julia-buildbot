@@ -20,11 +20,12 @@ mktempdir() do dir
     rr(func) = Base.invokelatest(rr_jll.rr, func; adjust_LIBPATH=false)
     rr() do rr_path
         capture_script_path = joinpath(dir, "capture_output.sh")
+        loader = Sys.WORD_SIZE == 64 ? "/lib64/ld-linux-x86-64.so.2" : "/lib/ld-linux.so.2"
         open(capture_script_path, "w") do io
             write(io, """
             #!/bin/bash
 
-            /lib64/ld-linux.so.2 --library-path "$(rr_jll.LIBPATH)" $(rr_path) record --nested=detach \$* > >(tee -a $(dir)/stdout.log) 2> >(tee -a $(dir)/stderr.log >&2)
+            $(loader) --library-path "$(rr_jll.LIBPATH)" $(rr_path) record --nested=detach \$* > >(tee -a $(dir)/stdout.log) 2> >(tee -a $(dir)/stderr.log >&2)
             """)
         end
         chmod(capture_script_path, 0o755)
@@ -33,7 +34,7 @@ mktempdir() do dir
         new_env["_RR_TRACE_DIR"] = joinpath(dir, "rr_traces")
         new_env["JULIA_RR"] = capture_script_path
         t_start = time()
-        proc = run(setenv(`/lib64/ld-linux.so.2 --library-path "$(rr_jll.LIBPATH)" $(rr_path) record --num-cores=$(num_cores + 1) $ARGS`, new_env), (stdin, stdout, stderr); wait=false)
+        proc = run(setenv(`$(loader) --library-path "$(rr_jll.LIBPATH)" $(rr_path) record --num-cores=$(num_cores + 1) $ARGS`, new_env), (stdin, stdout, stderr); wait=false)
 
         # Start asynchronous timer that will kill `rr`
         @async begin
