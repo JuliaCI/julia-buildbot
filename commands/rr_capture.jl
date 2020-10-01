@@ -18,13 +18,14 @@ mktempdir() do dir
 
     rr_jll = Base.require(Base.PkgId(Base.UUID((0xe86bdf43_55f7_5ea2_9fd0_e7daa2c0f2b4)), "rr_jll"))
     rr(func) = Base.invokelatest(rr_jll.rr, func)
-    rr() do rr_path
+    rr(;adjust_LIBPATH=false) do rr_path
         capture_script_path = joinpath(dir, "capture_output.sh")
         open(capture_script_path, "w") do io
             write(io, """
             #!/bin/bash
 
-            $(rr_path) record --nested=detach \$* > >(tee -a $(dir)/stdout.log) 2> >(tee -a $(dir)/stderr.log >&2)
+            DIR="\$( cd "\$( dirname "\${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+            /lib/ld-linux.so.2 --library-path "\${DIR}/lib/julia" $(rr_path) record --nested=detach \$* > >(tee -a $(dir)/stdout.log) 2> >(tee -a $(dir)/stderr.log >&2)
             """)
         end
         chmod(capture_script_path, 0o755)
