@@ -17,8 +17,8 @@ mktempdir() do dir
     Pkg.add("rr_jll")
 
     rr_jll = Base.require(Base.PkgId(Base.UUID((0xe86bdf43_55f7_5ea2_9fd0_e7daa2c0f2b4)), "rr_jll"))
-    rr(func) = Base.invokelatest(rr_jll.rr, func)
-    rr(;adjust_LIBPATH=false) do rr_path
+    rr(func) = Base.invokelatest(rr_jll.rr, func; adjust_LIBPATH=false)
+    rr() do rr_path
         capture_script_path = joinpath(dir, "capture_output.sh")
         open(capture_script_path, "w") do io
             write(io, """
