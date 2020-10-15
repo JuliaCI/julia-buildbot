@@ -144,6 +144,42 @@ def render_upload_command(props_obj):
     ]
 
 @util.renderer
+def render_srcdist_upload_command(props_obj):
+    JULIA_VERSION = props_obj.getProperty("JULIA_VERSION")
+    JULIA_COMMIT = props_obj.getProperty("JULIA_COMMIT")
+    majmin = JULIA_VERSION[0:3]
+
+    # First, the most specific names
+    light_filename = "julia-" + JULIA_VERSION + "_" + JULIA_COMMIT + ".tar.gz"
+    full_filename  = "julia-" + JULIA_VERSION + "_" + JULIA_COMMIT + "-full.tar.gz"
+    light_upload_path = "julialangnightlies/src/" + majmin + "/julia-" + majmin + "-" + JULIA_COMMIT + ".tar.gz"
+    full_upload_path  = "julialangnightlies/src/" + majmin + "/julia-" + majmin + "-" + JULIA_COMMIT + "-full.tar.gz"
+
+    # Next, the majmin-latest paths
+    light_majmin_latest_path = "julialangnightlies/src/" + majmin + "/julia-latest.tar.gz"
+    full_majmin_latest_path  = "julialangnightlies/src/" + majmin + "/julia-latest-full.tar.gz"
+
+    # Finally, the latest paths
+    light_latest_path = "julialangnightlies/src/julia-latest.tar.gz"
+    full_latest_path  = "julialangnightlies/src/julia-latest-full.tar.gz"
+
+    cmds = ""
+    # First, build up the commands to upload the majmin-specific names
+    for (filename, path) in ((light_filename, light_upload_path), (full_filename, full_upload_path)):
+        cmds += "aws s3 cp --acl public-read /tmp/julia_package/%s.asc s3://%s.asc ; "%(filename, path)
+        cmds += "aws s3 cp --acl public-read /tmp/julia_package/%s s3://%s ; "%(filename, path)
+    
+    # Next, We'll copy these to the majmin-latest and latest paths
+    for (path, majmin_latest_path, latest_path) in ((light_upload_path, light_majmin_latest_path, light_latest_path), (full_upload_path, full_majmin_latest_path, full_latest_path)):
+        cmds += "aws s3 cp --acl public-read s3://%s.asc s3://%s.asc ; "%(path, majmin_latest_path)
+        cmds += "aws s3 cp --acl public-read s3://%s s3://%s ; "%(path, majmin_latest_path)
+        cmds += "aws s3 cp --acl public-read s3://%s.asc s3://%s.asc ; "%(path, latest_path)
+        cmds += "aws s3 cp --acl public-read s3://%s s3://%s ; "%(path, latest_path)
+
+    # Chop off the final `"; "` before passing to `sh`:
+    return ["sh", "-c", cmds[:-2]]
+
+@util.renderer
 def render_promotion_command(props_obj):
     src_path = gen_upload_path(props_obj, namespace="pretesting")
     dst_path = gen_upload_path(props_obj)
