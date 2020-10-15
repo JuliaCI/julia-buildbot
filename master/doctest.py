@@ -24,7 +24,7 @@ julia_doctest_factory.addSteps([
     # Make Julia itself
     steps.ShellCommand(
         name="make release",
-        command=["/bin/sh", "-c", util.Interpolate("%(prop:make_cmd)s -j%(prop:nthreads)s %(prop:flags)s %(prop:extra_make_flags)s release")],
+        command=["/bin/sh", "-c", util.Interpolate("%(prop:make_cmd)s -j%(prop:nthreads)s JULIA_PRECOMPILE=0 %(prop:flags)s %(prop:extra_make_flags)s release")],
         haltOnFailure = True,
         # Fail out if 60 minutes have gone by with nothing printed to stdout
         timeout=60*60,
@@ -36,7 +36,7 @@ julia_doctest_factory.addSteps([
 
     steps.ShellCommand(
         name="make doctest",
-        command=["/bin/sh", "-c", util.Interpolate("%(prop:make_cmd)s -C doc -j%(prop:nthreads)s %(prop:flags)s %(prop:extra_make_flags)s doctest=true")],
+        command=["/bin/sh", "-c", util.Interpolate("%(prop:make_cmd)s -C doc JULIA_PRECOMPILE=0 -j%(prop:nthreads)s %(prop:flags)s %(prop:extra_make_flags)s doctest=true")],
         haltOnFailure = True,
         # Fail out if 60 minutes have gone by with nothing printed to stdout
         timeout=60*60,
@@ -48,7 +48,7 @@ julia_doctest_factory.addSteps([
 
     steps.ShellCommand(
         name="make deploy",
-        command=["/bin/sh", "-c", util.Interpolate("%(prop:make_cmd)s -C doc deploy %(prop:flags)s %(prop:extra_make_flags)s")],
+        command=["/bin/sh", "-c", util.Interpolate("%(prop:make_cmd)s -C doc JULIA_PRECOMPILE=0 %(prop:flags)s %(prop:extra_make_flags)s deploy")],
         haltOnFailure=True,
         env={
             'DOCUMENTER_KEY': DOCUMENTER_KEY,
@@ -60,13 +60,13 @@ julia_doctest_factory.addSteps([
     # We've already got Julia and the docs built; so let's build the source tarballs too
     steps.ShellCommand(
         name="make light-source-dist",
-        command=["/bin/sh", "-c", util.Interpolate("%(prop:make_cmd)s -j%(prop:nthreads)s %(prop:flags)s %(prop:extra_make_flags)s light-source-dist")],
+        command=["/bin/sh", "-c", util.Interpolate("%(prop:make_cmd)s -j%(prop:nthreads)s JULIA_PRECOMPILE=0 %(prop:flags)s %(prop:extra_make_flags)s light-source-dist")],
         haltOnFailure = True,
         doStepIf=is_protected_pr,
     ),
     steps.ShellCommand(
         name="make full-source-dist",
-        command=["/bin/sh", "-c", util.Interpolate("%(prop:make_cmd)s -j%(prop:nthreads)s %(prop:flags)s %(prop:extra_make_flags)s full-source-dist")],
+        command=["/bin/sh", "-c", util.Interpolate("%(prop:make_cmd)s -j%(prop:nthreads)s JULIA_PRECOMPILE=0 %(prop:flags)s %(prop:extra_make_flags)s full-source-dist")],
         haltOnFailure = True,
         doStepIf=is_protected_pr,
     ),
