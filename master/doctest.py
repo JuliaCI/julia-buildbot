@@ -60,13 +60,19 @@ julia_doctest_factory.addSteps([
     # We've already got Julia and the docs built; so let's build the source tarballs too
     steps.ShellCommand(
         name="make light-source-dist",
-        command=["/bin/sh", "-c", util.Interpolate("%(prop:make_cmd)s -j%(prop:nthreads)s JULIA_PRECOMPILE=0 %(prop:flags)s %(prop:extra_make_flags)s light-source-dist")],
+        command=["/bin/sh", "-c", util.Interpolate("%(prop:make_cmd)s -j%(prop:nthreads)s JULIA_PRECOMPILE=0 USE_BINARYBUILDER=0 %(prop:flags)s %(prop:extra_make_flags)s light-source-dist")],
         haltOnFailure = True,
         doStepIf=is_protected_pr,
     ),
     steps.ShellCommand(
-        name="make full-source-dist",
-        command=["/bin/sh", "-c", util.Interpolate("%(prop:make_cmd)s -j%(prop:nthreads)s JULIA_PRECOMPILE=0 %(prop:flags)s %(prop:extra_make_flags)s full-source-dist")],
+        name="make full-source-dist (without BB)",
+        command=["/bin/sh", "-c", util.Interpolate("%(prop:make_cmd)s -j%(prop:nthreads)s JULIA_PRECOMPILE=0 USE_BINARYBUILDER=0 %(prop:flags)s %(prop:extra_make_flags)s full-source-dist")],
+        haltOnFailure = True,
+        doStepIf=is_protected_pr,
+    ),
+    steps.ShellCommand(
+        name="make full-source-dist (with BB)",
+        command=["/bin/sh", "-c", util.Interpolate("%(prop:make_cmd)s -j%(prop:nthreads)s JULIA_PRECOMPILE=0 USE_BINARYBUILDER=1 %(prop:flags)s %(prop:extra_make_flags)s full-source-dist")],
         haltOnFailure = True,
         doStepIf=is_protected_pr,
     ),
@@ -76,15 +82,11 @@ julia_doctest_factory.addSteps([
         name="Get JULIA_VERSION",
         command=[util.Interpolate("%(prop:make_cmd)s"), "print-JULIA_VERSION"],
         property="JULIA_VERSION",
-        doStepIf=is_protected_pr,
-        hideStepIf=lambda results, s: results==SKIPPED,
     ),
     steps.SetPropertyFromCommand(
         name="Get JULIA_COMMIT",
         command=[util.Interpolate("%(prop:make_cmd)s"), "print-JULIA_COMMIT"],
         property="JULIA_COMMIT",
-        doStepIf=is_protected_pr,
-        hideStepIf=lambda results, s: results==SKIPPED,
     ),
 
     steps.FileUpload(
@@ -101,8 +103,15 @@ julia_doctest_factory.addSteps([
         doStepIf=is_protected_pr,
         hideStepIf=lambda results, s: results==SKIPPED,
     ),
+    steps.FileUpload(
+        name="Upload full source tarball",
+        workersrc=util.Interpolate("julia-%(prop:JULIA_VERSION)s_%(prop:JULIA_COMMIT)s-full+bb.tar.gz"),
+        masterdest=util.Interpolate("/tmp/julia_package/julia-%(prop:JULIA_VERSION)s_%(prop:JULIA_COMMIT)s-full+bb.tar.gz"),
+        doStepIf=is_protected_pr,
+        hideStepIf=lambda results, s: results==SKIPPED,
+    ),
 
-    # Sign and upload on teh master
+    # Sign and upload on the master
     steps.MasterShellCommand(
         name="gpg sign light source tarball on master",
         command=["sh", "-c", util.Interpolate("/root/sign_tarball.sh /tmp/julia_package/julia-%(prop:JULIA_VERSION)s_%(prop:JULIA_COMMIT)s.tar.gz")],

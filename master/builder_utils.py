@@ -149,28 +149,36 @@ def render_srcdist_upload_command(props_obj):
     JULIA_COMMIT = props_obj.getProperty("JULIA_COMMIT")
     majmin = JULIA_VERSION[0:3]
 
-    # First, the most specific names
-    light_filename = "julia-" + JULIA_VERSION + "_" + JULIA_COMMIT + ".tar.gz"
-    full_filename  = "julia-" + JULIA_VERSION + "_" + JULIA_COMMIT + "-full.tar.gz"
-    light_upload_path = "julialangnightlies/src/" + majmin + "/julia-" + majmin + "-" + JULIA_COMMIT + ".tar.gz"
-    full_upload_path  = "julialangnightlies/src/" + majmin + "/julia-" + majmin + "-" + JULIA_COMMIT + "-full.tar.gz"
+    # First, the most specific names.
+    light_filename  = "julia-" + JULIA_VERSION + "_" + JULIA_COMMIT + ".tar.gz"
+    full_filename   = "julia-" + JULIA_VERSION + "_" + JULIA_COMMIT + "-full.tar.gz"
+    fullbb_filename = "julia-" + JULIA_VERSION + "_" + JULIA_COMMIT + "-full+bb.tar.gz"
+    light_upload_path  = "julialangnightlies/src/" + majmin + "/julia-" + majmin + "-" + JULIA_COMMIT + ".tar.gz"
+    full_upload_path   = "julialangnightlies/src/" + majmin + "/julia-" + majmin + "-" + JULIA_COMMIT + "-full.tar.gz"
+    fullbb_upload_path = "julialangnightlies/src/" + majmin + "/julia-" + majmin + "-" + JULIA_COMMIT + "-full+bb.tar.gz"
 
     # Next, the majmin-latest paths
-    light_majmin_latest_path = "julialangnightlies/src/" + majmin + "/julia-latest.tar.gz"
-    full_majmin_latest_path  = "julialangnightlies/src/" + majmin + "/julia-latest-full.tar.gz"
+    light_majmin_latest_path  = "julialangnightlies/src/" + majmin + "/julia-latest.tar.gz"
+    full_majmin_latest_path   = "julialangnightlies/src/" + majmin + "/julia-latest-full.tar.gz"
+    fullbb_majmin_latest_path = "julialangnightlies/src/" + majmin + "/julia-latest-full+bb.tar.gz"
 
     # Finally, the latest paths
-    light_latest_path = "julialangnightlies/src/julia-latest.tar.gz"
-    full_latest_path  = "julialangnightlies/src/julia-latest-full.tar.gz"
+    light_latest_path  = "julialangnightlies/src/julia-latest.tar.gz"
+    full_latest_path   = "julialangnightlies/src/julia-latest-full.tar.gz"
+    fullbb_latest_path = "julialangnightlies/src/julia-latest-full+bb.tar.gz"
 
     cmds = ""
     # First, build up the commands to upload the majmin-specific names
-    for (filename, path) in ((light_filename, light_upload_path), (full_filename, full_upload_path)):
+    for (filename, path) in ((light_filename, light_upload_path),
+                             (full_filename, full_upload_path),
+                             (fullbb_filename, fullbb_upload_path)):
         cmds += "aws s3 cp --acl public-read /tmp/julia_package/%s.asc s3://%s.asc ; "%(filename, path)
         cmds += "aws s3 cp --acl public-read /tmp/julia_package/%s s3://%s ; "%(filename, path)
     
     # Next, We'll copy these to the majmin-latest and latest paths
-    for (path, majmin_latest_path, latest_path) in ((light_upload_path, light_majmin_latest_path, light_latest_path), (full_upload_path, full_majmin_latest_path, full_latest_path)):
+    for (path, majmin_latest_path, latest_path) in ((light_upload_path, light_majmin_latest_path, light_latest_path),
+                                                    (full_upload_path, full_majmin_latest_path, full_latest_path),
+                                                    (fullbb_upload_path, fullbb_majmin_latest_path, fullbb_latest_path)):
         cmds += "aws s3 cp --acl public-read s3://%s.asc s3://%s.asc ; "%(path, majmin_latest_path)
         cmds += "aws s3 cp --acl public-read s3://%s s3://%s ; "%(path, majmin_latest_path)
         cmds += "aws s3 cp --acl public-read s3://%s.asc s3://%s.asc ; "%(path, latest_path)
