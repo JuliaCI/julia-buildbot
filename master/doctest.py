@@ -104,7 +104,7 @@ julia_doctest_factory.addSteps([
         hideStepIf=lambda results, s: results==SKIPPED,
     ),
     steps.FileUpload(
-        name="Upload full source tarball",
+        name="Upload full source+bb tarball",
         workersrc=util.Interpolate("julia-%(prop:JULIA_VERSION)s_%(prop:JULIA_COMMIT)s-full+bb.tar.gz"),
         masterdest=util.Interpolate("/tmp/julia_package/julia-%(prop:JULIA_VERSION)s_%(prop:JULIA_COMMIT)s-full+bb.tar.gz"),
         doStepIf=is_protected_pr,
