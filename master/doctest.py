@@ -81,12 +81,12 @@ julia_doctest_factory.addSteps([
     steps.SetPropertyFromCommand(
         name="Get JULIA_VERSION",
         command=[util.Interpolate("%(prop:make_cmd)s"), "print-JULIA_VERSION"],
-        property="JULIA_VERSION",
+        extract_fn=lambda rc, stdout, stderr: {"JULIA_VERSION": stdout[stdout.find('=')+1:]}
     ),
     steps.SetPropertyFromCommand(
         name="Get JULIA_COMMIT",
         command=[util.Interpolate("%(prop:make_cmd)s"), "print-JULIA_COMMIT"],
-        property="JULIA_COMMIT",
+        extract_fn=lambda rc, stdout, stderr: {"JULIA_COMMIT": stdout[stdout.find('=')+1:]}
     ),
 
     steps.FileUpload(
