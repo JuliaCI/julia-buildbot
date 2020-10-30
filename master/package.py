@@ -67,16 +67,6 @@ julia_package_factory.addSteps([
         hideStepIf=lambda results, s: results==SKIPPED,
         env=julia_package_env,
     ),
-    # Temporary work-around for https://github.com/JuliaLang/julia/pull/32918#issuecomment-522158829
-    steps.ShellCommand(
-        name="Temporary 7z fixup for Pkg",
-        command=["sh", "-c", util.Interpolate("mkdir -p usr/bin; cp -v dist-extras/7z.* usr/bin/")],
-        haltOnFailure = False,
-        flunkOnFailure = False,
-        doStepIf=is_windows,
-        hideStepIf=lambda results, s: results==SKIPPED,
-        env=julia_package_env,
-    ),
 
     # Make release (we don't automatically build debug)
     steps.ShellCommand(
