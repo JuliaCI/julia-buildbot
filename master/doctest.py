@@ -72,7 +72,7 @@ julia_doctest_factory.addSteps([
     # We've already got Julia and the docs built; so let's build the source tarballs too
     steps.ShellCommand(
         name="make light-source-dist",
-        command=["/bin/sh", "-c", util.Interpolate("%(prop:make_cmd)s -j%(prop:nthreads)s JULIA_PRECOMPILE=0 USE_BINARYBUILDER=0 %(prop:flags)s %(prop:extra_make_flags)s light-source-dist")],
+        command=["/bin/sh", "-c", util.Interpolate("%(prop:make_cmd)s -j%(prop:nthreads)s JULIA_PRECOMPILE=0 USE_BINARYBUILDER=0 light-source-dist")],
         haltOnFailure = True,
         doStepIf=is_protected_pr,
     ),
@@ -86,7 +86,7 @@ julia_doctest_factory.addSteps([
 
     steps.ShellCommand(
         name="make full-source-dist (without BB)",
-        command=["/bin/sh", "-c", util.Interpolate("%(prop:make_cmd)s -j%(prop:nthreads)s JULIA_PRECOMPILE=0 USE_BINARYBUILDER=0 %(prop:flags)s %(prop:extra_make_flags)s full-source-dist")],
+        command=["/bin/sh", "-c", util.Interpolate("%(prop:make_cmd)s -j%(prop:nthreads)s JULIA_PRECOMPILE=0 USE_BINARYBUILDER=0 full-source-dist")],
         haltOnFailure = True,
         doStepIf=is_protected_pr,
     ),
@@ -100,7 +100,7 @@ julia_doctest_factory.addSteps([
 
     steps.ShellCommand(
         name="make full-source-dist (with BB)",
-        command=["/bin/sh", "-c", util.Interpolate("%(prop:make_cmd)s -j%(prop:nthreads)s JULIA_PRECOMPILE=0 USE_BINARYBUILDER=1 %(prop:flags)s %(prop:extra_make_flags)s full-source-dist")],
+        command=["/bin/sh", "-c", util.Interpolate("%(prop:make_cmd)s -j%(prop:nthreads)s JULIA_PRECOMPILE=0 USE_BINARYBUILDER=1 full-source-dist")],
         haltOnFailure = True,
         doStepIf=is_protected_pr,
     ),
