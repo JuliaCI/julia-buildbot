@@ -23,6 +23,7 @@ win_names      = build_names("win", ["x86_64", "i686"], ["aws_%d"%(idx) for idx 
 # some run on packet, etc...
 linux_names     = []
 linux_names    += build_names("linux", ["x86_64"], ["nanosoldier1_1"] + ["nanosoldier%d_%d"%(jdx, idx) for idx in range(1,3) for jdx in (2,4)])
+linux_names    += build_names("linux", ["x86_64"], ["amdci6_%d"%(idx) for idx in range(1,3)])
 linux_names    += build_names("linux", ["i686"], ["nanosoldier1_1"] + ["nanosoldier3_%d"%(idx) for idx in range(1,3)])
 linux_names    += build_names("linux", ["ppc64le"], ["osu_%d"%(idx) for idx in range(1,4)])
 linux_names    += build_names("linux", ["aarch64"], ["packet_%d"%(idx) for idx in range(1,9)])
