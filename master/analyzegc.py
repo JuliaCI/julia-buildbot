@@ -28,6 +28,13 @@ julia_analyzegc_factory.addSteps([
         command=["/bin/sh", "-c", util.Interpolate("%(prop:make_cmd)s -j%(prop:nthreads)s %(prop:flags)s %(prop:extra_make_flags)s -C deps install-llvm install-libuv install-utf8proc install-unwind")],
         haltOnFailure = True,
     ),
+    
+    # Install necessary dependencies
+    steps.ShellCommand(
+        name="install clang (1.6+ compat shim)",
+        command=["/bin/sh", "-c", util.Interpolate("%(prop:make_cmd)s -j%(prop:nthreads)s %(prop:flags)s %(prop:extra_make_flags)s -C deps install-clang")],
+        haltOnFailure = False,
+    ),
 
     # Run clangsa
     steps.ShellCommand(
