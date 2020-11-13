@@ -33,7 +33,7 @@ julia_analyzegc_factory.addSteps([
     steps.ShellCommand(
         name="install clang (1.6+ compat shim)",
         command=["/bin/sh", "-c", util.Interpolate("%(prop:make_cmd)s -j%(prop:nthreads)s %(prop:flags)s %(prop:extra_make_flags)s -C deps install-clang")],
-        haltOnFailure = False,
+        flunkOnFailure=False,
     ),
 
     # Run clangsa
