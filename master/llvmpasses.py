@@ -33,6 +33,13 @@ julia_llvmpasses_factory.addSteps([
         # Give the process 10 seconds to print out the current backtraces when being killed
         sigtermTime=10,
     ),
+    
+    # Install necessary dependencies
+    steps.ShellCommand(
+        name="install clang/llvm (1.6+ compat shim)",
+        command=["/bin/sh", "-c", util.Interpolate("%(prop:make_cmd)s -j%(prop:nthreads)s %(prop:flags)s %(prop:extra_make_flags)s -C src install-analysis-deps")],
+        flunkOnFailure=False,
+    ),
 
     steps.ShellCommand(
         name="make test/llvmpasses",
