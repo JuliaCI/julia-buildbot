@@ -32,7 +32,7 @@ julia_analyzegc_factory.addSteps([
     # Install necessary dependencies
     steps.ShellCommand(
         name="install clang/llvm (1.6+ compat shim)",
-        command=["/bin/sh", "-c", util.Interpolate("%(prop:make_cmd)s -j%(prop:nthreads)s %(prop:flags)s %(prop:extra_make_flags)s -C src install-analysis-tools")],
+        command=["/bin/sh", "-c", util.Interpolate("%(prop:make_cmd)s -j%(prop:nthreads)s %(prop:flags)s %(prop:extra_make_flags)s -C src install-analysis-deps")],
         flunkOnFailure=False,
     ),
 
