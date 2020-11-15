@@ -60,11 +60,11 @@ def gen_upload_filename(props_obj, ext=".{os_pkg_ext}"):
     filename_format = "julia-{shortcommit}-{os_name_file}{bits}%s"%(ext)
     return filename_format.format(**props)
 
-def gen_upload_path(props_obj, namespace="bin", store_majmin=True, latest=False):
+def gen_upload_path(props_obj, namespace="bin", store_majmin=True, latest=False, filename_var="upload_filename"):
     # First, pull information out of props_obj
     up_arch = props_obj.getProperty("up_arch")
     majmin = props_obj.getProperty("majmin")
-    upload_filename = props_obj.getProperty("upload_filename")
+    upload_filename = props_obj.getProperty(filename_var)
     assert_build = props_obj.getProperty("assert_build")
 
     # If we're asking for the latest information,
@@ -96,7 +96,7 @@ def gen_upload_path(props_obj, namespace="bin", store_majmin=True, latest=False)
 
 def gen_download_url(props_obj, namespace="bin", store_majmin=True, latest=False):
     base = 'https://s3.amazonaws.com'
-    return '%s/%s'%(base, gen_upload_path(props_obj, namespace=namespace, store_majmin=store_majmin, latest=latest))
+    return '%s/%s'%(base, gen_upload_path(props_obj, namespace=namespace, store_majmin=store_majmin, latest=latest, filename_var="upload_tarball_name"))
 
 
 # This is a weird buildbot hack where we really want to parse the output of our
@@ -224,37 +224,7 @@ def render_pretesting_download_url(props_obj):
 
 def build_download_julia_cmd(props_obj):
     download_url = props_obj.getProperty("download_url")
-
-    # Build commands to download/install julia
-    cmd = ""
-    if is_mac(props_obj):
-        # Download the .dmg
-        cmd += "curl -L '%s' -o julia-installer.dmg && "%(download_url)
-        # Mount it
-        cmd += "hdiutil mount julia-installer.dmg -mountpoint ./dmg_mount && "
-        # copy its `julia` folder contents here.
-        cmd += "cp -Ra ./dmg_mount/Julia-*.app/Contents/Resources/julia/* . && "
-        # Unmount any and all Julia disk images
-        cmd += "hdiutil detach dmg_mount && "
-        # Delete the .dmg
-        cmd += "rm -f julia-installer.dmg"
-    elif is_windows(props_obj):
-        # Download the .exe
-        cmd += "curl -L '%s' -o julia-installer.exe && "%(download_url)
-        # Make it executable
-        cmd += "chmod +x julia-installer.exe && "
-        # Extract it into the current directory.  Note that for 1.4, we switched to a different
-        # compression scheme, meaning we must polymorph here.
-        if props_obj.getProperty("majmin") in ("1.0", "1.1", "1.2", "1.3"):
-            cmd += "./julia-installer.exe /S /D=$(cygpath -w $(pwd)) && "
-        else:
-            cmd += "./julia-installer.exe /VERYSILENT /DIR=$(cygpath -w $(pwd)) && "
-        # Remove the .exe
-        cmd += "rm -f julia-installer.exe"
-    else:
-        # Oh linux.  Your simplicity always gets me
-        cmd = "curl -L '%s' | tar --strip-components=1 -zxf -"%(download_url)
-    return ["sh", "-c", cmd]
+    return ["sh", "-c", "curl -L '%s' | tar --strip-components=1 -zxf -"%(download_url)]
 
 
 @util.renderer
