@@ -242,7 +242,7 @@ julia_package_factory.addSteps([
             'majmin': util.Property('majmin'),
             'assert_build': util.Property('assert_build'),
             'upload_filename': util.Property('upload_filename'),
-            'upload_tarball_name': util.Property('upload__tarball_name'),
+            'upload_tarball_name': util.Property('upload_tarball_name'),
             'commitmessage': util.Property('commitmessage'),
             'commitname': util.Property('commitname'),
             'commitemail': util.Property('commitemail'),
