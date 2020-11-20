@@ -33,7 +33,7 @@ musl_names      = build_names("musl", ["x86_64"], ["nureha_1"])
 macos_names     = build_names("macos", ["x86_64"], ["macmini", "macmini2", "macmini3"])
 macos_names    += build_names("macos", ["x86_64"], ["macmini-x64-%d"%(idx) for idx in range(1,7)])
 macos_names    += build_names("macos", ["aarch64"], ["macmini-aarch64-%d"%(idx) for idx in range(1,3)])
-freebsd_names   = build_names("freebsd", ["x86_64"], ["openstack_%d"%(idx) for idx in range(1,4)])
+freebsd_names   = build_names("freebsd", ["x86_64"], ["amdci6_%d"%(idx) for idx in range(1,4)])
 all_names       = win_names + linux_names + musl_names + macos_names + freebsd_names
 
 # Define all the attributes we'll use in our buildsteps
