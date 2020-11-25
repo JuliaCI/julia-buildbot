@@ -187,32 +187,44 @@ def render_srcdist_upload_command(props_obj):
     # Chop off the final `"; "` before passing to `sh`:
     return ["sh", "-c", cmds[:-2]]
 
+def do_promotion(props_obj, **dst_args):
+    # We promote:
+    # - normal mame (.dmg on macos, .exe on windows, .tar.gz elsewhere)
+    # - tarball name (if that's not equal to normal name)
+    # - zip name (only on windows)
+    filename_vars = ["upload_filename"]
+    if props_obj.getProperty("upload_filename") != props_obj.getProperty("upload_tarball_name"):
+        filename_vars += ["upload_tarball_name"]
+    if is_windows(props_obj):
+        filename_vars += ["upload_zip_name"]
+
+    # Helper function to copy both the tarball and its signature, if it exists.
+    def gen_aws_cp(filename_var):
+        src_path = gen_upload_path(props_obj, namespace="pretesting", filename_var=filename_var)
+        dst_path = gen_upload_path(props_obj, filename_var=filename_var, **dst_args)
+        cmds = [
+            "aws s3 cp --acl public-read s3://%s.asc s3://%s.asc"%(src_path, dst_path),
+        ]
+        if src_path.endswith(".tar.gz"):
+            cmds += ["aws s3 cp --acl public-read s3://%s s3://%s"%(src_path, dst_path)]
+        return cmds
+
+    # splat all the commands together, separating by `;`
+    return ["sh", "-c",
+        "; ".join([cmd for f in filename_vars for cmd in gen_aws_cp(f)])
+    ]
+
 @util.renderer
 def render_promotion_command(props_obj):
-    src_path = gen_upload_path(props_obj, namespace="pretesting")
-    dst_path = gen_upload_path(props_obj)
-    return ["sh", "-c",
-        "aws s3 cp --acl public-read s3://%s.asc s3://%s.asc ; "%(src_path, dst_path) +
-        "aws s3 cp --acl public-read s3://%s s3://%s "%(src_path, dst_path),
-    ]
+    return do_promotion(props_obj)
 
 @util.renderer
 def render_majmin_promotion_command(props_obj):
-    src_path = gen_upload_path(props_obj, namespace="pretesting")
-    dst_majmin_path = gen_upload_path(props_obj, latest=True)
-    return ["sh", "-c",
-        "aws s3 cp --acl public-read s3://%s.asc s3://%s.asc ; "%(src_path, dst_majmin_path) +
-        "aws s3 cp --acl public-read s3://%s s3://%s"%(src_path, dst_majmin_path),
-    ]
+    return do_promotion(props_obj, latest=True)
 
 @util.renderer
 def render_latest_promotion_command(props_obj):
-    src_path = gen_upload_path(props_obj, namespace="pretesting")
-    dst_path = gen_upload_path(props_obj, store_majmin=False, latest=True)
-    return ["sh", "-c",
-        "aws s3 cp --acl public-read s3://%s.asc s3://%s.asc ; "%(src_path, dst_path) +
-        "aws s3 cp --acl public-read s3://%s s3://%s"%(src_path, dst_path),
-    ]
+    return do_promotion(props_obj, store_majmin=False, latest=True)
 
 @util.renderer
 def render_download_url(props_obj):
