@@ -243,6 +243,7 @@ julia_package_factory.addSteps([
             'assert_build': util.Property('assert_build'),
             'upload_filename': util.Property('upload_filename'),
             'upload_tarball_name': util.Property('upload_tarball_name'),
+            'upload_zip_name': util.Property('upload_zip_name'),
             'commitmessage': util.Property('commitmessage'),
             'commitname': util.Property('commitname'),
             'commitemail': util.Property('commitemail'),
