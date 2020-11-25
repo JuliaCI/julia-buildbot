@@ -203,10 +203,10 @@ def do_promotion(props_obj, **dst_args):
         src_path = gen_upload_path(props_obj, namespace="pretesting", filename_var=filename_var)
         dst_path = gen_upload_path(props_obj, filename_var=filename_var, **dst_args)
         cmds = [
-            "aws s3 cp --acl public-read s3://%s.asc s3://%s.asc"%(src_path, dst_path),
+            "aws s3 cp --acl public-read s3://%s s3://%s"%(src_path, dst_path),
         ]
         if src_path.endswith(".tar.gz"):
-            cmds += ["aws s3 cp --acl public-read s3://%s s3://%s"%(src_path, dst_path)]
+            cmds += ["aws s3 cp --acl public-read s3://%s.asc s3://%s.asc"%(src_path, dst_path)]
         return cmds
 
     # splat all the commands together, separating by `;`
