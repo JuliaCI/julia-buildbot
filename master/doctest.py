@@ -150,6 +150,12 @@ julia_doctest_factory.addSteps([
         doStepIf=is_protected_pr,
         hideStepIf=lambda results, s: results==SKIPPED,
     ),
+    steps.MasterShellCommand(
+        name="Cleanup Master",
+        command=["sh", "-c", util.Interpolate("rm -vf /tmp/julia_package/julia-%(prop:JULIA_VERSION)s_%(prop:JULIA_COMMIT)s* ;")],
+        flunkOnFailure=False
+        haltOnFailure=False,
+    ),
 ])
 
 c['schedulers'].append(schedulers.AnyBranchScheduler(
