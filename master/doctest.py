@@ -153,7 +153,7 @@ julia_doctest_factory.addSteps([
     steps.MasterShellCommand(
         name="Cleanup Master",
         command=["sh", "-c", util.Interpolate("rm -vf /tmp/julia_package/julia-%(prop:JULIA_VERSION)s_%(prop:JULIA_COMMIT)s* ;")],
-        flunkOnFailure=False
+        flunkOnFailure=False,
         haltOnFailure=False,
     ),
 ])
