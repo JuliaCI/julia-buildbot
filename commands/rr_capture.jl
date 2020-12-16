@@ -61,7 +61,7 @@ mktempdir() do dir
         wait(proc)
 
         # On a non-zero exit code, upload the `rr` trace
-        if proc.exitcode != 0
+        if !success(proc)
             println(stderr, "`rr` returned $(proc.exitcode), packing and uploading traces...")
 
             if !isdir(joinpath(dir, "rr_traces"))
@@ -84,6 +84,11 @@ mktempdir() do dir
         end
 
         # Pass the exit code back up to buildbot
-        exit(proc.exitcode)
+        if proc.termsig != 0
+            ccall(:raise, Cvoid, (Cint,), proc.termsig)
+            exit(1) # Just in case the signal did not cause an exit
+        else
+            exit(proc.exitcode)
+        end
     end
 end
