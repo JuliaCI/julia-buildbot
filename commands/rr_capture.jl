@@ -84,8 +84,8 @@ mktempdir() do dir
         end
 
         # Pass the exit code back up to buildbot
-        if proc.termsig != 0
-            ccall(:raise, Cvoid, (Cint,), proc.termsig)
+        if proc.termsignal != 0
+            ccall(:raise, Cvoid, (Cint,), proc.termsignal)
             exit(1) # Just in case the signal did not cause an exit
         else
             exit(proc.exitcode)
