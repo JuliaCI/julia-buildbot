@@ -1,4 +1,4 @@
-using Pkg, Dates
+using Pkg, Dates, Tar
 
 if length(ARGS) < 3
     println(stderr, "Usage: rr_capture.jl [buildnumber] [shortcommit] [command...]")
@@ -11,12 +11,16 @@ run_id = popfirst!(ARGS)
 shortcommit = popfirst!(ARGS)
 num_cores = min(Sys.CPU_THREADS, 8, parse(Int, get(ENV, "JULIA_TEST_NUM_CORES", "8")) + 1)
 
+proc = nothing
+
 new_env = copy(ENV)
 mktempdir() do dir
     Pkg.activate(dir)
     Pkg.add("rr_jll")
+    Pkg.add("Zstd_jll")
 
     rr_jll = Base.require(Base.PkgId(Base.UUID((0xe86bdf43_55f7_5ea2_9fd0_e7daa2c0f2b4)), "rr_jll"))
+    zstd_jll = Base.require(Base.PkgId(Base.UUID((0x3161d3a3_bdf6_5164_811a_617609db77b4)), "Zstd_jll"))
     rr(func) = Base.invokelatest(rr_jll.rr, func; adjust_LIBPATH=false)
     rr() do rr_path
         capture_script_path = joinpath(dir, "capture_output.sh")
@@ -34,7 +38,7 @@ mktempdir() do dir
         new_env["_RR_TRACE_DIR"] = joinpath(dir, "rr_traces")
         new_env["JULIA_RR"] = capture_script_path
         t_start = time()
-        proc = run(setenv(`$(rr_path) record --num-cores=$(num_cores) $ARGS`, new_env), (stdin, stdout, stderr); wait=false)
+        global proc = run(setenv(`$(rr_path) record --num-cores=$(num_cores) $ARGS`, new_env), (stdin, stdout, stderr); wait=false)
 
         # Start asynchronous timer that will kill `rr`
         @async begin
@@ -69,26 +73,36 @@ mktempdir() do dir
                 exit(1)
             end
 
+            # Clean up non-traces
+            rm(joinpath(dir, "rr_traces", "latest-trace"))
+            rm(joinpath(dir, "rr_traces", "cpu_lock"))
+
+            # Create a directory for the pack files to go
+            pack_dir = joinpath(dir, "pack")
+            mkdir(pack_dir)
+
             # Pack all traces
             trace_dirs = [joinpath(dir, "rr_traces", f) for f in readdir(joinpath(dir, "rr_traces"))]
             filter!(isdir, trace_dirs)
-            for trace_dir in trace_dirs
-                println(stderr, " -> packing $(basename(trace_dir))")
-                run(ignorestatus(`$(loader) --library-path "$(rr_jll.LIBPATH)" $(rr_path) pack $(trace_dir)`))
-            end
+            run(ignorestatus(`$(rr_path) pack --pack-dir=$pack_dir $(trace_dirs)`))
 
             # Tar it up
             mkpath("dumps")
             datestr = Dates.format(now(), dateformat"yyyy-mm-dd_HH_MM_SS") 
-            Pkg.PlatformEngines.package(dir, "dumps/rr-run_$(run_id)-gitsha_$(shortcommit)-$(datestr).tar.gz")
-        end
-
-        # Pass the exit code back up to buildbot
-        if proc.termsignal != 0
-            ccall(:raise, Cvoid, (Cint,), proc.termsignal)
-            exit(1) # Just in case the signal did not cause an exit
-        else
-            exit(proc.exitcode)
+            dst_path = "dumps/rr-run_$(run_id)-gitsha_$(shortcommit)-$(datestr).tar.zst"
+            zstd_jll.zstdmt() do zstdp
+                tarproc = open(`$zstdp -o $dst_path`, "w")
+                Tar.create(dir, tarproc)
+                close(tarproc.in)
+            end
         end
     end
+end
+
+# Pass the exit code back up to buildbot
+if proc.termsignal != 0
+    ccall(:raise, Cvoid, (Cint,), proc.termsignal)
+    exit(1) # Just in case the signal did not cause an exit
+else
+    exit(proc.exitcode)
 end
