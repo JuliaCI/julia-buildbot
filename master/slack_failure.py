@@ -1,10 +1,14 @@
-from buildbot.process.results import SUCCESS
+from buildbot.process.results import FAILURE, EXCEPTION
+import logging
+
+log = logging.getLogger(__name__)
 
 def slack_failed_build(build):
-    if build['results'] == SUCCESS:
+    # Only report failure/exception (in reality this still reports but with an illegal payload)
+    if build['results'] not in (FAILURE, EXCEPTION):
         return
 
-    print(build)
+    log.info(build)
     return {
        'text': 'Builder %s on %s failed: %s'%(build['builder']['name'], 'placeholder', build['url']),
     }
