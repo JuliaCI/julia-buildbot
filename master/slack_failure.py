@@ -20,6 +20,10 @@ def slack_failed_build(build):
     if 'properties' in build and 'workername' in build['properties']:
         worker_name = build['properties']['workername'][0]
 
+    # HACK: ignore armv7l and ppc64le failures:
+    if builder_name in ('package_linuxarmv7l', 'tester_linuxarmv7l', 'package_linuxppc64le', 'tester_linuxppc64le'):
+        return
+
     return {
        'text': 'Builder %s on %s failed: %s'%(builder_name, worker_name, url),
     }
