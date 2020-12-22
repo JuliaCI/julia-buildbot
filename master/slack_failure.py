@@ -16,11 +16,19 @@ def slack_failed_build(build):
         builder_name = build['builder']['name']
 
     # Try to get the worker name:
+    branch = '<unknown branch>'
     worker_name = '<unknown worker>'
-    if 'properties' in build and 'workername' in build['properties']:
-        worker_name = build['properties']['workername'][0]
+    if 'properties' in build:
+        if 'workername' in build['properties']:
+            worker_name = build['properties']['workername'][0]
+        if 'branch' in build['properties']:
+            branch = build['properties']['branch'][0]
 
-    # HACK: ignore armv7l and ppc64le failures:
+    # Filter out non-master builds:
+    if branch != 'master':
+        return
+
+    # Filter out armv7l and ppc64le failures:
     if builder_name in ('package_linuxarmv7l', 'tester_linuxarmv7l', 'package_linuxppc64le', 'tester_linuxppc64le'):
         return
 
