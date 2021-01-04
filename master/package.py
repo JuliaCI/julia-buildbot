@@ -122,14 +122,6 @@ julia_package_factory.addSteps([
         property="dummy",
     ),
 
-    # Sign windows julia .exe
-    steps.ShellCommand(
-        name="sign .exe (julia)",
-        command=["sh", "-c", util.Interpolate("~/sign.sh usr/bin/julia.exe")],
-        doStepIf=is_windows,
-        hideStepIf=lambda results, s: results==SKIPPED,
-    ),
-
     # Make binary-dist to package it up
     steps.ShellCommand(
         name="make binary-dist",
