@@ -37,7 +37,7 @@ mktempdir() do dir
         new_env = copy(ENV)
         new_env["_RR_TRACE_DIR"] = joinpath(dir, "rr_traces")
         new_env["RR_LOG"]="all:debug"
-        new_env["RR_LOG_BUFFER"]="100000"
+        new_env["RR_LOG_BUFFER"]="5000000"
         new_env["JULIA_RR"] = capture_script_path
         t_start = time()
         global proc = run(setenv(`$(rr_path) record --num-cores=$(num_cores) $ARGS`, new_env), (stdin, stdout, stderr); wait=false)
