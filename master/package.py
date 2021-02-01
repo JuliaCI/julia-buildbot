@@ -68,6 +68,14 @@ julia_package_factory.addSteps([
         env=julia_package_env,
     ),
 
+    ## DEBUGGING
+    steps.ShellCommand(
+        name="PRE-build fdinfo debug",
+        command=["sh", "-c", "cat /proc/self/fdinfo/2"],
+        haltOnFailure = False,
+        flunkOnFailure = False,
+    ),
+
     # Make release (we don't automatically build debug)
     steps.ShellCommand(
         name="make release",
@@ -80,6 +88,14 @@ julia_package_factory.addSteps([
         # Give the process 10 seconds to print out the current backtraces when being killed
         sigtermTime=10,
         env=julia_package_env,
+    ),
+
+    ## DEBUGGING
+    steps.ShellCommand(
+        name="POST-build fdinfo debug",
+        command=["sh", "-c", "cat /proc/self/fdinfo/2"],
+        haltOnFailure = False,
+        flunkOnFailure = False,
     ),
 
     # Get info about ccache
@@ -122,6 +138,14 @@ julia_package_factory.addSteps([
         property="dummy",
     ),
 
+    ## DEBUGGING
+    steps.ShellCommand(
+        name="PRE-package fdinfo debug",
+        command=["sh", "-c", "cat /proc/self/fdinfo/2"],
+        haltOnFailure = False,
+        flunkOnFailure = False,
+    ),
+
     # Make binary-dist to package it up
     steps.ShellCommand(
         name="make binary-dist",
@@ -134,6 +158,14 @@ julia_package_factory.addSteps([
         # Give the process 10 seconds to print out the current backtraces when being killed
         sigtermTime=10,
         env=julia_package_env,
+    ),
+
+    ## DEBUGGING
+    steps.ShellCommand(
+        name="POST-package fdinfo debug",
+        command=["sh", "-c", "cat /proc/self/fdinfo/2"],
+        haltOnFailure = False,
+        flunkOnFailure = False,
     ),
 
     # Build .app on macOS
