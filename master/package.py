@@ -71,7 +71,7 @@ julia_package_factory.addSteps([
     ## DEBUGGING
     steps.ShellCommand(
         name="PRE-build fdinfo debug",
-        command=["sh", "-c", "cat /proc/self/fdinfo/1"],
+        command=["sh", "-c", "cat /proc/self/fdinfo/2"],
         haltOnFailure = False,
         flunkOnFailure = False,
     ),
@@ -93,7 +93,7 @@ julia_package_factory.addSteps([
     ## DEBUGGING
     steps.ShellCommand(
         name="POST-build fdinfo debug",
-        command=["sh", "-c", "cat /proc/self/fdinfo/1"],
+        command=["sh", "-c", "cat /proc/self/fdinfo/2"],
         haltOnFailure = False,
         flunkOnFailure = False,
     ),
@@ -141,7 +141,7 @@ julia_package_factory.addSteps([
     ## DEBUGGING
     steps.ShellCommand(
         name="PRE-package fdinfo debug",
-        command=["sh", "-c", "cat /proc/self/fdinfo/1"],
+        command=["sh", "-c", "cat /proc/self/fdinfo/2"],
         haltOnFailure = False,
         flunkOnFailure = False,
     ),
@@ -163,7 +163,7 @@ julia_package_factory.addSteps([
     ## DEBUGGING
     steps.ShellCommand(
         name="POST-package fdinfo debug",
-        command=["sh", "-c", "cat /proc/self/fdinfo/1"],
+        command=["sh", "-c", "cat /proc/self/fdinfo/2"],
         haltOnFailure = False,
         flunkOnFailure = False,
     ),
