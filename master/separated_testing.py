@@ -40,7 +40,7 @@ def render_upload_debugging_files(props_obj):
     """.format(**props)
     return ["bash", "-c", upload_script]
 
-# Steps to download a linux tarball, extract it, run testing on it, and maybe trigger coverage
+# Steps to download a linux tarball, extract it and run tests on it
 julia_testing_factory = util.BuildFactory()
 julia_testing_factory.useProgress = True
 julia_testing_factory.addSteps([
@@ -109,23 +109,6 @@ julia_testing_factory.addSteps([
         doStepIf=should_promote_latest,
     ),
 
-    # Trigger coverage build if everything goes well
-    steps.Trigger(
-        schedulerNames=["Julia Coverage Testing"],
-        set_properties={
-            'download_url': render_download_url,
-            'commitmessage': util.Property('commitmessage'),
-            'commitname': util.Property('commitname'),
-            'commitemail': util.Property('commitemail'),
-            'authorname': util.Property('authorname'),
-            'authoremail': util.Property('authoremail'),
-            'shortcommit': util.Property('shortcommit'),
-            'scheduler': util.Property('scheduler'),
-        },
-        waitForFinish=False,
-        doStepIf=is_assert_nightly,
-    ),
-    
     # Trigger a build of a non-assert version if the assert version finished properly
     steps.Trigger(
         schedulerNames=["Julia CI (non-assert build)"],
