@@ -176,6 +176,7 @@ coverage_nightly_scheduler = schedulers.Nightly(
         project=['JuliaLang/julia'],
         branch='master',
     ),
+    properties={'download_url': "https://julialangnightlies-s3.julialang.org/bin/linux/x64/julia-latest-linux64.tar.gz"},
     onlyIfChanged=True,
 )
 c['schedulers'].append(coverage_nightly_scheduler)
