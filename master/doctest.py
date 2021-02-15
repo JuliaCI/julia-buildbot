@@ -55,6 +55,7 @@ julia_doctest_factory.addSteps([
             'TRAVIS_PULL_REQUEST': 'false',
         },
         doStepIf=is_protected_pr,
+        logEnviron=False,
     ),
 
     # Get JULIA_VERSION and JULIA_COMMIT from the build system
