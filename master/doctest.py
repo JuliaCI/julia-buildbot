@@ -1,3 +1,9 @@
+# Certain buildsteps we only run if the unwashed masses can't submit arbitrary code
+def should_deploy_docs(props):
+    if props.getProperty('force_deploy_docs'):
+        return True
+    return is_protected_non_pr(props)
+
 julia_doctest_factory = util.BuildFactory()
 julia_doctest_factory.useProgress = True
 julia_doctest_factory.addSteps([
@@ -54,7 +60,7 @@ julia_doctest_factory.addSteps([
             'DOCUMENTER_KEY': DOCUMENTER_KEY,
             'TRAVIS_PULL_REQUEST': 'false',
         },
-        doStepIf=is_protected_pr,
+        doStepIf=should_deploy_docs,
         logEnviron=False,
     ),
 
@@ -79,13 +85,13 @@ julia_doctest_factory.addSteps([
         name="make light-source-dist",
         command=["/bin/sh", "-c", util.Interpolate("%(prop:make_cmd)s -j%(prop:nthreads)s JULIA_PRECOMPILE=0 USE_BINARYBUILDER=0 light-source-dist")],
         haltOnFailure = True,
-        doStepIf=is_protected_pr,
+        doStepIf=is_protected_non_pr,
     ),
     steps.FileUpload(
         name="Upload light source tarball",
         workersrc=util.Interpolate("julia-%(prop:JULIA_VERSION)s_%(prop:JULIA_COMMIT)s.tar.gz"),
         masterdest=util.Interpolate("/tmp/julia_package/julia-%(prop:JULIA_VERSION)s_%(prop:JULIA_COMMIT)s.tar.gz"),
-        doStepIf=is_protected_pr,
+        doStepIf=is_protected_non_pr,
         hideStepIf=lambda results, s: results==SKIPPED,
     ),
 
@@ -97,13 +103,13 @@ julia_doctest_factory.addSteps([
         name="make full-source-dist (without BB)",
         command=["/bin/sh", "-c", util.Interpolate("%(prop:make_cmd)s -j%(prop:nthreads)s JULIA_PRECOMPILE=0 USE_BINARYBUILDER=0 full-source-dist")],
         haltOnFailure = True,
-        doStepIf=is_protected_pr,
+        doStepIf=is_protected_non_pr,
     ),
     steps.FileUpload(
         name="Upload full source tarball",
         workersrc=util.Interpolate("julia-%(prop:JULIA_VERSION)s_%(prop:JULIA_COMMIT)s-full.tar.gz"),
         masterdest=util.Interpolate("/tmp/julia_package/julia-%(prop:JULIA_VERSION)s_%(prop:JULIA_COMMIT)s-full.tar.gz"),
-        doStepIf=is_protected_pr,
+        doStepIf=is_protected_non_pr,
         hideStepIf=lambda results, s: results==SKIPPED,
     ),
 
@@ -115,13 +121,13 @@ julia_doctest_factory.addSteps([
         name="make full-source-dist (with BB)",
         command=["/bin/sh", "-c", util.Interpolate("%(prop:make_cmd)s -j%(prop:nthreads)s JULIA_PRECOMPILE=0 USE_BINARYBUILDER=1 full-source-dist")],
         haltOnFailure = True,
-        doStepIf=is_protected_pr,
+        doStepIf=is_protected_non_pr,
     ),
     steps.FileUpload(
         name="Upload full source+bb tarball",
         workersrc=util.Interpolate("julia-%(prop:JULIA_VERSION)s_%(prop:JULIA_COMMIT)s-full.tar.gz"),
         masterdest=util.Interpolate("/tmp/julia_package/julia-%(prop:JULIA_VERSION)s_%(prop:JULIA_COMMIT)s-full+bb.tar.gz"),
-        doStepIf=is_protected_pr,
+        doStepIf=is_protected_non_pr,
         hideStepIf=lambda results, s: results==SKIPPED,
     ),
 
@@ -129,26 +135,26 @@ julia_doctest_factory.addSteps([
     steps.MasterShellCommand(
         name="gpg sign light source tarball on master",
         command=["sh", "-c", util.Interpolate("/root/sign_tarball.sh /tmp/julia_package/julia-%(prop:JULIA_VERSION)s_%(prop:JULIA_COMMIT)s.tar.gz")],
-        doStepIf=is_protected_pr,
+        doStepIf=is_protected_non_pr,
         hideStepIf=lambda results, s: results==SKIPPED,
     ),
     steps.MasterShellCommand(
         name="gpg sign full source tarball on master",
         command=["sh", "-c", util.Interpolate("/root/sign_tarball.sh /tmp/julia_package/julia-%(prop:JULIA_VERSION)s_%(prop:JULIA_COMMIT)s-full.tar.gz")],
-        doStepIf=is_protected_pr,
+        doStepIf=is_protected_non_pr,
         hideStepIf=lambda results, s: results==SKIPPED,
     ),
     steps.MasterShellCommand(
         name="gpg sign full+bb source tarball on master",
         command=["sh", "-c", util.Interpolate("/root/sign_tarball.sh /tmp/julia_package/julia-%(prop:JULIA_VERSION)s_%(prop:JULIA_COMMIT)s-full+bb.tar.gz")],
-        doStepIf=is_protected_pr,
+        doStepIf=is_protected_non_pr,
         hideStepIf=lambda results, s: results==SKIPPED,
     ),
     steps.MasterShellCommand(
         name="Upload source tarballs to AWS",
         command=render_srcdist_upload_command,
         haltOnFailure=True,
-        doStepIf=is_protected_pr,
+        doStepIf=is_protected_non_pr,
         hideStepIf=lambda results, s: results==SKIPPED,
     ),
     steps.MasterShellCommand(
@@ -196,6 +202,11 @@ c['schedulers'].append(schedulers.ForceScheduler(
             label="Extra Make Flags",
             size=30,
             default="",
+        ),
+        util.BooleanParameter(
+            name="force_deploy_docs",
+            label="Force deploy docs",
+            default=False,
         ),
     ],
 ))
