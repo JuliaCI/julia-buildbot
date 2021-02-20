@@ -203,10 +203,10 @@ c['schedulers'].append(schedulers.ForceScheduler(
             size=30,
             default="",
         ),
-        util.BooleanParameter(
-            name="force_deploy_docs",
-            label="Force deploy docs",
-            default=False,
-        ),
+        #util.BooleanParameter(
+        #    name="force_deploy_docs",
+        #    label="Force deploy docs",
+        #    default=False,
+        #),
     ],
 ))
