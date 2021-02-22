@@ -1,4 +1,14 @@
-using Pkg, Dates, Tar
+using Pkg, Dates
+
+if VERSION >= v"1.6.0-DEV.1087"
+    using Tar
+    const create_tar = Tar.create
+else
+    function create_tar(dir, process)
+        run(pipeline(`tar cf - $dir/`; stdout=process.in))
+        return nothing
+    end
+end
 
 if length(ARGS) < 3
     println(stderr, "Usage: rr_capture.jl [buildnumber] [shortcommit] [command...]")
@@ -94,7 +104,7 @@ mktempdir() do dir
             dst_path = "dumps/rr-run_$(run_id)-gitsha_$(shortcommit)-$(datestr).tar.zst"
             zstd_jll.zstdmt() do zstdp
                 tarproc = open(`$zstdp -o $dst_path`, "w")
-                Tar.create(dir, tarproc)
+                create_tar(dir, tarproc)
                 close(tarproc.in)
             end
         end
