@@ -8,12 +8,14 @@ const TIMEOUT = 2*60*60 # seconds
 run_id = popfirst!(ARGS)
 shortcommit = popfirst!(ARGS)
 
+if VERSION >= v"1.6.0-DEV.1087"
+    using Pkg, Dates, Tar
+end
+
 if VERSION < v"1.6.0-DEV.1087"
     # On sufficiently old Julia versions, don't attempt to use rr
     run(`$ARGS`)
 else
-    using Pkg, Dates, Tar
-
     num_cores = min(Sys.CPU_THREADS, 8, parse(Int, get(ENV, "JULIA_TEST_NUM_CORES", "8")) + 1)
 
     proc = nothing
