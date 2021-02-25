@@ -8,8 +8,10 @@ const TIMEOUT = 2*60*60 # seconds
 run_id = popfirst!(ARGS)
 shortcommit = popfirst!(ARGS)
 
+using Pkg, Dates
+
 if VERSION >= v"1.6.0-DEV.1087"
-    using Pkg, Dates, Tar
+    using Tar
 end
 
 if VERSION < v"1.6.0-DEV.1087"
