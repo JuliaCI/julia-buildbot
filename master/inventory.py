@@ -53,8 +53,8 @@ for name in all_names:
     # except for FreeBSD, on which it is `gmake`
     make_cmd = "make"
 
-    # Everything should be VERBOSE
-    flags = 'VERBOSE=1 '
+    # Everything should be VERBOSE and readable afterwards
+    flags = 'VERBOSE=1 --output-sync=target '
 
     # Add on the tagged release banner
     flags += 'TAGGED_RELEASE_BANNER="Official https://julialang.org/ release" '
