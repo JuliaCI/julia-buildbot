@@ -47,7 +47,7 @@ julia_gc_debug_factory.addSteps([
     # Make!
     steps.ShellCommand(
         name="make",
-        command=["/bin/sh", "-c", util.Interpolate("%(prop:make_cmd)s -j3 %(prop:flags)s")],
+        command=["/bin/sh", "-c", util.Interpolate("%(prop:make_cmd)s -j%(prop:nthreads)s %(prop:flags)s")],
         haltOnFailure = True
     ),
 

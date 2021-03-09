@@ -64,7 +64,7 @@ julia_threading_factory.addSteps([
     # Make!
     steps.ShellCommand(
         name="make binary-dist",
-        command=["/bin/sh", "-c", util.Interpolate("%(prop:make_cmd)s -j3 %(prop:flags)s binary-dist")],
+        command=["/bin/sh", "-c", util.Interpolate("%(prop:make_cmd)s -j%(prop:nthreads)s %(prop:flags)s binary-dist")],
         haltOnFailure = True
     ),
 
