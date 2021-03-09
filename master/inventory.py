@@ -99,7 +99,7 @@ for name in all_names:
         os_name = "linux"
         os_pkg_ext = "tar.gz"
 
-    if os_name != "mac"
+    if os_name != "mac":
         # Organize the output to make it clearer later, when using gmake > v4.0
         flags += '--output-sync=target '
         
