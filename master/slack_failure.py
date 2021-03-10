@@ -2,6 +2,7 @@ from buildbot.process.results import FAILURE, EXCEPTION
 
 def slack_failed_build(build):
     # Only report failure/exception (in reality this still reports but with an illegal payload)
+    build = build['build']
     if build['results'] not in (FAILURE, EXCEPTION):
         return
 
