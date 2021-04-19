@@ -125,7 +125,7 @@ julia_package_factory.addSteps([
     # Sign the julia exectuable julia.exe
     steps.ShellCommand(
         name="sign .exe (julia)",
-        command=["sh", "-c", util.Interpolate("~/sign.sh usr/bin/julia.exe")],
+        command=["sh", "-c", util.Interpolate("powershell -NoProfile `cygpath -w ~/sign.ps1` usr/bin/julia.exe")],
         doStepIf=is_windows,
         hideStepIf=lambda results, s: results==SKIPPED,
     ),
