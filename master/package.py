@@ -85,7 +85,7 @@ julia_package_factory.addSteps([
     # Check that the working directory is clean
     steps.ShellCommand(
         name="test that working directory is clean",
-        command=["bash", "-c", "if [ -z "$(git status --short)" ]; then   echo "INFO: The working directory is clean."; else   echo "ERROR: The working directory is dirty.";   echo "Output of git status:";   git status;   exit 1; fi"],
+        command=["bash", "-c", "if [ -z \"$(git status --short)\" ]; then   echo \"INFO: The working directory is clean.\"; else   echo \"ERROR: The working directory is dirty.\";   echo \"Output of git status:\";   git status;   exit 1; fi"],
         flunkOnFailure=True,
         env=julia_package_env,
     ),
