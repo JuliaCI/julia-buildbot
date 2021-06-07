@@ -56,12 +56,25 @@ allfiles = map(fn -> Coverage.FileCoverage(fn, read(CoverageBase.fixabspath(fn),
     [allfiles_base; allfiles_stdlib])
 results = Coverage.merge_coverage_counts(results, allfiles)
 length(results) == length(allfiles) || @warn "Got coverage for an unexpected file:" symdiff=symdiff(map(x -> x.filename, allfiles), map(x -> x.filename, results))
-  # drop vendored files
-  # todo: find a more general way to do this, as this may become hard to maintain
-let prefixes = (joinpath("stdlib", "Pkg", ""),
-                joinpath("stdlib", "Statistics", ""))
+  # Drop external stdlibs (i.e. stdlibs that live in external repos):
+let
+    get_external_stdlib_prefixes = function (stdlib_dir)
+        filename_list = filter(x -> isfile(joinpath(stdlib_dir, x)), readdir(stdlib_dir))
+        # find all of the files like `Pkg.version`, `Statistics.version`, etc.
+        regex_matches_or_nothing = match.(Ref(r"^([\w].*?)\.version$"), filename_list)
+        regex_matches = filter(x -> x !== nothing, regex_matches_or_nothing)
+        # get the names of the external stdlibs, like `Pkg`, `Statistics`, etc.
+        external_stdlib_names = only.(regex_matches)
+        prefixes = joinpath.(Ref(stdlib_dir), external_stdlib_names, Ref(""))
+        # example of what `prefixes` might look like:
+        # 2-element Vector{String}:
+        # "stdlib/Pkg/"
+        # "stdlib/Statistics/"
+        return prefixes
+    end
+    external_stdlib_prefixes = get_external_stdlib_prefixes("stdlib")
     filter!(results) do c
-        all(p -> !startswith(c.filename, p), prefixes)
+        all(p -> !startswith(c.filename, p), external_stdlib_prefixes)
     end
 end
   # attempt to improve accuracy of the results
