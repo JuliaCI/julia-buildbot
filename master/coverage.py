@@ -72,10 +72,22 @@ let
         # "stdlib/Statistics/"
         return prefixes
     end
-    external_stdlib_prefixes = get_external_stdlib_prefixes("stdlib")
+    # external_stdlib_prefixes = get_external_stdlib_prefixes("stdlib")
+    external_stdlib_prefixes = String[
+        "stdlib/ArgTools/",
+        "stdlib/Downloads/",
+        "stdlib/LibCURL/",
+        "stdlib/NetworkOptions/",
+        "stdlib/Pkg/",
+        "stdlib/Statistics/",
+        "stdlib/SuiteSparse/",
+        "stdlib/Tar/",
+    ]
     filter!(results) do c
         all(p -> !startswith(c.filename, p), external_stdlib_prefixes)
     end
+    @info "" pwd() # debugging statement; remove later
+    @info "" readdir(pwd()) # debugging statement; remove later
 end
   # attempt to improve accuracy of the results
 foreach(Coverage.amend_coverage_from_src!, results)
