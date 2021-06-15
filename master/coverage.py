@@ -88,6 +88,9 @@ let
     end
     @info "" pwd() # debugging statement; remove later
     @info "" readdir(pwd()) # debugging statement; remove later
+    @info "" first(readdir(pwd())) # debugging statement; remove later
+    @info "" joinpath(pwd(), first(readdir(pwd()))) # debugging statement; remove later
+    @info "" readdir(joinpath(pwd(), first(readdir(pwd())))) # debugging statement; remove later
 end
   # attempt to improve accuracy of the results
 foreach(Coverage.amend_coverage_from_src!, results)
