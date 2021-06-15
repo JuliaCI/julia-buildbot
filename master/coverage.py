@@ -84,6 +84,7 @@ let
     ]
     stdlib_dir_name = "stdlib"
     # external_stdlib_prefixes = get_external_stdlib_prefixes(; stdlib_dir_name)
+    @info "" external_stdlib_prefixes
     filter!(results) do c
         all(p -> !startswith(c.filename, p), external_stdlib_prefixes)
     end
