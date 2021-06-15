@@ -58,21 +58,20 @@ results = Coverage.merge_coverage_counts(results, allfiles)
 length(results) == length(allfiles) || @warn "Got coverage for an unexpected file:" symdiff=symdiff(map(x -> x.filename, allfiles), map(x -> x.filename, results))
   # Drop external stdlibs (i.e. stdlibs that live in external repos):
 let
-    get_external_stdlib_prefixes = function (stdlib_dir)
-        filename_list = filter(x -> isfile(joinpath(stdlib_dir, x)), readdir(stdlib_dir))
+    get_external_stdlib_prefixes = function (; stdlib_dir_name)
+        filename_list = filter(x -> isfile(joinpath(stdlib_dir_name, x)), readdir(stdlib_dir_name))
         # find all of the files like `Pkg.version`, `Statistics.version`, etc.
         regex_matches_or_nothing = match.(Ref(r"^([\w].*?)\.version$"), filename_list)
         regex_matches = filter(x -> x !== nothing, regex_matches_or_nothing)
         # get the names of the external stdlibs, like `Pkg`, `Statistics`, etc.
         external_stdlib_names = only.(regex_matches)
-        prefixes = joinpath.(Ref(stdlib_dir), external_stdlib_names, Ref(""))
+        prefixes = joinpath.(Ref(stdlib_dir_name), external_stdlib_names, Ref(""))
         # example of what `prefixes` might look like:
         # 2-element Vector{String}:
         # "stdlib/Pkg/"
         # "stdlib/Statistics/"
         return prefixes
     end
-    # external_stdlib_prefixes = get_external_stdlib_prefixes("stdlib")
     external_stdlib_prefixes = String[
         "stdlib/ArgTools/",
         "stdlib/Downloads/",
@@ -83,14 +82,18 @@ let
         "stdlib/SuiteSparse/",
         "stdlib/Tar/",
     ]
+    stdlib_dir_name = "stdlib"
+    # external_stdlib_prefixes = get_external_stdlib_prefixes(; stdlib_dir_name)
     filter!(results) do c
         all(p -> !startswith(c.filename, p), external_stdlib_prefixes)
     end
-    @info "" pwd() # debugging statement; remove later
-    @info "" readdir(pwd()) # debugging statement; remove later
-    @info "" first(readdir(pwd())) # debugging statement; remove later
-    @info "" joinpath(pwd(), first(readdir(pwd()))) # debugging statement; remove later
     @info "" readdir(joinpath(pwd(), first(readdir(pwd())))) # debugging statement; remove later
+    try
+        run(`git --version`)
+        @info "git was found"
+    catch
+        @info "git was not found"
+    end
 end
   # attempt to improve accuracy of the results
 foreach(Coverage.amend_coverage_from_src!, results)
