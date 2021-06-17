@@ -96,6 +96,10 @@ let
         @info "git was not found"
     end
 end
+  # Drop all stdlib JLLs
+filter!(results) do c
+    !occursin(r"^stdlib\/[A-Za-z0-9]*?_jll\/", c.filename)
+end
   # attempt to improve accuracy of the results
 foreach(Coverage.amend_coverage_from_src!, results)
 # Create git_info for codecov
