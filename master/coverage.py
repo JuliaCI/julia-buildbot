@@ -16,9 +16,9 @@ Pkg.activate("CoverageBase")
 using Coverage, CoverageBase
 # Process code-coverage files
 results = Coverage.LCOV.readfolder(raw"%(prop:juliadir)s/LCOV")
-  # remove test/ files
+  # remove `test/` files, `benchmark/` files, etc.
 filter!(results) do c
-    !occursin("test/", c.filename)
+    occursin(r"^base/", c.filename) || occursin("/src/", c.filename)
 end
   # turn absolute paths into relative, and add base/ to relative paths
 CoverageBase.fixpath!(results)
