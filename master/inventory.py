@@ -35,6 +35,7 @@ macos_names     = build_names("macos", ["x86_64"], ["macmini", "macmini2", "macm
 macos_names    += build_names("macos", ["x86_64"], ["macmini-x64-%d"%(idx) for idx in range(1,7)])
 macos_names    += build_names("macos", ["aarch64"], ["macmini-aarch64-%d"%(idx) for idx in range(1,3)])
 freebsd_names   = build_names("freebsd", ["x86_64"], ["amdci6_%d"%(idx) for idx in range(1,4)])
+freebsd_names  += build_names("freebsd", ["x86_64"], ["amdci6_%d"%(idx) for idx in range(4,7)])
 all_names       = win_names + linux_names + musl_names + macos_names + freebsd_names
 
 # Define all the attributes we'll use in our buildsteps
