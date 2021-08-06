@@ -43,7 +43,7 @@ c['workers'] = []
 for name in all_names:
     # Initialize `march` to `None`, as some buildbots (power8) don't set it
     march = None
-    
+
     # Initialize `mcpu` to `None`, as most buildbots don't set it (only ARM)
     mcpu = None
 
@@ -88,7 +88,8 @@ for name in all_names:
     elif name[:7] == "freebsd":
         os_name = "freebsd"
         os_pkg_ext = "tar.gz"
-        make_cmd = "gmake USE_BINARYBUILDER_LIBUV=0"
+        make_cmd = "gmake"
+        flags += 'USE_BINARYBUILDER_LIBUV=0 ' # https://github.com/JuliaLang/julia/issues/34627
 
     elif name[:4] == "musl":
         os_name = "musl"
@@ -103,7 +104,7 @@ for name in all_names:
     if os_name in ["win", "freebsd"]:
         # Organize the output to make it clearer later, when using gmake > v4.0
         flags += '--output-sync=target '
-        
+
     # Use ccache everywhere
     flags += 'USECCACHE=1 '
 
