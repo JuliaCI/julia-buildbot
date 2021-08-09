@@ -32,6 +32,13 @@ julia_package_factory.addSteps([
         value=util.Interpolate("%(prop:flags)s USE_BINARYBUILDER=%(prop:use_bb:#?:1:0)s"),
     ),
 
+    steps.SetProperty(
+        name="Unset BinaryBuilder for libuv",
+        property="flags",
+        value=util.Interpolate("%(prop:flags)s USE_BINARYBUILDER_LIBUV=0"),
+        doStepIf=is_freebsd,
+    ),
+
     # Recursive `git clean` on windows is very slow. It is faster to
     # wipe the dir and reset it. Important is that we don't delete our
     # `.git` folder.
