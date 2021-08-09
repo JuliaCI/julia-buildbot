@@ -88,7 +88,7 @@ for name in all_names:
         os_name = "freebsd"
         os_pkg_ext = "tar.gz"
         flags += 'USE_BINARYBUILDER_LIBUV=0 ' # On FreeBSD 12 and later: https://github.com/JuliaLang/julia/issues/34627
-        make_cmd = "gmake USE_BINARYBUILDER_LIBUV=0"   
+        make_cmd = "gmake"   
     elif name[:4] == "musl":
         os_name = "musl"
         os_pkg_ext = "tar.gz"
