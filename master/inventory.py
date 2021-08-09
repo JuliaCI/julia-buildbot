@@ -50,7 +50,7 @@ for name in all_names:
     llvm_cmake = None
 
     # Initialize `make_cmd` to `make`, as that's what it is on all platforms
-    # except for FreeBSD, on which it is `gmake`
+    # except for FreeBSD
     make_cmd = "make"
 
     # Everything should be VERBOSE
@@ -101,7 +101,7 @@ for name in all_names:
         os_pkg_ext = "tar.gz"
 
     if os_name in ["win", "freebsd"]:
-        # Organize the output to make it clearer later, when using gmake > v4.0
+        # Organize the output to make it clearer later
         flags += '--output-sync=target '
 
     # Use ccache everywhere
