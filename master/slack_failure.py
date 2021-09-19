@@ -30,7 +30,7 @@ def slack_failed_build(build):
         return
 
     # Filter out armv7l and ppc64le failures:
-    if builder_name in ('package_linuxarmv7l', 'tester_linuxarmv7l', 'package_linuxppc64le', 'tester_linuxppc64le'):
+    if builder_name in ('package_linuxarmv7l', 'tester_linuxarmv7l', 'tester_linuxppc64le'):
         return
 
     return {
