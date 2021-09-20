@@ -80,8 +80,8 @@ julia_package_factory.addSteps([
         name="make release",
         command=["sh", "-c", util.Interpolate("%(prop:make_cmd)s -j%(prop:nthreads)s %(prop:flags)s %(prop:extra_make_flags)s release")],
         haltOnFailure = True,
-        # Fail out if 60 minutes have gone by with nothing printed to stdout
-        timeout=60*60,
+        # Fail out if 80 minutes have gone by with nothing printed to stdout
+        timeout=60*80,
         # Kill everything if the overall job has taken more than 10 hours
         maxTime=60*60*10,
         # Give the process 10 seconds to print out the current backtraces when being killed
