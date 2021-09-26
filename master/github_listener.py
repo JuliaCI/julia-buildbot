@@ -67,7 +67,7 @@ class JuliaGithubListener(GitHubEventHandler):
         head_msg = yield self._get_commit_msg(repo_full_name, head_sha)
 
         action = payload.get('action')
-        if action not in ('opened', 'reopened', 'synchronize'):
+        if action not in ('opened', 'synchronize'):
             log.msg("GitHub PR #{} {}, ignoring".format(number, action))
             return (changes, 'git')
 
