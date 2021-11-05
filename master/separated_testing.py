@@ -4,6 +4,7 @@
 ###############################################################################
 
 julia_testing_env = {
+    "CI": "true",
     "JULIA_TEST_MAXRSS_MB": util.Property('maxrss', default=None),
     "JULIA_TEST_NUM_CORES": util.Interpolate('%(prop:nthreads)s'),
     "OPENBLAS_NUM_THREADS": "8",
