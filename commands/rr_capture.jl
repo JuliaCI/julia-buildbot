@@ -3,7 +3,7 @@ if length(ARGS) < 3
     exit(2)
 end
 
-const TIMEOUT = 2*60*60 # seconds
+const TIMEOUT = 3*60*60 # seconds
 
 run_id = popfirst!(ARGS)
 shortcommit = popfirst!(ARGS)
