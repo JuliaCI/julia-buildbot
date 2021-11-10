@@ -225,6 +225,15 @@ for name in all_names:
 # the auto_reload builders and whatnot.
 all_names += ["tabularasa_" + x for x in all_names]
 
+# Add `all_names` as things that should have old builds cancelled for pushes
+# to branches, except for `master` and `release-*` branches
+c['services'] += [
+    OldBuildCanceller(
+        "build_canceller",
+        [(all_names, SourceStampFilter(branch_not_re=r"^(master|release-\d+\.\d+)$"))],
+    )
+]
+
 # Build a nicer mapping for us.  This is how we know things like "package_linux64"
 # runs on "linux-x86_64-nanosoldier2_1", for instance.
 namefilt = lambda arch, names: [n for n in names if arch in n]
