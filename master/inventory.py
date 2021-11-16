@@ -227,7 +227,7 @@ all_names += ["tabularasa_" + x for x in all_names]
 
 # Add `all_names` as things that should have old builds cancelled for pushes
 # to branches, except for `master` and `release-*` branches
-foo = [
+c['services'] += [
     OldBuildCanceller(
         "build_canceller",
         [(all_names, SourceStampFilter(branch_not_re=r"^(master|release-\d+\.\d+)$"))],
