@@ -227,10 +227,29 @@ all_names += ["tabularasa_" + x for x in all_names]
 
 # Add `all_names` as things that should have old builds cancelled for pushes
 # to branches, except for `master` and `release-*` branches
+builders_to_auto_cancel = [
+    "doctest_linux64",
+
+    "package_freebsd64",
+    "package_linux32",
+    "package_linux64",
+    "package_linuxaarch64",
+    "package_macos64",
+    "package_win32",
+    "package_win64",
+
+    "tester_freebsd64",
+    "tester_linux32",
+    "tester_linux64",
+    "tester_aarch64",
+    "tester_macos64",
+    "tester_win32",
+    "tester_win64",
+]
 c['services'] += [
     OldBuildCanceller(
         "build_canceller",
-        [(all_names, SourceStampFilter(branch_not_re=r"^(master|release-\d+\.\d+)$"))],
+        [(builders_to_auto_cancel, SourceStampFilter(branch_not_re=r"^(master|release-\d+\.\d+)$"))],
     )
 ]
 
