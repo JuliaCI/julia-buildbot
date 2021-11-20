@@ -225,8 +225,12 @@ for name in all_names:
 # the auto_reload builders and whatnot.
 all_names += ["tabularasa_" + x for x in all_names]
 
-# Add `all_names` as things that should have old builds cancelled for pushes
-# to branches, except for `master` and `release-*` branches
+# Add the `build_canceller` service, which automatically cancels old builds when
+# a new commit is pushed to a branch.
+# We apply the `build_canceller` service to the builders in the
+# `builders_to_auto_cancel` list.
+# We apply the `build_canceller` service to all branches except the `master`
+# and `release-*` branches.
 builders_to_auto_cancel = [
     "doctest_linux64",
 
