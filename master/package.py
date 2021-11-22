@@ -32,13 +32,6 @@ julia_package_factory.addSteps([
         value=util.Interpolate("%(prop:flags)s USE_BINARYBUILDER=%(prop:use_bb:#?:1:0)s"),
     ),
 
-    steps.SetProperty(
-        name="Unset BinaryBuilder for libuv",
-        property="flags",
-        value=util.Interpolate("%(prop:flags)s USE_BINARYBUILDER_LIBUV=0"),
-        doStepIf=is_freebsd,
-    ),
-
     # Recursive `git clean` on windows is very slow. It is faster to
     # wipe the dir and reset it. Important is that we don't delete our
     # `.git` folder.
@@ -88,7 +81,7 @@ julia_package_factory.addSteps([
         sigtermTime=10,
         env=julia_package_env,
     ),
-    
+
     # Check that the working directory is clean
     steps.ShellCommand(
         name="test that working directory is clean",
@@ -144,7 +137,7 @@ julia_package_factory.addSteps([
         doStepIf=is_windows,
         hideStepIf=lambda results, s: results==SKIPPED,
     ),
- 
+
     # Make binary-dist to package it up
     steps.ShellCommand(
         name="make binary-dist",
@@ -168,7 +161,7 @@ julia_package_factory.addSteps([
         hideStepIf=lambda results, s: results==SKIPPED,
         env=julia_package_env,
     ),
-    
+
     # Deploy tar2zip, convert tarball to zip and cleanup
     steps.FileDownload(
         name="Deploy tar2zip.py",
