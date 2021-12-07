@@ -245,7 +245,7 @@ builders_to_auto_cancel = [
     "tester_freebsd64",
     "tester_linux32",
     "tester_linux64",
-    "tester_aarch64",
+    "tester_linuxaarch64",
     "tester_macos64",
     "tester_win32",
     "tester_win64",
