@@ -25,7 +25,11 @@ else
     new_env = copy(ENV)
     mktempdir() do dir
         Pkg.activate(dir)
-        Pkg.add(Pkg.PackageSpec(name = "rr_jll", version = v"5.4.1"))
+        # Note: Pkg does not currently support build numbers. Therefore, if you provide a
+        # version number, Pkg will always install the latest build number. If you need to
+        # install a build number that is not the latest build number, you must provide the
+        # commit instead of providing the version number.
+        Pkg.add(Pkg.PackageSpec(name = "rr_jll", version = v"5.5.0"))
         Pkg.add("Zstd_jll")
 
         rr_jll = Base.require(Base.PkgId(Base.UUID((0xe86bdf43_55f7_5ea2_9fd0_e7daa2c0f2b4)), "rr_jll"))
