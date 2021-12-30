@@ -87,7 +87,7 @@ for name in all_names:
     elif name[:7] == "freebsd":
         os_name = "freebsd"
         os_pkg_ext = "tar.gz"
-        make_cmd = "gmake"   
+        make_cmd = "gmake"
     elif name[:4] == "musl":
         os_name = "musl"
         os_pkg_ext = "tar.gz"
