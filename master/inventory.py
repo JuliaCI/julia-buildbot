@@ -238,7 +238,11 @@ builders_to_auto_cancel = [
     "package_linux32",
     "package_linux64",
     "package_linuxaarch64",
+    "package_linuxarmv7l",
+    "package_linuxppc64le"
     "package_macos64",
+    "package_macosaarch64",
+    "package_musl64",
     "package_win32",
     "package_win64",
 
@@ -246,7 +250,11 @@ builders_to_auto_cancel = [
     "tester_linux32",
     "tester_linux64",
     "tester_linuxaarch64",
+    "tester_linuxarmv7l",
+    "tester_linuxppc64le",
     "tester_macos64",
+    "tester_macosaarch64",
+    "tester_musl64"
     "tester_win32",
     "tester_win64",
 ]
