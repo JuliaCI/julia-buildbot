@@ -25,7 +25,7 @@ else
     new_env = copy(ENV)
     mktempdir() do dir
         Pkg.activate(dir)
-        Pkg.add("rr_jll")
+        Pkg.add(Pkg.PackageSpec(name = "rr_jll", version = v"5.4.1"))
         Pkg.add("Zstd_jll")
 
         rr_jll = Base.require(Base.PkgId(Base.UUID((0xe86bdf43_55f7_5ea2_9fd0_e7daa2c0f2b4)), "rr_jll"))
