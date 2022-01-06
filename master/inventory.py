@@ -16,7 +16,7 @@ def build_names(platform, arch, name):
     return list(map(lambda x: '-'.join(x), itertools.product([platform], arch, name)))
 
 # Our windows machines are on AWS
-win_names      = build_names("win", ["x86_64", "i686"], ["aws_%d"%(idx) for idx in range(1,4)])
+win_names      = build_names("win", ["x86_64", "i686"], ["amdci6_%d"%(idx) for idx in range(1,4)])
 
 # Our linux (packaging) machines are typically centos, but we just call them `linux`,
 # to fit in with the other builders.  Some run on nanosoldier2 at MIT, some run at OSU,
@@ -27,7 +27,7 @@ linux_names    += build_names("linux", ["x86_64"], ["amdci6_%d"%(idx) for idx in
 linux_names    += build_names("linux", ["i686"], ["nanosoldier1_1"] + ["nanosoldier3_%d"%(idx) for idx in range(1,3)])
 linux_names    += build_names("linux", ["i686"], ["amdci6_%d"%(idx) for idx in range(1,4)])
 linux_names    += build_names("linux", ["ppc64le"], ["osu_%d"%(idx) for idx in range(1,4)])
-linux_names    += build_names("linux", ["aarch64"], ["aws_%d"%(idx) for idx in range(1,9)])
+linux_names    += build_names("linux", ["aarch64"], ["equinix_%d"%(idx) for idx in range(1,9)])
 linux_names    += build_names("linux", ["armv7l"], ["firefly_%d"%(idx) for idx in range(1,4)])
 linux_names    += build_names("linux", ["armv7l"], ["rock64_%d"%(idx) for idx in range(1,2)])
 musl_names      = build_names("musl", ["x86_64"], ["nureha_1"])
