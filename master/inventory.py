@@ -16,7 +16,7 @@ def build_names(platform, arch, name):
     return list(map(lambda x: '-'.join(x), itertools.product([platform], arch, name)))
 
 # Our windows machines are on AWS
-win_names      = build_names("win", ["x86_64", "i686"], ["aws_%d"%(idx) for idx in range(1,4)])
+win_names      = build_names("win", ["x86_64", "i686"], ["amdci6_%d"%(idx) for idx in range(1,4)])
 
 # Our linux (packaging) machines are typically centos, but we just call them `linux`,
 # to fit in with the other builders.  Some run on nanosoldier2 at MIT, some run at OSU,
