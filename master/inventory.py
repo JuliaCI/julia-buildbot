@@ -97,6 +97,9 @@ for name in all_names:
     else:
         os_name = "linux"
         os_pkg_ext = "tar.gz"
+        
+        # Reduce parallelism on nanosoldier a bit
+        nthreads = 4
 
     if os_name in ["win", "freebsd"]:
         # Organize the output to make it clearer later
