@@ -137,6 +137,17 @@ julia_package_factory.addSteps([
         doStepIf=is_windows,
         hideStepIf=lambda results, s: results==SKIPPED,
     ),
+    
+    # Unlock keychain before binary-dist, which uses keychain items now
+    steps.ShellCommand(
+        name="unlock keychain",
+        command=["sh", "-c", util.Interpolate("~/unlock_keychain.sh")],
+        haltOnFailure=True,
+        doStepIf=is_mac,
+        hideStepIf=lambda results, s: results==SKIPPED,
+        env=julia_package_env,
+    ),
+
 
     # Make binary-dist to package it up
     steps.ShellCommand(
@@ -155,7 +166,7 @@ julia_package_factory.addSteps([
     # Build .app on macOS
     steps.ShellCommand(
         name="make .app",
-        command=["sh", "-c", util.Interpolate("~/unlock_keychain.sh && make %(prop:flags)s %(prop:extra_make_flags)s app")],
+        command=["sh", "-c", util.Interpolate("make %(prop:flags)s %(prop:extra_make_flags)s app")],
         haltOnFailure=True,
         doStepIf=is_mac,
         hideStepIf=lambda results, s: results==SKIPPED,
