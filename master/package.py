@@ -140,7 +140,7 @@ julia_package_factory.addSteps([
     
     # Unlock keychain before binary-dist, which uses keychain items now
     steps.ShellCommand(
-        name="make .app",
+        name="unlock keychain",
         command=["sh", "-c", util.Interpolate("~/unlock_keychain.sh")],
         haltOnFailure=True,
         doStepIf=is_mac,
