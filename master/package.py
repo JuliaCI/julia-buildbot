@@ -290,7 +290,7 @@ def julia_branch_nonskip_filter(c):
 c['schedulers'].append(schedulers.AnyBranchScheduler(
     name="Julia CI (assert build)",
     change_filter=util.ChangeFilter(filter_fn=julia_branch_nonskip_filter),
-    builderNames=[k for k in packager_mapping.keys() if k not in ["linux64"]],
+    builderNames=[k for k in packager_mapping.keys() if k not in ["package_linux64"]],
     treeStableTimer=1,
     properties={
         "assert_build": True,
