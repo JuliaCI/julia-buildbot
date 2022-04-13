@@ -286,11 +286,26 @@ def julia_branch_filter(c):
 def julia_branch_nonskip_filter(c):
     return julia_branch_filter(c) and not c.properties.getProperty('has_skip', default=False)
 
+builders_to_disable = [
+    "package_linux64",
+    "tester_linux64",
+
+    "package_musl64",
+    "tester_musl64",
+
+    "package_macos64",
+    "tester_macos64",
+
+    "package_macosaarch64",
+    "tester_macosaarch64",
+]
+
 # This is the CI scheduler, where we build an assert build and test it
 c['schedulers'].append(schedulers.AnyBranchScheduler(
     name="Julia CI (assert build)",
     change_filter=util.ChangeFilter(filter_fn=julia_branch_nonskip_filter),
-    builderNames=[k for k in packager_mapping.keys() if k not in ["package_linux64", "package_macos64"]],
+    builderNames=[k for k in packager_mapping.keys() if k not in builders_to_disable],
+
     treeStableTimer=1,
     properties={
         "assert_build": True,
