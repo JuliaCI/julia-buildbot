@@ -165,12 +165,12 @@ julia_doctest_factory.addSteps([
     ),
 ])
 
-c['schedulers'].append(schedulers.AnyBranchScheduler(
-    name="Julia Doctesting and source upload",
-    change_filter=util.ChangeFilter(filter_fn=julia_branch_nonskip_filter),
-    builderNames=["doctest_linux64"],
-    treeStableTimer=1,
-))
+#c['schedulers'].append(schedulers.AnyBranchScheduler(
+#    name="Julia Doctesting and source upload",
+#    change_filter=util.ChangeFilter(filter_fn=julia_branch_nonskip_filter),
+#    builderNames=["doctest_linux64"],
+#    treeStableTimer=1,
+#))
 
 # Add workers for these jobs
 c['builders'].append(util.BuilderConfig(
