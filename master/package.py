@@ -290,6 +290,9 @@ builders_to_disable = [
     "package_linux64",
     "tester_linux64",
 
+    "package_linux32",
+    "tester_linux32",
+
     "package_linuxaarch64",
     "tester_linuxaarch64",
 
