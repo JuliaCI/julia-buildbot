@@ -324,7 +324,7 @@ c['schedulers'].append(schedulers.AnyBranchScheduler(
 # Add a dependent scheduler for non-assert after we build tarballs
 c['schedulers'].append(schedulers.Triggerable(
     name="Julia CI (non-assert build)",
-    builderNames=[k for k in packager_mapping.keys()],
+    builderNames=[k for k in packager_mapping.keys() if k not in builders_to_disable],
     properties={
         "assert_build": False,
 
