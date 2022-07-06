@@ -48,7 +48,7 @@ julia_package_factory.addSteps([
     # Clone julia
     steps.Git(
         name="Julia checkout",
-        repourl=util.Property('repository', default='git://github.com/JuliaLang/julia.git'),
+        repourl=util.Property('repository', default='https://github.com/JuliaLang/julia.git'),
         mode='full',
         method='fresh',
         submodules=True,
