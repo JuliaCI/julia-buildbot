@@ -304,12 +304,6 @@ builders_to_disable = [
 
     "package_macosaarch64",
     "tester_macosaarch64",
-    
-    "package_win64",
-    "tester_win64",
-
-    "package_win32",
-    "tester_win32",
 ]
 
 # This is the CI scheduler, where we build an assert build and test it
