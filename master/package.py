@@ -254,25 +254,25 @@ julia_package_factory.addSteps([
     ),
 
     # Trigger a download of this file onto another worker for testing
-    steps.Trigger(
-        schedulerNames=[render_tester_name],
-        set_properties={
-            'download_url': render_pretesting_download_url,
-            'majmin': util.Property('majmin'),
-            'assert_build': util.Property('assert_build'),
-            'upload_filename': util.Property('upload_filename'),
-            'upload_tarball_name': util.Property('upload_tarball_name'),
-            'upload_zip_name': util.Property('upload_zip_name'),
-            'commitmessage': util.Property('commitmessage'),
-            'commitname': util.Property('commitname'),
-            'commitemail': util.Property('commitemail'),
-            'authorname': util.Property('authorname'),
-            'authoremail': util.Property('authoremail'),
-            'shortcommit': util.Property('shortcommit'),
-            'scheduler': util.Property('scheduler'),
-        },
-        waitForFinish=False,
-    ),
+    # steps.Trigger(
+    #     schedulerNames=[render_tester_name],
+    #     set_properties={
+    #         'download_url': render_pretesting_download_url,
+    #         'majmin': util.Property('majmin'),
+    #         'assert_build': util.Property('assert_build'),
+    #         'upload_filename': util.Property('upload_filename'),
+    #         'upload_tarball_name': util.Property('upload_tarball_name'),
+    #         'upload_zip_name': util.Property('upload_zip_name'),
+    #         'commitmessage': util.Property('commitmessage'),
+    #         'commitname': util.Property('commitname'),
+    #         'commitemail': util.Property('commitemail'),
+    #         'authorname': util.Property('authorname'),
+    #         'authoremail': util.Property('authoremail'),
+    #         'shortcommit': util.Property('shortcommit'),
+    #         'scheduler': util.Property('scheduler'),
+    #     },
+    #     waitForFinish=False,
+    # ),
 ])
 
 # Build a builder-worker mapping based off of the parent mapping in inventory.py
