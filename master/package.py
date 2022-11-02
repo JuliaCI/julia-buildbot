@@ -314,7 +314,7 @@ c['schedulers'].append(schedulers.AnyBranchScheduler(
 
     treeStableTimer=1,
     properties={
-        "assert_build": True,
+        "assert_build": False,
 
         # Default to using BB
         'use_bb': True,
@@ -322,16 +322,16 @@ c['schedulers'].append(schedulers.AnyBranchScheduler(
 ))
 
 # Add a dependent scheduler for non-assert after we build tarballs
-c['schedulers'].append(schedulers.Triggerable(
-    name="Julia CI (non-assert build)",
-    builderNames=[k for k in packager_mapping.keys() if k not in builders_to_disable],
-    properties={
-        "assert_build": False,
+#c['schedulers'].append(schedulers.Triggerable(
+#    name="Julia CI (non-assert build)",
+#    builderNames=[k for k in packager_mapping.keys() if k not in builders_to_disable],
+#    properties={
+#        "assert_build": False,
 
-        # Default to using BB
-        'use_bb': True,
-    }
-))
+#        # Default to using BB
+#        'use_bb': True,
+#    }
+#))
 
 
 # Add workers for these jobs
