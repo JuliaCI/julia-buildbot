@@ -129,8 +129,12 @@ for name in all_names:
 
         cpu_targets = [
             'generic',
+            # macOS Rosetta 2 emulates this version of the architecture
+            'westmere,aes',
             'sandybridge,-xsaveopt,clone_all',
-            'haswell,-rdrnd,base(1)',
+            'haswell,-rdrnd,base(2)',
+            # A common baseline for modern Intel and AMD machines
+            'x86-64-v3,base(2)',
         ]
         flags += 'JULIA_CPU_TARGET="%s" '%(';'.join(cpu_targets))
 
@@ -177,13 +181,12 @@ for name in all_names:
             'cortex-a57',
             # Cavium ThunderX2T99, a common server architecture
             'thunderx2t99',
-            # Until we're on LLVM 11, 'carmel' as a CPU type doesn't exist, but we can
-            # cobble something together that is more or less equivalent:
-            #   https://github.com/llvm/llvm-project/commit/0863e94ebd87f4dea7a457c8441979ec4151fedb#diff-e7c1b2c4e39c03a58a53c9ae8e162886R183
-            # Note that we only use features defined within Julia itself here:
-            #   https://github.com/JuliaLang/julia/blob/adf6d521afd125f2de12a3209b342148d78981c2/src/features_aarch64.h
-            # Additionally, yichao asserts that `crc` is not needed.
-            'armv8.2-a,crypto,fullfp16,lse,rdm',
+            # Nvidia Carmel; also serves as a baseline for more modern architectures
+            'carmel,clone_all',
+            # Apple M1
+            'apple-m1,base(3)',
+            # Neoverse V1/V2/V3, vector-length-agnostic common denominator
+            'neoverse-512tvb,base(3)'
         ]
         flags += 'JULIA_CPU_TARGET="%s" '%(';'.join(cpu_targets))
 
