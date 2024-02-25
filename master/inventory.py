@@ -133,8 +133,8 @@ for name in all_names:
             'westmere,aes',
             'sandybridge,-xsaveopt,clone_all',
             'haswell,-rdrnd,base(2)',
-            # A common baseline for modern Intel and AMD machines
-            'x86-64-v3,base(2)',
+            # A common baseline for modern Intel and AMD server machines
+            'x86-64-v4,base(2)',
         ]
         flags += 'JULIA_CPU_TARGET="%s" '%(';'.join(cpu_targets))
 
