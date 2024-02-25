@@ -1,4 +1,4 @@
-julia-buildbot
+Archived
 ==============
 
-Buildbot configuration for [build.julialang.org](https://build.julialang.org)
+The julia buildbot configuration is now hosted at https://github.com/JuliaCI/julia-buildkite
